@@ -1,0 +1,28 @@
+plugins {
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'java-library'
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':jawisp:http')
+
+    implementation 'io.netty:netty-buffer:4.2.9.Final'
+    implementation 'io.netty:netty-codec:4.2.9.Final'
+    implementation 'io.netty:netty-codec-http:4.2.9.Final'
+    implementation 'io.netty:netty-common:4.2.9.Final'
+    implementation 'io.netty:netty-handler:4.2.9.Final'
+    implementation 'io.netty:netty-resolver:4.2.9.Final'
+    implementation 'io.netty:netty-transport:4.2.9.Final'
+    // Optional Linux perf boost
+    implementation 'io.netty:netty-transport-native-epoll:4.2.9.Final:linux-x86_64'
+
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    
+    // This dependency is used by the application.
+    // implementation libs.guava
+}
