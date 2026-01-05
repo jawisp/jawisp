@@ -223,7 +223,30 @@ public final class ReflectConfigBuilder {
                 out.println("    \"allPublicConstructors\": true,");
                 out.println("    \"allDeclaredMethods\": true,");
                 out.println("    \"allPublicMethods\": true,");
-                out.println("    \"allPrivateMethods\": true");
+                out.print("    \"allPrivateMethods\": true");
+                
+                // Add fields section if the class has non-static fields
+                Field[] fields = clazz.getDeclaredFields();
+                List<Field> nonStaticFields = new ArrayList<>();
+                for (Field field : fields) {
+                    if (!Modifier.isStatic(field.getModifiers())) {
+                        nonStaticFields.add(field);
+                    }
+                }
+                
+                if (!nonStaticFields.isEmpty()) {
+                    out.println(",\n    \"fields\": [");
+                    for (int j = 0; j < nonStaticFields.size(); j++) {
+                        Field field = nonStaticFields.get(j);
+                        out.println("      {");
+                        out.println("        \"name\": \"" + escapeJson(field.getName()) + "\"");
+                        out.println(j < nonStaticFields.size() - 1 ? "      }," : "      }");
+                    }
+                    out.println("    ]");
+                } else {
+                    out.println("");
+                }
+                
                 out.println(i < sorted.size() - 1 ? "  }," : "  }");
             }
             out.println("]");

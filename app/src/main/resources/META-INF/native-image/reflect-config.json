@@ -13,6 +13,19 @@
     "allPublicConstructors": true,
     "allDeclaredMethods": true,
     "allPublicMethods": true,
+    "allPrivateMethods": true,
+    "fields": [
+      {
+        "name": "homeService"
+      }
+    ]
+  },
+  {
+    "name": "io.jawisp.example.service.HomeService",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
     "allPrivateMethods": true
   }
 ]
