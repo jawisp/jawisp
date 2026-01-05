@@ -10,3 +10,6 @@ dev:
 clean:
 	./gradlew clean
 	rm -rf build
+
+nativeRun:
+	./gradlew nativeRun

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.jawisp.core.annotation.Application;
+// import io.jawisp.core.graal.ReflectConfigBuilder;
 
 public class ReflectionConfigParser {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionConfigParser.class);
@@ -20,10 +21,26 @@ public class ReflectionConfigParser {
     public List<ReflectionEntry> getReflectionEntries() {
         var entries = new ArrayList<ReflectionEntry>();
 
+        // try {
+        //     String className = findMainClassName();
+        //     System.out.println("XAX " + className);
+        //     // List<String> appClasses = List.of("io.jawisp.example");
+        //     Class<?> appClass = Class.forName(className);
+        //     if (appClass.isAnnotationPresent(Application.class)) {
+        //         System.out.println("XAXAXAXAX !!!!");
+        //     }
+        // } catch (Exception e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
+
         Class<?> mainClass = ClassFinder.findClassByAnnotation(Application.class);
-        if (mainClass == null) {
-            throw new RuntimeErrorException(new Error("Cannot find main class of the application"));
-        }
+        // if (mainClass == null) {
+        //     throw new RuntimeErrorException(new Error("Cannot find main class of the application"));
+        // }
+
+        // Path nativeImageDir = Path.of("build", "resources", "main", "META-INF", "native-image", "reflect-config.json");
+        // new ReflectConfigBuilder().buildFrom(createMainClassInstance(mainClass), nativeImageDir);
 
         String json = readJsonFile(mainClass);
         if (json == null || !isValidJsonArray(json)) {
@@ -37,6 +54,40 @@ public class ReflectionConfigParser {
         }
 
         return parseEntries(content);
+    }
+
+    public static String findMainClassName() {
+        Exception e = new Exception();
+        StackTraceElement[] stack = e.getStackTrace();
+
+        // Skip current frame (this method) - start from index 1
+        for (int i = 1; i < stack.length; i++) {
+            StackTraceElement el = stack[i];
+
+            // Find "main" method invocation
+            if ("main".equals(el.getMethodName())) {
+                String className = el.getClassName();
+                System.out.println("Found main() caller: " + el.getClassName());
+
+                // In native, often the direct main class shows as first "main" frame
+                // with no line number or simple name pattern
+                // if (i == 1 || className.endsWith("Application") || className.endsWith("Main")) {
+                    return className; // ← Return String instead of Class
+                // }
+            }
+        }
+        return null;
+    }
+
+    public Object createMainClassInstance(Class<?> mainClass) {
+        if (mainClass == null) {
+            throw new RuntimeErrorException(new Error("Cannot find main class of the application"));
+        }
+        try {
+            return mainClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeErrorException(new Error("Cannot create instance of main class: " + e.getMessage()));
+        }
     }
 
     private String readJsonFile(Class<?> mainClass) {

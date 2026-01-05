@@ -10,7 +10,6 @@ repositories {
 
 dependencies {
     implementation project(':jawisp:core')
-    implementation project(':jawisp:graal')
     implementation project(':jawisp:http-netty')
     
     implementation 'org.slf4j:slf4j-api:2.0.17'
@@ -35,15 +34,23 @@ testing {
     }
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
-application {
-    // Define the main class for the application.
-    mainClass = 'io.jawisp.example.App'
+task generateReflectConfig(type: JavaExec) {
+    group = 'build'
+    description = 'Generate GraalVM reflect-config.json'
+    classpath = sourceSets.main.compileClasspath
+    mainClass = 'io.jawisp.core.inject.AnnotationAnalyzer'
 }
 
+tasks.named('compileJava') {
+    dependsOn generateReflectConfig
+}
+
+application {
+    mainClass = 'io.jawisp.example.App'
+}

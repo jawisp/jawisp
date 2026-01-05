@@ -26,6 +26,11 @@ public class RouteHandler {
         parsePathAndCreatePattern(path);
     }
 
+    public RouteHandler(Object controller, Method method, HttpMethod httpMethod, String path, boolean isAnonymous) {
+        this(controller, method, httpMethod, path); // Delegate to first constructor
+        this.isAnonymous = isAnonymous;
+    }
+
     public RouteHandler(Object controller, Method method, HttpMethod httpMethod, String path, boolean isAnonymous, String view) {
         this(controller, method, httpMethod, path); // Delegate to first constructor
         this.isAnonymous = isAnonymous;

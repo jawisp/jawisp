@@ -3,6 +3,7 @@ package io.jawisp.http;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -25,12 +26,22 @@ public class HttpHandler implements Handler {
         RouteHandler handler = findMatchingRoute(req.method, req.path);
         if (handler != null) {
             Map<String, Object> pathParams = new HashMap<>();
-            try {
-                var result = callControllerMethod(handler, pathParams);
-                res.body = String.valueOf(result).getBytes();
-            } catch (Exception e) {
-                // Handle errors
-                logger.debug("Request error: {}, {}, method: {}", e.getLocalizedMessage(), req.path, req.method);
+            Matcher matcher = handler.pattern.matcher((req.path));
+
+            if (matcher.matches()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("{} reguest {}", req.method, req.path);
+                }
+                // validate secure access
+                // validateForSecureAccess(exchange, handler.isAnonymous);
+
+                try {
+                    var result = callControllerMethod(handler, pathParams);
+                    res.body = String.valueOf(result).getBytes();
+                } catch (Exception e) {
+                    // Handle errors
+                    logger.debug("Request error: {}, {}, method: {}", e.getLocalizedMessage(), req.path, req.method);
+                }
             }
         }
     }
@@ -67,5 +78,14 @@ public class HttpHandler implements Handler {
         handler.method.setAccessible(true);
         return handler.method.invoke(handler.controller, params);
     }
+
+    // private void validateForSecureAccess(HttpExchange exchange, boolean isAnonymous) {
+    //     if (!isAnonymous) {
+    //         var userSession = SessionManager.readUserSession(exchange);
+    //         if (!userSession.isPresent()) {
+    //             HttpUtils.redirectTo(exchange, "/login");
+    //         }
+    //     }
+    // }
 
 }

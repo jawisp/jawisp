@@ -1,21 +1,29 @@
 package io.jawisp.core.inject;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jawisp.core.Jawisp;
 import io.jawisp.core.annotation.Controller;
+import io.jawisp.core.annotation.Inject;
 import io.jawisp.core.annotation.Route;
-// import io.jawisp.core.annotation.Secured;
-// import io.jawisp.core.annotation.Secured.SecurityRule;
+import io.jawisp.core.annotation.Service;
+import io.jawisp.core.annotation.Secured;
+import io.jawisp.core.annotation.Secured.SecurityRule;
 import io.jawisp.http.HttpMethod;
 import io.jawisp.http.RouteHandler;
 
 public class DependencyInjector {
     private static final Logger logger = LoggerFactory.getLogger(DependencyInjector.class);
+
+    private final Map<String, Object> services = new HashMap<>();
     private final List<ReflectionEntry> reflectionEntries;
     private final List<RouteHandler> routeHandlers = new ArrayList<>();
 
@@ -23,7 +31,38 @@ public class DependencyInjector {
         ReflectionConfigParser parser = new ReflectionConfigParser();
         this.reflectionEntries = parser.getReflectionEntries();
 
+        // Phase 1: Instantiate Services
+        instantiateServices();
+        // Phase 2: Inject dependencies into Services
+        injectServiceDependencies();
+        // Phase 3: Instantiate Controllers
         registerControllers();
+    }
+
+    private void instantiateServices() {
+        for (var entry : reflectionEntries) {
+            try {
+                Class<?> clazz = Class.forName(entry.name());
+                if (clazz.isAnnotationPresent(Service.class)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Registering service: {}", clazz.getName());
+                    }
+                    services.put(clazz.getName(), clazz.getDeclaredConstructor().newInstance());
+                }
+            } catch (Exception e) {
+                logger.error("Failed to instantiate service: {}, {}", entry.name(), e);
+            }
+        }
+    }
+
+    private void injectServiceDependencies() {
+        for (Object service : services.values()) {
+            try {
+                injectDependencies(service, service.getClass());
+            } catch (Exception e) {
+                logger.error("Failed to inject dependencies for service: {0}, {0}", service.getClass().getName(), e);
+            }
+        }
     }
 
     private void registerControllers() {
@@ -35,11 +74,27 @@ public class DependencyInjector {
                         logger.debug("Registering controller: {}", clazz.getName());
                     }
                     Object controller = clazz.getDeclaredConstructor().newInstance();
-                    // injectDependencies(controller, clazz);
+                    injectDependencies(controller, clazz);
                     registerRoutes(controller);
                 }
             } catch (Exception e) {
                 logger.error("Failed to instantiate controller: {}, {}", entry.name(), e);
+            }
+        }
+    }
+
+    private void injectDependencies(Object instance, Class<?> clazz) throws IllegalAccessException {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Inject.class)) {
+                field.setAccessible(true);
+                var fieldName = field.getType().getName();
+                Object serviceInstance = services.get(fieldName);
+                if (serviceInstance != null) {
+                    field.set(instance, serviceInstance);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Injected service: {}", fieldName);
+                    }
+                }
             }
         }
     }
@@ -76,20 +131,20 @@ public class DependencyInjector {
                         httpMethod.name(), fullPath, controllerClass.getSimpleName(), method.getName());
 
                 // Security rule to determine access control
-                // boolean isAnonymous = true;
-                // if (method.isAnnotationPresent(Secured.class)) {
-                //     Secured secured = method.getAnnotation(Secured.class);
-                //     if (secured.securityRule() == SecurityRule.IS_AUTHENTICATED) {
-                //         isAnonymous = false;
-                //     }
-                // }
+                boolean isAnonymous = true;
+                if (method.isAnnotationPresent(Secured.class)) {
+                    Secured secured = method.getAnnotation(Secured.class);
+                    if (secured.securityRule() == SecurityRule.IS_AUTHENTICATED) {
+                        isAnonymous = false;
+                    }
+                }
 
                 // String view = "";
                 // if (method.isAnnotationPresent(View.class)) {
                 //     view = method.getAnnotation(View.class).value();
                 // }
 
-                routeHandlers.add(new RouteHandler(controller, method, httpMethod, fullPath));
+                routeHandlers.add(new RouteHandler(controller, method, httpMethod, fullPath, isAnonymous));
             }
         }
     }
