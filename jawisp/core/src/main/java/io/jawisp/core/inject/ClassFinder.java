@@ -55,12 +55,7 @@ public class ClassFinder {
         for (int i = stack.length - 1; i >= 0; i--) {
             try {
                 String className = stack[i].getClassName();
-                // System.out.println("Class name :" + className);
-                // System.out.println("Clazz name :" + stack[i]);
                 Class<?> clazz = Class.forName(className);
-                // System.out.println("Clazz :" + clazz.getCanonicalName());
-                // System.out.println("Is annotated: " + clazz.isAnnotationPresent(annotationClass));
-
                 if (clazz.isAnnotationPresent(annotationClass)) {
                     return clazz;
                 }

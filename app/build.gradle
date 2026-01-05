@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     implementation project(':jawisp:core')
+    implementation project(':jawisp:graal')
     implementation project(':jawisp:http-netty')
     
     implementation 'org.slf4j:slf4j-api:2.0.17'

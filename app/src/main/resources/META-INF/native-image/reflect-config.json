@@ -1,5 +1,18 @@
 [
-    {
-        "name": "io.jawisp.example.controller.HomeController"
-    }
+  {
+    "name": "io.jawisp.example.App",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allPrivateMethods": true
+  },
+  {
+    "name": "io.jawisp.example.controller.HomeController",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allPrivateMethods": true
+  }
 ]

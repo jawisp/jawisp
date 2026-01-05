@@ -7,25 +7,28 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.jawisp.core.annotation.Application;
-// import com.reftch.server.http.ReflectionEntry;
 
 public class ReflectionConfigParser {
-
     private static final Logger logger = LoggerFactory.getLogger(ReflectionConfigParser.class);
 
     public List<ReflectionEntry> getReflectionEntries() {
         var entries = new ArrayList<ReflectionEntry>();
 
         Class<?> mainClass = ClassFinder.findClassByAnnotation(Application.class);
-        String json = readJsonFile(mainClass);
+        if (mainClass == null) {
+            throw new RuntimeErrorException(new Error("Cannot find main class of the application"));
+        }
 
+        String json = readJsonFile(mainClass);
         if (json == null || !isValidJsonArray(json)) {
             logger.info("Invalid JSON format or empty file");
-            return entries;
+            throw new RuntimeErrorException(new Error("Invalid JSON format or empty file"));
         }
 
         String content = removeOuterBrackets(json);
