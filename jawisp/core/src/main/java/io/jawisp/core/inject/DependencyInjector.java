@@ -10,13 +10,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jawisp.core.Jawisp;
 import io.jawisp.core.annotation.Controller;
 import io.jawisp.core.annotation.Inject;
 import io.jawisp.core.annotation.Route;
-import io.jawisp.core.annotation.Service;
 import io.jawisp.core.annotation.Secured;
 import io.jawisp.core.annotation.Secured.SecurityRule;
+import io.jawisp.core.annotation.Service;
 import io.jawisp.http.HttpMethod;
 import io.jawisp.http.RouteHandler;
 
