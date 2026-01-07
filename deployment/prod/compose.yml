@@ -1,0 +1,17 @@
+name: jawisp
+
+services:
+  
+  app:
+    env_file: ./.env
+    image: jawisp-app:1.0.0
+    ports:
+      - 8080:8081
+    build:
+      context: ../..
+      dockerfile: ./deployment/prod/dockerfile-graalvm
+    networks:
+      - jawisp_network
+      
+networks:
+  jawisp_network:

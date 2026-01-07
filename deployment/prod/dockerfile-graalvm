@@ -1,0 +1,35 @@
+FROM ghcr.io/graalvm/native-image-community:25-ol9 AS build-stage
+
+RUN microdnf install -y --setopt=install_weak_deps=0 --nodocs findutils \
+    && microdnf clean all
+
+# Now your existing layers work
+ARG WORKDIR=/app
+WORKDIR /app
+
+# App
+COPY app ./app
+COPY jawisp ./jawisp
+
+# Gradle wrapper
+COPY gradlew ./gradlew
+COPY gradle ./gradle
+COPY gradle.properties ./gradle.properties
+COPY settings.gradle ./settings.gradle
+
+RUN ./gradlew nativeCompile
+
+# ENTRYPOINT ["/bin/sh", "-c", "exec /bin/tail -f /dev/null"]
+
+# -------- Stage 2: Running application ----------
+FROM alpine:3 AS release-stage
+# Install the `gcompat` package in your Alpine Dockerfile to provide a compatibility layer for `glibc` binaries.
+RUN apk add --no-cache gcompat
+
+# Copy artifact
+COPY --from=build-stage /app/app/build/native/nativeCompile/app /app
+# Set the timezone to Berlin
+ENV TZ=Europe/Berlin
+
+# Run the application
+ENTRYPOINT ["/app"]

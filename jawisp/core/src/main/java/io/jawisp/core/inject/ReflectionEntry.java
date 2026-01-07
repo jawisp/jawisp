@@ -13,7 +13,6 @@ public record ReflectionEntry(
         boolean allPublicConstructors,
         boolean allDeclaredMethods,
         boolean allPublicMethods,
-        boolean allPrivateMethods,
         List<Field> fields) {
     
     /**

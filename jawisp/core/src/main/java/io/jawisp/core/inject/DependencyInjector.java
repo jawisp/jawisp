@@ -126,7 +126,7 @@ public class DependencyInjector {
                     path = "/" + path;
                 }
                 String fullPath = basePath + path;
-                logger.info("Registering route: {} {} -> {}.{}()",
+                logger.info("{} {} -> {}.{}()",
                         httpMethod.name(), fullPath, controllerClass.getSimpleName(), method.getName());
 
                 // Security rule to determine access control

@@ -49,4 +49,12 @@ public interface Server {
                 .map(p -> p.get().create(handler))
                 .orElseThrow(() -> new IllegalArgumentException("No " + impl));
     }
+
+    static Server create(Handler handler) {
+        return ServiceLoader.load(ServerFactory.class)
+                .stream()
+                .findFirst()
+                .map(p -> p.get().create(handler))
+                .orElseThrow(() -> new IllegalArgumentException("No servers, please add server as a dependency"));
+    }
 }

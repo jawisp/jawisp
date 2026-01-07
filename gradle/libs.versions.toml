@@ -5,8 +5,12 @@
 guava = "33.4.6-jre"
 junit-jupiter = "5.12.1"
 slf4j-api = "2.0.17"
+pebble = "4.1.0"
+logback-classic = "1.5.23"
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j-api" }
+pebble = { module = "io.pebbletemplates:pebble", version.ref = "pebble" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic" }
