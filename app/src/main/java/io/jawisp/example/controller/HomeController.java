@@ -2,10 +2,13 @@ package io.jawisp.example.controller;
 
 import io.jawisp.core.annotation.Controller;
 import io.jawisp.core.annotation.Inject;
-import io.jawisp.core.annotation.Route;
 import io.jawisp.core.annotation.Secured;
 import io.jawisp.core.annotation.Secured.SecurityRule;
+import io.jawisp.http.MediaType;
+import io.jawisp.example.model.User;
 import io.jawisp.example.service.HomeService;
+import io.jawisp.http.annotation.Produces;
+import io.jawisp.http.annotation.Route;
 
 @Controller(basePath = "/")
 public class HomeController {
@@ -19,9 +22,17 @@ public class HomeController {
         return homeService.getHome();
     }
 
+    @Route(method = "GET", path = "/page")
+    @Secured(securityRule = SecurityRule.IS_AUTHENTICATED)
+    @Produces(MediaType.TEXT_HTML)
+    public String getPage() {
+        return homeService.getPage();
+    }
+
     @Route(method = "GET", path = "/api")
-    public String getApi() {
-        return "This is API";
+    @Produces(MediaType.APPLICATION_JSON)
+    public User getApi() {
+        return homeService.getUser(); 
     }
     
 }

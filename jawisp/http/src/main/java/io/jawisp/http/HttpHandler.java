@@ -9,13 +9,17 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
+import io.jawisp.http.utilities.JsonSerializer;
 
 public class HttpHandler implements Handler {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
     private final List<RouteHandler> routeHandlers;
+    private ObjectMapper mapper = new ObjectMapper();
 
     public HttpHandler(List<RouteHandler> routeHandlers) {
         this.routeHandlers = routeHandlers;
@@ -37,7 +41,20 @@ public class HttpHandler implements Handler {
 
                 try {
                     var result = callControllerMethod(handler, pathParams);
-                    res.body = String.valueOf(result).getBytes();
+                    if (result != null) {
+                        var produces = handler.getProduces();
+                        res.contentType =  produces.getName();                
+                        switch (produces) {
+                            case APPLICATION_JSON:
+                                // var content = JsonSerializer.writeValueAsString(result);
+                                var content = mapper.writeValueAsString(result);
+                                res.body = String.valueOf(content).getBytes();
+                                break;
+                            default:
+                                res.body = String.valueOf(result).getBytes();
+                                break;
+                        }
+                    }
                 } catch (Exception e) {
                     // Handle errors
                     logger.debug("Request error: {}, {}, method: {}", e.getLocalizedMessage(), req.path, req.method);

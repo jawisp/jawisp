@@ -101,7 +101,6 @@ public class HttpRequestProcessor extends SimpleChannelInboundHandler<FullHttpRe
                 HttpResponseStatus.valueOf(res.status), Unpooled.copiedBuffer(res.body));
 
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, res.contentType);
-        // response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
 
         res.headers.forEach((k, v) -> response.headers().set(k, v));

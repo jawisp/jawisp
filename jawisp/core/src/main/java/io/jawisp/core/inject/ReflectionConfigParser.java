@@ -120,8 +120,6 @@ public class ReflectionConfigParser {
             return null;
 
         boolean allDeclaredConstructors = parseBoolean(obj, "\"allDeclaredConstructors\"");
-        boolean allPublicConstructors = parseBoolean(obj, "\"allPublicConstructors\"");
-        boolean allDeclaredMethods = parseBoolean(obj, "\"allDeclaredMethods\"");
         boolean allPublicMethods = parseBoolean(obj, "\"allPublicMethods\"");
 
         List<ReflectionEntry.Field> fields = new ArrayList<>();
@@ -138,8 +136,7 @@ public class ReflectionConfigParser {
             }
         }
 
-        return new ReflectionEntry(name, allDeclaredConstructors, allPublicConstructors,
-                allDeclaredMethods, allPublicMethods, fields);
+        return new ReflectionEntry(name, allDeclaredConstructors, allPublicMethods, fields);
     }
 
     // Helper methods

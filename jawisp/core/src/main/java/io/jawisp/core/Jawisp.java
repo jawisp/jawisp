@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.jawisp.core.config.ConfigurationService;
-import io.jawisp.core.inject.DependencyInjector;
 import io.jawisp.http.HttpHandler;
-import io.jawisp.http.Server;;
+import io.jawisp.http.Server;
+import io.jawisp.core.inject.DependencyInjector;
 
 public class Jawisp {
 

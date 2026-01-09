@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.swing.text.html.parser.Entity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +28,8 @@ public class ReflectConfigGenerator {
     static final Set<String> TARGET_ANNOTATIONS = Set.of(
             Application.class.getSimpleName(),
             Controller.class.getSimpleName(),
-            Service.class.getSimpleName());
+            Service.class.getSimpleName(),
+            Entity.class.getSimpleName());
 
     public static void main() throws IOException {
         ResourceConfigGenerator.run();
@@ -84,9 +87,12 @@ public class ReflectConfigGenerator {
     }
 
     static String extractClassName(String content, String packageName) {
-        var m = Pattern.compile("public\\s+class\\s+(\\w+)", Pattern.CASE_INSENSITIVE).matcher(content);
+        var pattern = Pattern.compile(
+                "^\\s*(public\\s+)?(class|record|enum|interface)\\s+(\\w+)",
+                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+        var m = pattern.matcher(content);
         if (m.find()) {
-            var simpleName = m.group(1);
+            var simpleName = m.group(3);
             return packageName.isEmpty() ? simpleName : packageName + "." + simpleName;
         }
         return null;
@@ -142,8 +148,6 @@ public class ReflectConfigGenerator {
                 writer.printf("  {\n");
                 writer.printf("    \"name\": \"%s\",\n", cfg.name);
                 writer.printf("    \"allDeclaredConstructors\": true,\n");
-                writer.printf("    \"allPublicConstructors\": true,\n");
-                writer.printf("    \"allDeclaredMethods\": true,\n");
                 writer.printf("    \"allPublicMethods\": true");
 
                 if (!cfg.injectFields.isEmpty()) {

@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import io.jawisp.core.annotation.Controller;
 import io.jawisp.core.annotation.Inject;
-import io.jawisp.core.annotation.Route;
-import io.jawisp.core.annotation.Secured;
-import io.jawisp.core.annotation.Secured.SecurityRule;
 import io.jawisp.core.annotation.Service;
 import io.jawisp.http.HttpMethod;
+import io.jawisp.http.MediaType;
 import io.jawisp.http.RouteHandler;
+import io.jawisp.http.annotation.Produces;
+import io.jawisp.http.annotation.Route;
 
 public class DependencyInjector {
     private static final Logger logger = LoggerFactory.getLogger(DependencyInjector.class);
@@ -130,20 +130,17 @@ public class DependencyInjector {
                         httpMethod.name(), fullPath, controllerClass.getSimpleName(), method.getName());
 
                 // Security rule to determine access control
-                boolean isAnonymous = true;
-                if (method.isAnnotationPresent(Secured.class)) {
-                    Secured secured = method.getAnnotation(Secured.class);
-                    if (secured.securityRule() == SecurityRule.IS_AUTHENTICATED) {
-                        isAnonymous = false;
-                    }
-                }
-
-                // String view = "";
-                // if (method.isAnnotationPresent(View.class)) {
-                //     view = method.getAnnotation(View.class).value();
+                // var rule = SecurityRule.IS_ANONYMOUS;
+                // if (method.isAnnotationPresent(Secured.class)) {
+                //     rule = method.getAnnotation(Secured.class).securityRule();
                 // }
 
-                routeHandlers.add(new RouteHandler(controller, method, httpMethod, fullPath, isAnonymous));
+                MediaType produces = MediaType.TEXT_PLAIN;
+                if (method.isAnnotationPresent(Produces.class)) {
+                    produces = method.getAnnotation(Produces.class).value();
+                }
+
+                routeHandlers.add(new RouteHandler(controller, method, httpMethod, fullPath, produces));
             }
         }
     }

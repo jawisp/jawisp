@@ -25,7 +25,7 @@ public interface Server {
     
     class Response {
         public final int status;
-        public final String contentType;
+        public String contentType;
         public byte[] body;
         public final Map<String, String> headers;
         

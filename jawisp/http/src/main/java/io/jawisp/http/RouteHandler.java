@@ -13,28 +13,17 @@ public class RouteHandler {
     String path;
     Pattern pattern;
     List<String> pathParams = new ArrayList<>();
-    boolean isAnonymous = true;
-    String view;
+    MediaType produces;
 
-    public RouteHandler(Object controller, Method method, HttpMethod httpMethod, String path) {
+    public RouteHandler(Object controller, Method method, HttpMethod httpMethod, String path, MediaType produces) {
         this.controller = controller;
         this.method = method;
         this.httpMethod = httpMethod;
         this.path = path;
+        this.produces = produces;
 
         // Parse path for parameters and create proper regex pattern
         parsePathAndCreatePattern(path);
-    }
-
-    public RouteHandler(Object controller, Method method, HttpMethod httpMethod, String path, boolean isAnonymous) {
-        this(controller, method, httpMethod, path); // Delegate to first constructor
-        this.isAnonymous = isAnonymous;
-    }
-
-    public RouteHandler(Object controller, Method method, HttpMethod httpMethod, String path, boolean isAnonymous, String view) {
-        this(controller, method, httpMethod, path); // Delegate to first constructor
-        this.isAnonymous = isAnonymous;
-        this.view = view;
     }
 
     private void parsePathAndCreatePattern(String path) {
@@ -78,5 +67,9 @@ public class RouteHandler {
 
     public String getPath() {
         return path;
+    }
+
+    public MediaType getProduces() {
+        return produces;
     }
 }

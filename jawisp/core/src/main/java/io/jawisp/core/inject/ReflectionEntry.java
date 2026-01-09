@@ -10,8 +10,6 @@ import java.util.List;
 public record ReflectionEntry(
         String name,
         boolean allDeclaredConstructors,
-        boolean allPublicConstructors,
-        boolean allDeclaredMethods,
         boolean allPublicMethods,
         List<Field> fields) {
     
