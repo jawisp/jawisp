@@ -7,13 +7,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RouteHandler {
-    Object controller;
-    Method method;
-    HttpMethod httpMethod;
-    String path;
+    private final Object controller;
+    private final Method method;
+    private final HttpMethod httpMethod;
+    private final String path;
+    private final List<String> pathParams;
+    private final MediaType produces;
     Pattern pattern;
-    List<String> pathParams = new ArrayList<>();
-    MediaType produces;
 
     public RouteHandler(Object controller, Method method, HttpMethod httpMethod, String path, MediaType produces) {
         this.controller = controller;
@@ -21,6 +21,7 @@ public class RouteHandler {
         this.httpMethod = httpMethod;
         this.path = path;
         this.produces = produces;
+        this.pathParams = new ArrayList<>();
 
         // Parse path for parameters and create proper regex pattern
         parsePathAndCreatePattern(path);
@@ -28,22 +29,19 @@ public class RouteHandler {
 
     private void parsePathAndCreatePattern(String path) {
         // Find all parameter placeholders like {id}
-        List<String> params = new ArrayList<>();
         Pattern paramPattern = Pattern.compile("\\{([^}]+)\\}");
         Matcher matcher = paramPattern.matcher(path);
 
         while (matcher.find()) {
-            params.add(matcher.group(1));
+            this.pathParams.add(matcher.group(1));
         }
 
-        this.pathParams = params;
 
-        // Escape special regex characters except for curly braces {} so placeholders
-        // remain intact
+        // Escape special regex characters except for curly braces {} so placeholders remain intact
         String regex = path.replaceAll("([\\\\.$|()\\[\\]^+*?])", "\\\\$1");
 
         // Replace {param} with capturing groups
-        for (String param : params) {
+        for (String param : this.pathParams) {
             regex = regex.replace("{" + param + "}", "([^/]+)");
         }
 

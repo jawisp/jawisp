@@ -10,7 +10,8 @@ repositories {
 
 dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.1'
-    implementation 'org.slf4j:slf4j-api:2.0.17'
+    
+    implementation libs.slf4j.api
     
     // This dependency is used by the application.
     // implementation libs.guava

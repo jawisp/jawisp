@@ -13,13 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
-import io.jawisp.http.utilities.JsonSerializer;
 
 public class HttpHandler implements Handler {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
+    
     private final List<RouteHandler> routeHandlers;
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public HttpHandler(List<RouteHandler> routeHandlers) {
         this.routeHandlers = routeHandlers;
@@ -43,10 +43,9 @@ public class HttpHandler implements Handler {
                     var result = callControllerMethod(handler, pathParams);
                     if (result != null) {
                         var produces = handler.getProduces();
-                        res.contentType =  produces.getName();                
+                        res.contentType =  produces.getMediaType();                
                         switch (produces) {
                             case APPLICATION_JSON:
-                                // var content = JsonSerializer.writeValueAsString(result);
                                 var content = mapper.writeValueAsString(result);
                                 res.body = String.valueOf(content).getBytes();
                                 break;
@@ -65,7 +64,7 @@ public class HttpHandler implements Handler {
 
     private RouteHandler findMatchingRoute(String method, String path) {
         for (RouteHandler handler : routeHandlers) {
-            if (handler.httpMethod.name().equals(method) && matchesPath(handler.path, path)) {
+            if (handler.getHttpMethod().name().equals(method) && matchesPath(handler.getPath(), path)) {
                 return handler;
             }
         }
@@ -81,9 +80,10 @@ public class HttpHandler implements Handler {
     }
 
     private Object callControllerMethod(RouteHandler handler, Map<String, Object> pathParams) throws Exception {
-        Object[] params = new Object[handler.method.getParameterCount()];
+        var method = handler.getMethod();
+        Object[] params = new Object[method.getParameterCount()];
 
-        Class<?>[] paramTypes = handler.method.getParameterTypes();
+        Class<?>[] paramTypes = method.getParameterTypes();
         for (int i = 0; i < paramTypes.length; i++) {
             if (paramTypes[i] == Map.class) {
                 params[i] = pathParams;
@@ -92,8 +92,9 @@ public class HttpHandler implements Handler {
             }
         }
 
-        handler.method.setAccessible(true);
-        return handler.method.invoke(handler.controller, params);
+       
+        method.setAccessible(true);
+        return method.invoke(handler.getController(), params);
     }
 
     // private void validateForSecureAccess(HttpExchange exchange, boolean isAnonymous) {

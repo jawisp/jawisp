@@ -21,7 +21,7 @@ dependencies {
     // Optional Linux perf boost
     implementation 'io.netty:netty-transport-native-epoll:4.2.9.Final:linux-x86_64'
 
-    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation libs.slf4j.api
     
     // This dependency is used by the application.
     // implementation libs.guava

@@ -88,11 +88,11 @@ public class ReflectConfigGenerator {
 
     static String extractClassName(String content, String packageName) {
         var pattern = Pattern.compile(
-                "^\\s*(public\\s+)?(class|record|enum|interface)\\s+(\\w+)",
+                "^\\s*public\\s+(class|record|enum|interface)\\s+(\\w+)",
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
         var m = pattern.matcher(content);
         if (m.find()) {
-            var simpleName = m.group(3);
+            var simpleName = m.group(2); // Now group 2 (was 3)
             return packageName.isEmpty() ? simpleName : packageName + "." + simpleName;
         }
         return null;
