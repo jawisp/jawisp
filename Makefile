@@ -41,4 +41,4 @@ nativeRun:
 	./gradlew nativeRun
 
 test:
-	./gradlew test
+	./gradlew clean test

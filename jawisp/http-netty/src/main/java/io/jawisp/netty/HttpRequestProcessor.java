@@ -50,8 +50,7 @@ public class HttpRequestProcessor extends SimpleChannelInboundHandler<FullHttpRe
             // 4. Send response
             boolean keepAlive = HttpUtil.isKeepAlive(request);
             if (keepAlive) {
-                response.headers().set(HttpHeaderNames.CONNECTION,
-                        HttpHeaderValues.KEEP_ALIVE);
+                response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
                 ctx.writeAndFlush(response);
             } else {
                 ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
