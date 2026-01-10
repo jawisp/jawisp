@@ -15,4 +15,17 @@ dependencies {
     
     // This dependency is used by the application.
     // implementation libs.guava
+
+    testImplementation libs.junit.jupiter
+    // JUnit Platform Launcher (if needed)
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Mockito for mocking
+    testImplementation 'org.mockito:mockito-core:5.20.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
 }

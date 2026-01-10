@@ -67,8 +67,9 @@ public class ReflectConfigGenerator {
         var packageName = extractPackageName(content);
         var className = extractClassName(content, packageName);
 
-        if (className == null)
+        if (className == null) {
             return null;
+        }
 
         var cfg = new ClassConfig(className);
         if (hasAnyAnnotation(content, TARGET_ANNOTATIONS)) {

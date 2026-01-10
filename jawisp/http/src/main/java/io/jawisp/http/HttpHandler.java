@@ -30,7 +30,7 @@ public class HttpHandler implements Handler {
         RouteHandler handler = findMatchingRoute(req.method, req.path);
         if (handler != null) {
             Map<String, Object> pathParams = new HashMap<>();
-            Matcher matcher = handler.pattern.matcher((req.path));
+            Matcher matcher = handler.getPattern().matcher((req.path));
 
             if (matcher.matches()) {
                 if (logger.isDebugEnabled()) {
