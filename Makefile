@@ -28,14 +28,15 @@ prod-down:
 	docker compose -f deployment/prod/compose.yml down
 
 app:
-	./scripts/watch.sh ./app/src ./jawisp/core/src ./jawisp/http/src ./jawisp/http-netty/src 
+	./scripts/watch.sh ./app/src ./jawisp/core/src ./jawisp/http/src ./jawisp/http-netty/src
 
 dev:
 	make -j1 app
 
 clean:
 	./gradlew clean
-	rm -rf build
+	find . -type d -name "build" -exec rm -rf {} +
+	find . -type d -name "bin" -exec rm -rf {} +
 
 nativeRun:
 	./gradlew nativeRun

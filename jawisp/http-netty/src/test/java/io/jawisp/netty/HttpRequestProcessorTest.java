@@ -81,8 +81,8 @@ class HttpRequestProcessorTest {
         channel.finish();
 
         // Verify nettyToCore() extracted query params correctly
-        assertEquals("John", testHandler.lastRequest.params.get("name"));
-        assertEquals("30", testHandler.lastRequest.params.get("age"));
+        assertEquals("John", testHandler.lastRequest.getQueryParams().get("name"));
+        assertEquals("30", testHandler.lastRequest.getQueryParams().get("age"));
     }
 
     @Test

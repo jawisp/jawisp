@@ -6,3 +6,8 @@ build
 
 # VS Code settings
 .vscode
+
+# Zed java extensions
+.project
+.settings
+.classpath

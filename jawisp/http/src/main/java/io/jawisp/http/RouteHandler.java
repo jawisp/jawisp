@@ -9,8 +9,7 @@ import java.util.regex.Pattern;
 /**
  * Represents a route handler that maps HTTP requests to controller methods.
  * This class encapsulates the information needed to handle routing for a
- * specific
- * HTTP method, path pattern, and controller method combination.
+ * specific HTTP method, path pattern, and controller method combination
  */
 public class RouteHandler {
     /** The controller instance that contains the method to be invoked */

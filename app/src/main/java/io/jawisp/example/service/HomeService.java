@@ -14,7 +14,11 @@ public class HomeService {
         return "<h1>Home page</h1>";
     }
 
-    public User getUser() {
-        return new User("John smith", 33);
+    public User getUser(String id) {
+        return new User(id, "John smith", 33);
+    }
+
+    public User getUserByAge(int age) {
+        return new User("1", "John smith", age);
     }
 }

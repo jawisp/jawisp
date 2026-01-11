@@ -13,24 +13,27 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConfigurationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+        ConfigurationService.class
+    );
 
     private static ConfigurationService instance;
     private final Map<String, String> configMap = new HashMap<>();
     private static final String CONFIG_FILE = "application.yaml";
     // private static final String USER_CONFIG_FILE = ".application.yaml";
-    private static final Pattern ENV_VAR_PATTERN = Pattern.compile("\\{([^:{}]+)(?::([^{}]*))?\\}");
+    private static final Pattern ENV_VAR_PATTERN = Pattern.compile(
+        "\\{([^:{}]+)(?::([^{}]*))?\\}"
+    );
 
     /**
      * Private constructor that initializes the configuration service by loading
      * the configuration file from the classpath.
-     * 
+     *
      * @throws IOException if the configuration file cannot be found or read
      */
     private ConfigurationService() {
@@ -39,10 +42,10 @@ public class ConfigurationService {
 
     /**
      * Gets the singleton instance of the ConfigurationService.
-     * 
+     *
      * This method ensures that only one instance of the configuration service
      * is created and provides thread-safe access to the configuration data.
-     * 
+     *
      * @return The singleton instance of ConfigurationService
      */
     public static synchronized ConfigurationService getInstance() {
@@ -54,7 +57,7 @@ public class ConfigurationService {
 
     /**
      * Loads configuration data from the YAML file located in the classpath.
-     * 
+     *
      * This method reads the configuration file and parses it to build a flat
      * key-value map. It handles nested structures by using dot notation for keys
      * and properly manages indentation to determine the hierarchy level of each
@@ -82,8 +85,7 @@ public class ConfigurationService {
      * Loads the default configuration from classpath
      */
     private void loadDefaultConfig() {
-        getFileContent(CONFIG_FILE)
-            .ifPresent(content -> parse(content));
+        getFileContent(CONFIG_FILE).ifPresent(content -> parse(content));
     }
 
     /**
@@ -114,10 +116,10 @@ public class ConfigurationService {
 
     /**
      * Processes environment variables in configuration values
-     * 
+     *
      * Looks for patterns like {ENV_VAR_NAME:DEFAULT_VALUE} and replaces them
      * with environment variable values or default values if env var is not set
-     * 
+     *
      * @param value The configuration value that may contain environment variable
      *              placeholders
      * @return The processed string with environment variables resolved
@@ -144,8 +146,9 @@ public class ConfigurationService {
             var envValue = System.getenv(envVarName);
 
             // Use the environment variable if set and not empty; otherwise, default value
-            var replacement = (envValue != null && !envValue.isEmpty()) ? envValue
-                    : (defaultValue != null ? defaultValue : "");
+            var replacement = (envValue != null && !envValue.isEmpty())
+                ? envValue
+                : (defaultValue != null ? defaultValue : "");
 
             // Escape replacement string to handle special characters correctly in regex
             // replacement
@@ -167,36 +170,37 @@ public class ConfigurationService {
     /**
      * Calculates the indentation level of a line by comparing its length with
      * the length after stripping leading whitespace.
-     * 
+     *
      * This method helps determine the hierarchy level of configuration properties
      * in nested YAML structures.
-     * 
+     *
      * @param line The line of text to analyze for indentation
      * @return The number of leading whitespace characters (indentation level)
      */
     private int getIndentLevel(String line) {
         int count = 0;
         for (char c : line.toCharArray()) {
-            if (c == ' ')
-                count++;
-            else
-                break;
+            if (c == ' ') count++;
+            else break;
         }
         return count / 2; // Assuming 2 spaces per indent level
     }
 
     /**
      * Removes surrounding quotes from a string value if present.
-     * 
+     *
      * This method handles both single and double quotes that may be present
      * in YAML configuration values.
-     * 
+     *
      * @param value The string value that may contain surrounding quotes
      * @return The string value with quotes removed, or the original string if no
      *         quotes found
      */
     private String removeQuotes(String value) {
-        if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
+        if (
+            (value.startsWith("\"") && value.endsWith("\"")) ||
+            (value.startsWith("'") && value.endsWith("'"))
+        ) {
             return value.substring(1, value.length() - 1);
         }
         return value;
@@ -205,7 +209,7 @@ public class ConfigurationService {
     /**
      * Retrieves a configuration value as a String, returning a default value if the
      * key is not found.
-     * 
+     *
      * @param key The configuration key to look up
      * @return The configuration value as a String, or the default value if not
      *         found
@@ -222,7 +226,7 @@ public class ConfigurationService {
      * Retrieves a configuration value as an Integer, returning a default value if
      * the key is not found
      * or cannot be parsed as an integer.
-     * 
+     *
      * @param key The configuration key to look up
      * @return The configuration value as an Integer, or the default value if not
      *         found or parsing fails
@@ -255,7 +259,7 @@ public class ConfigurationService {
      * Retrieves a configuration value as a Boolean, returning a default value if
      * the key is not found
      * or cannot be parsed as a boolean.
-     * 
+     *
      * @param key          The configuration key to look up
      * @param defaultValue The default value to return if the key is not found or
      *                     cannot be parsed
@@ -272,7 +276,7 @@ public class ConfigurationService {
 
     /**
      * Gets a copy of all configuration values.
-     * 
+     *
      * @return A new HashMap containing all configuration key-value pairs
      */
     public Map<String, String> getAll() {
@@ -328,7 +332,9 @@ public class ConfigurationService {
 
     public Optional<String> getFileContent(String filePath) {
         // Load file content if not cached
-        var inputStream = getClass().getClassLoader().getResourceAsStream(filePath);
+        var inputStream = getClass()
+            .getClassLoader()
+            .getResourceAsStream(filePath);
         if (inputStream == null) {
             logger.debug("File not found: {}", filePath);
             return Optional.empty();
@@ -336,7 +342,11 @@ public class ConfigurationService {
 
         logger.debug("Configuration file found: {}", filePath);
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+        try (
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(inputStream, StandardCharsets.UTF_8)
+            )
+        ) {
             var stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -351,5 +361,4 @@ public class ConfigurationService {
         }
         return Optional.empty();
     }
-
 }

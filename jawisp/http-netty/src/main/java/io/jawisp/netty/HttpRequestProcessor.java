@@ -95,14 +95,14 @@ public class HttpRequestProcessor extends SimpleChannelInboundHandler<FullHttpRe
     }
 
     private FullHttpResponse coreToNetty(Response res, HttpVersion version) {
-        var content = Unpooled.copiedBuffer(res.body);
+        var content = Unpooled.copiedBuffer(res.getBody());
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                HttpResponseStatus.valueOf(res.status), Unpooled.copiedBuffer(res.body));
+                HttpResponseStatus.valueOf(res.getStatus()), Unpooled.copiedBuffer(res.getBody()));
 
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, res.contentType);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, res.getContentType());
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
 
-        res.headers.forEach((k, v) -> response.headers().set(k, v));
+        res.getHeaders().forEach((k, v) -> response.headers().set(k, v));
 
         return response;
     }

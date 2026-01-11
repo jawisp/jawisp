@@ -7,12 +7,16 @@ import io.jawisp.core.annotation.Secured.SecurityRule;
 import io.jawisp.http.MediaType;
 import io.jawisp.example.model.User;
 import io.jawisp.example.service.HomeService;
+import io.jawisp.http.annotation.Cookie;
+import io.jawisp.http.annotation.Header;
+import io.jawisp.http.annotation.PathVariable;
 import io.jawisp.http.annotation.Produces;
+import io.jawisp.http.annotation.QueryValue;
 import io.jawisp.http.annotation.Route;
 
 @Controller(basePath = "/")
 public class HomeController {
-    
+
     @Inject
     private HomeService homeService;
 
@@ -31,8 +35,27 @@ public class HomeController {
 
     @Route(method = "GET", path = "/api")
     @Produces(MediaType.APPLICATION_JSON)
-    public User getApi() {
-        return homeService.getUser(); 
+    public User getDefaultUser() {
+        return homeService.getUser("1");
     }
-    
+
+    @Route(method = "GET", path = "/api/user/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public User getUser(String id) {
+        return homeService.getUser(id);
+    }
+
+    @Route(method = "GET", path = "/api/user/age/{age}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public User getUserByAge(
+            @PathVariable("age") Integer age1,
+            @QueryValue(value = "page", defaultValue = "0") int page,
+            @Header("Accept") String header,
+            @Cookie("sessionId") String session) {
+        System.out.println("Filter: " + String.valueOf(page));
+        System.out.println("sessionId: " + session);
+        System.out.println("Header: " + header);
+        return homeService.getUserByAge(age1);
+    }
+
 }
