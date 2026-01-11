@@ -1,6 +1,8 @@
 package io.jawisp.http;
 
 import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -12,8 +14,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.jawisp.http.Server.ErrorResponse;
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
 import io.jawisp.http.annotation.Body;
@@ -21,353 +25,297 @@ import io.jawisp.http.annotation.Cookie;
 import io.jawisp.http.annotation.Header;
 import io.jawisp.http.annotation.PathVariable;
 import io.jawisp.http.annotation.QueryValue;
+import io.jawisp.http.exception.ResourceNotFoundException;
+import io.jawisp.http.exception.UnauthorizedException;
 
-/**
- * Handles HTTP requests by routing them to appropriate controllers based on
- * method and path.
- * It uses registered route handlers to match incoming requests and invoke the
- * corresponding controller methods.
- */
 public class HttpHandler implements Handler {
-
     private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
-
-    /**
-     * List of route handlers that define how to process different HTTP methods and
-     * paths.
-     */
+    private final ObjectMapper mapper = new ObjectMapper();
     private final List<RouteHandler> routeHandlers;
 
-    /**
-     * ObjectMapper instance used for serializing response objects to JSON.
-     */
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    /**
-     * Constructs an HttpHandler with a list of route handlers.
-     *
-     * @param routeHandlers List of RouteHandler instances defining routes and their
-     *                      associated logic.
-     */
     public HttpHandler(List<RouteHandler> routeHandlers) {
         this.routeHandlers = routeHandlers;
     }
 
-    /**
-     * Handles an incoming HTTP request by finding the matching route handler,
-     * invoking the appropriate controller method, and setting the response
-     * accordingly.
-     *
-     * @param req The HTTP request to handle.
-     * @param res The HTTP response to populate.
-     */
     @Override
     public void handle(Request request, Response response) {
-        RouteHandler handler = findMatchingRoute(request.getMethod(), request.getPath());
-        if (handler != null) {
-            Matcher matcher = handler.getPattern().matcher((request.getPath()));
-            
-            if (matcher.matches()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("{} request {}", request.getMethod(), request.getPath());
-                }
-                
-                Map<String, Object> pathParams = getPathParams(handler, matcher);
-
-                // System.out.println("Request " + req.body);
-                try {
-                    var result = callControllerMethod(handler, pathParams, request);
-                    if (result != null) {
-                        var produces = handler.getProduces();
-                        response.setContentType(produces.getMediaType());
-                        switch (produces) {
-                            case APPLICATION_JSON:
-                                var content = mapper.writeValueAsString(result);
-                                response.setBody(String.valueOf(content).getBytes());
-                                break;
-                            default:
-                                response.setBody(String.valueOf(result).getBytes());
-                                break;
-                        }
-                    }
-                } catch (Exception e) {
-                    // Handle errors
-                    logger.debug("Request error: {}, {}, method: {}", e.getMessage(), request.getPath(), request.getMethod());
-                }
-            }
+        RouteMatch match = findRouteMatch(request);
+        
+        if (match.isNotFound()) {
+            handleNotFound(request, response);
+            return;
+        }
+        
+        logRequest(request);
+        
+        try {
+            Object result = executeController(match.handler(), match.pathParams(), request);
+            handleSuccess(result, match.handler().getProduces(), response);
+        } catch (Exception e) {
+            handleError(e, request, response);
         }
     }
 
-    private Map<String, Object> getPathParams(RouteHandler handler, Matcher matcher) {
-        // Extract parameter values
+    private RouteMatch findRouteMatch(Request request) {
+        RouteHandler handler = findMatchingRoute(request.getMethod(), request.getPath());
+        if (handler == null) {
+            return RouteMatch.notFound();
+        }
+        
+        Matcher matcher = handler.getPattern().matcher(request.getPath());
+        if (!matcher.matches()) {
+            return RouteMatch.notFound();
+        }
+        
+        // return RouteMatch.found(handler, extractPathParams(handler, matcher));
+        return new RouteMatch(handler, extractPathParams(handler, matcher));
+    }
+
+    private RouteHandler findMatchingRoute(String method, String path) {
+        return routeHandlers.stream()
+            .filter(h -> h.getHttpMethod().name().equals(method))
+            .filter(h -> matchesPath(h.getPath(), path))
+            .findFirst()
+            .orElse(null);
+    }
+
+    private boolean matchesPath(String routePattern, String requestPath) {
+        Pattern pattern = Pattern.compile("^" + 
+            routePattern.replaceAll("\\{([^}]+)\\}", "([^/]+)") + "$");
+        return pattern.matcher(requestPath).matches();
+    }
+
+    private Map<String, Object> extractPathParams(RouteHandler handler, Matcher matcher) {
         Map<String, Object> pathParams = new HashMap<>();
         for (int i = 0; i < handler.getPathParams().size(); i++) {
             String paramName = handler.getPathParams().get(i);
-            String paramValue = matcher.group(i + 1); // Groups start at 1
+            String paramValue = matcher.group(i + 1);
             pathParams.put(paramName, paramValue);
         }
         return pathParams;
     }
 
-    /**
-     * Finds the first matching RouteHandler for a given HTTP method and path.
-     *
-     * @param method The HTTP method (e.g., GET, POST).
-     * @param path   The requested path.
-     * @return A RouteHandler if a match is found, otherwise null.
-     */
-    private RouteHandler findMatchingRoute(String method, String path) {
-        for (RouteHandler handler : routeHandlers) {
-            if (handler.getHttpMethod().name().equals(method) && matchesPath(handler.getPath(), path)) {
-                return handler;
-            }
+    private void logRequest(Request request) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} {}", request.getMethod(), request.getPath());
         }
-        return null;
     }
 
-    /**
-     * Checks whether the request path matches the route pattern.
-     * This implementation converts path parameters (e.g., {id}) into regex groups.
-     *
-     * @param routePattern The route pattern (with placeholders like {id}).
-     * @param requestPath  The actual path requested.
-     * @return true if the path matches the pattern, false otherwise.
-     */
-    private boolean matchesPath(String routePattern, String requestPath) {
-        // Create a simple regex pattern for matching
-        Pattern pattern = Pattern.compile("^" +
-                routePattern.replaceAll("\\{([^}]+)\\}", "([^/]+)") + "$");
-        return pattern.matcher(requestPath).matches();
-    }
-
-    /**
-     * Invokes the controller method associated with the route handler.
-     *
-     * @param handler    The RouteHandler containing the method to invoke.
-     * @param pathParams Map of extracted path parameters.
-     * @return The result returned by the controller method.
-     * @throws Exception If the method invocation fails.
-     */
-    private Object callControllerMethod(RouteHandler handler, Map<String, Object> pathParams, Request request) throws Exception {
-    // private Object callControllerMethod(RouteHandler handler, Request request) throws Exception {
+    private Object executeController(RouteHandler handler, Map<String, Object> pathParams, Request request) 
+            throws Exception {
         var method = handler.getMethod();
-        Object[] params = new Object[method.getParameterCount()];
-
-        Class<?>[] paramTypes = method.getParameterTypes();
-        Parameter[] methodParams = method.getParameters();
-
-        for (int i = 0; i < paramTypes.length; i++) {
-            var param = methodParams[i];
-
-            // Priority order: Body > Header > Cookie > QueryValue > PathVariable
-            var bodyAnno = param.getAnnotation(Body.class);
-            if (bodyAnno != null) {
-                params[i] = parseBody(request.getBody(), paramTypes[i]);
-                continue;
-            }
-
-            var headerAnno = param.getAnnotation(Header.class);
-            if (headerAnno != null) {
-                params[i] = getHeaderValue(request.getHeaders(), headerAnno, paramTypes[i]);
-                continue;
-            }
-
-            var cookieAnno = param.getAnnotation(Cookie.class);
-            if (cookieAnno != null) {
-                params[i] = getCookieValue(request.getHeaders(), cookieAnno, paramTypes[i]);
-                continue;
-            }
-
-            // PathVariable / QueryValue fallback
-            String paramName = extractParamNameSafe(methodParams, handler, i);
-            Map<String, String> sourceMap = extractParamSourceSafe(methodParams, i, pathParams, request.getQueryParams());
-
-            switch (paramTypes[i].getName()) {
-                case "java.util.Map" -> params[i] = pathParams;
-                case "java.lang.String" -> params[i] = getStringValue(sourceMap, paramName, param);
-                case "java.lang.Integer", "int" -> params[i] = getIntegerValue(sourceMap, paramName, param);
-                case "java.lang.Long", "long" -> params[i] = getLongValue(sourceMap, paramName, param);
-                case "java.lang.Boolean", "boolean" -> params[i] = getBooleanValue(sourceMap, paramName, param);
-                case "java.lang.Double", "double" -> params[i] = getDoubleValue(sourceMap, paramName, param);
-                default -> throw new IllegalArgumentException(
-                        "Unsupported parameter type: " + paramTypes[i].getSimpleName() +
-                                " at index " + i + " in " + method.getName());
-            }
-        }
-
-        // System.out.println("Params: " + Arrays.toString(params) + " " + method);
+        Object[] params = resolveMethodParameters(method, pathParams, request);
         method.setAccessible(true);
         return method.invoke(handler.getController(), params);
     }
 
-    // Helper methods
-    private String extractParamNameSafe(Parameter[] methodParams, RouteHandler handler, int index) {
-        if (index >= methodParams.length) {
-            var pathParamNames = handler.getPathParams();
-            return index < pathParamNames.size() ? pathParamNames.get(index) : "param" + index;
+    private Object[] resolveMethodParameters(java.lang.reflect.Method method, 
+                                           Map<String, Object> pathParams, Request request) {
+        Parameter[] parameters = method.getParameters();
+        Object[] params = new Object[parameters.length];
+        
+        for (int i = 0; i < parameters.length; i++) {
+            params[i] = resolveParameter(parameters[i], pathParams, request, i);
         }
-
-        var param = methodParams[index];
-        var pathVariable = param.getAnnotation(PathVariable.class);
-        if (pathVariable != null && !pathVariable.value().isEmpty()) {
-            return pathVariable.value();
-        }
-
-        var queryValue = param.getAnnotation(QueryValue.class);
-        if (queryValue != null) {
-            return queryValue.value();
-        }
-
-        var pathParamNames = handler.getPathParams();
-        return index < pathParamNames.size() ? pathParamNames.get(index) : "param" + index;
+        return params;
     }
 
-    private Map<String, String> extractParamSourceSafe(Parameter[] methodParams, int index,
-            Map<String, Object> pathParams, Map<String, String> queryParams) {
-        if (index >= methodParams.length) {
-            return convertToStringMap(pathParams);
+    private Object resolveParameter(Parameter param, Map<String, Object> pathParams, 
+                                  Request request, int index) {
+        // Body annotation has highest priority
+        if (param.isAnnotationPresent(Body.class)) {
+            return parseBody(request.getBody(), param.getType());
         }
-
-        var param = methodParams[index];
-        return param.getAnnotation(QueryValue.class) != null ? queryParams : convertToStringMap(pathParams);
+        
+        // Header annotation
+        if (param.isAnnotationPresent(Header.class)) {
+            return getHeaderValue(request.getHeaders(), param.getAnnotation(Header.class), param.getType());
+        }
+        
+        // Cookie annotation
+        if (param.isAnnotationPresent(Cookie.class)) {
+            return getCookieValue(request.getHeaders(), param.getAnnotation(Cookie.class), param.getType());
+        }
+        
+        // Regular parameter resolution
+        String paramName = extractParamName(param, pathParams, index);
+        Map<String, String> source = param.isAnnotationPresent(QueryValue.class) ? 
+            request.getQueryParams() : toStringMap(pathParams);
+            
+        return resolveSimpleType(param.getType(), source, paramName, param);
     }
 
-    private Map<String, String> convertToStringMap(Map<String, Object> map) {
-        return map.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
+    private String extractParamName(Parameter param, Map<String, Object> pathParams, int index) {
+        var pathVar = param.getAnnotation(PathVariable.class);
+        if (pathVar != null && !pathVar.value().isEmpty()) {
+            return pathVar.value();
+        }
+        
+        var query = param.getAnnotation(QueryValue.class);
+        if (query != null && !query.value().isEmpty()) {
+            return query.value();
+        }
+        
+        return pathParams.keySet().stream().findFirst().orElse("param" + index);
     }
 
-    private Object parseBody(String requestBody, Class<?> paramType) throws Exception {
-        if (requestBody == null || requestBody.trim().isEmpty())
-            return null;
-        return convertValue(requestBody, paramType);
-    }
-
-    private Object getHeaderValue(Map<String, String> headers, Header headerAnno, Class<?> paramType) {
-        String value = headers.get(headerAnno.value());
-        if (value == null) {
-            if (headerAnno.required()) {
-                throw new IllegalArgumentException("Missing required header: " + headerAnno.value());
+    private Object resolveSimpleType(Class<?> type, Map<String, String> source, 
+                                   String paramName, Parameter param) {
+        String value = source.get(paramName);
+        
+        var queryAnno = param.getAnnotation(QueryValue.class);
+        if (queryAnno != null) {
+            if (value == null) {
+                if (queryAnno.required()) {
+                    throw new IllegalArgumentException("Missing required query param: " + paramName);
+                }
+                return parseDefaultValue(queryAnno.defaultValue(), type);
             }
-            value = headerAnno.defaultValue();
         }
-        return convertValue(value, paramType);
+        
+        return convertValue(value, type);
     }
 
-    private Object getCookieValue(Map<String, String> headers, Cookie cookieAnno, Class<?> paramType) {
+    // Response handling
+    private void handleSuccess(Object result, MediaType produces, Response response) {
+        if (result == null) {
+            response.setStatus(204);
+            return;
+        }
+        
+        response.setContentType(produces.getMediaType());
+        response.setBody(serialize(result, produces));
+    }
+
+    private byte[] serialize(Object result, MediaType produces) {
+        return switch (produces) {
+            case APPLICATION_JSON -> safeJsonSerialize(result);
+            default -> result.toString().getBytes(StandardCharsets.UTF_8);
+        };
+    }
+
+    private byte[] safeJsonSerialize(Object result) {
+        try {
+            return mapper.writeValueAsBytes(result);
+        } catch (JsonProcessingException e) {
+            logger.warn("JSON serialization failed: {}", e.getMessage());
+            return "{}".getBytes(StandardCharsets.UTF_8);
+        }
+    }
+
+    // Error handling
+    private void handleError(Exception e, Request request, Response response) {
+        ErrorResponse error = classifyError(e, request);
+        logger.error("Error [{} {}]: {}", request.getMethod(), request.getPath(), error.message(), e);
+        
+        response.setStatus(error.statusCode());
+        response.setContentType(MediaType.APPLICATION_JSON.getMediaType());
+        response.setBody(safeJsonSerialize(error));
+    }
+
+    private ErrorResponse classifyError(Exception e, Request request) {
+        Throwable cause = e.getCause() != null ? e.getCause() : e;
+        
+        return switch (cause) {
+            case IllegalArgumentException ex -> new ErrorResponse(400, "Bad Request", ex.getMessage(), request);
+            case ResourceNotFoundException ex -> new ErrorResponse(404, "Not Found", ex.getMessage(), request);
+            case UnauthorizedException ex -> new ErrorResponse(401, "Unauthorized", "Authentication required", request);
+            case AccessDeniedException ex -> new ErrorResponse(403, "Forbidden", "Access denied", request);
+            case JsonProcessingException ex -> new ErrorResponse(400, "Bad Request", "Invalid JSON", request);
+            default -> new ErrorResponse(500, "Internal Server Error", "Internal server error", request);
+        };
+    }
+
+    private void handleNotFound(Request request, Response response) {
+        ErrorResponse error = new ErrorResponse(404, "Not Found", "Route not found", request);
+        response.setStatus(404);
+        response.setContentType(MediaType.APPLICATION_JSON.getMediaType());
+        response.setBody(safeJsonSerialize(error));
+    }
+
+    // Parameter resolution helpers (consolidated)
+    private Object parseBody(String body, Class<?> type) {
+        if (body == null || body.trim().isEmpty()) return null;
+        return convertValue(body, type);
+    }
+
+    private Object getHeaderValue(Map<String, String> headers, Header anno, Class<?> type) {
+        String value = headers.get(anno.value());
+        if (value == null) {
+            if (anno.required()) {
+                throw new IllegalArgumentException("Missing required header: " + anno.value());
+            }
+            return parseDefaultValue(anno.defaultValue(), type);
+        }
+        return convertValue(value, type);
+    }
+
+    private Object getCookieValue(Map<String, String> headers, Cookie anno, Class<?> type) {
         String cookieHeader = headers.get("Cookie");
         if (cookieHeader == null) {
-            if (cookieAnno.required()) {
-                throw new IllegalArgumentException("Missing required cookie: " + cookieAnno.value());
+            if (anno.required()) {
+                throw new IllegalArgumentException("Missing required cookie: " + anno.value());
             }
-            return convertValue(cookieAnno.defaultValue(), paramType);
+            return parseDefaultValue(anno.defaultValue(), type);
         }
-
-        String value = parseCookieValue(cookieHeader, cookieAnno.value());
+        
+        String value = parseCookieValue(cookieHeader, anno.value());
         if (value == null) {
-            if (cookieAnno.required()) {
-                throw new IllegalArgumentException("Missing required cookie: " + cookieAnno.value());
+            if (anno.required()) {
+                throw new IllegalArgumentException("Missing required cookie: " + anno.value());
             }
-            value = cookieAnno.defaultValue();
+            return parseDefaultValue(anno.defaultValue(), type);
         }
-        return convertValue(value, paramType);
+        return convertValue(value, type);
     }
 
     private String parseCookieValue(String cookieHeader, String cookieName) {
         return Arrays.stream(cookieHeader.split(";"))
-                .map(String::trim)
-                .filter(part -> part.startsWith(cookieName + "="))
-                .map(part -> part.substring(cookieName.length() + 1))
-                .findFirst()
-                .orElse(null);
+            .map(String::trim)
+            .filter(part -> part.startsWith(cookieName + "="))
+            .map(part -> part.substring(cookieName.length() + 1))
+            .findFirst().orElse(null);
     }
 
-    private Object convertValue(String value, Class<?> paramType) {
-        if (value == null || value.trim().isEmpty())
-            return null;
+    private Object parseDefaultValue(String defaultValue, Class<?> type) {
+        return defaultValue.isEmpty() ? getTypeDefault(type) : convertValue(defaultValue, type);
+    }
 
-        return switch (paramType.getName()) {
+    private Object getTypeDefault(Class<?> type) {
+        if (type == int.class || type == Integer.class) return 0;
+        if (type == long.class || type == Long.class) return 0L;
+        if (type == boolean.class || type == Boolean.class) return false;
+        if (type == double.class || type == Double.class) return 0.0;
+        return null;
+    }
+
+    private Object convertValue(String value, Class<?> type) {
+        if (value == null || value.trim().isEmpty()) {
+            return getTypeDefault(type);
+        }
+        
+        return switch (type.getName()) {
             case "java.lang.String" -> value;
             case "java.lang.Integer", "int" -> Integer.valueOf(value.trim());
             case "java.lang.Long", "long" -> Long.valueOf(value.trim());
             case "java.lang.Boolean", "boolean" -> Boolean.valueOf(value.trim());
             case "java.lang.Double", "double" -> Double.valueOf(value.trim());
-            default -> throw new IllegalArgumentException("Unsupported type: " + paramType.getSimpleName());
+            default -> throw new IllegalArgumentException("Unsupported type: " + type.getSimpleName());
         };
     }
 
-    // Type-specific handlers with annotation support
-    private String getStringValue(Map<String, String> sourceMap, String paramName, Parameter param) {
-        var queryValue = param.getAnnotation(QueryValue.class);
-        if (queryValue != null) {
-            String value = sourceMap.get(paramName);
-            if (value == null) {
-                if (queryValue.required())
-                    throw new IllegalArgumentException("Missing required query param: " + paramName);
-                return queryValue.defaultValue();
-            }
-            return value;
-        }
-        return sourceMap.getOrDefault(paramName, "");
+    private Map<String, String> toStringMap(Map<String, Object> map) {
+        return map.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
     }
 
-    private Integer getIntegerValue(Map<String, String> sourceMap, String paramName, Parameter param) {
-        var queryValue = param.getAnnotation(QueryValue.class);
-        if (queryValue != null) {
-            String value = sourceMap.get(paramName);
-            if (value == null) {
-                if (queryValue.required())
-                    throw new IllegalArgumentException("Missing required query param: " + paramName);
-                return queryValue.defaultValue().isEmpty() ? 0 : Integer.parseInt(queryValue.defaultValue());
-            }
-            return Integer.valueOf(value);
+    // Supporting records
+    record RouteMatch(RouteHandler handler, Map<String, Object> pathParams) {
+        static RouteMatch notFound() {
+            return new RouteMatch(null, Map.of());
         }
-        var value = sourceMap.get(paramName);
-        return value != null ? Integer.valueOf(value) : 0;
-    }
-
-    private Long getLongValue(Map<String, String> sourceMap, String paramName, Parameter param) {
-        var queryValue = param.getAnnotation(QueryValue.class);
-        if (queryValue != null) {
-            String value = sourceMap.get(paramName);
-            if (value == null) {
-                if (queryValue.required())
-                    throw new IllegalArgumentException("Missing required query param: " + paramName);
-                return queryValue.defaultValue().isEmpty() ? 0L : Long.parseLong(queryValue.defaultValue());
-            }
-            return Long.valueOf(value);
+        boolean isNotFound() {
+            return handler == null;
         }
-        var value = sourceMap.get(paramName);
-        return value != null ? Long.valueOf(value) : 0L;
-    }
-
-    private Boolean getBooleanValue(Map<String, String> sourceMap, String paramName, Parameter param) {
-        var queryValue = param.getAnnotation(QueryValue.class);
-        if (queryValue != null) {
-            String value = sourceMap.get(paramName);
-            if (value == null) {
-                if (queryValue.required())
-                    throw new IllegalArgumentException("Missing required query param: " + paramName);
-                return Boolean.parseBoolean(queryValue.defaultValue());
-            }
-            return Boolean.valueOf(value);
-        }
-        var value = sourceMap.get(paramName);
-        return value != null ? Boolean.valueOf(value) : false;
-    }
-
-    private Double getDoubleValue(Map<String, String> sourceMap, String paramName, Parameter param) {
-        var queryValue = param.getAnnotation(QueryValue.class);
-        if (queryValue != null) {
-            String value = sourceMap.get(paramName);
-            if (value == null) {
-                if (queryValue.required())
-                    throw new IllegalArgumentException("Missing required query param: " + paramName);
-                return queryValue.defaultValue().isEmpty() ? 0.0 : Double.parseDouble(queryValue.defaultValue());
-            }
-            return Double.valueOf(value);
-        }
-        var value = sourceMap.get(paramName);
-        return value != null ? Double.valueOf(value) : 0.0;
     }
 }

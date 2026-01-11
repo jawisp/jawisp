@@ -1,5 +1,6 @@
 package io.jawisp.http;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -12,9 +13,9 @@ public interface Server {
     class Request {
         private final String method, path, body;
         private final Map<String, String> headers, queryParams;
-        
-        public Request(String method, String path, String body, 
-                      Map<String, String> headers, Map<String, String> params) {
+
+        public Request(String method, String path, String body,
+                Map<String, String> headers, Map<String, String> params) {
             this.method = method;
             this.path = path;
             this.body = body;
@@ -42,17 +43,17 @@ public interface Server {
             return queryParams;
         }
     }
-    
+
     class Response {
-        private final int status;
+        private int status;
         private String contentType;
         private byte[] body;
         private final Map<String, String> headers;
-        
+
         public Response(int status, String contentType, byte[] body) {
             this(status, contentType, body, new HashMap<>());
         }
-        
+
         public Response(int status, String contentType, byte[] body, Map<String, String> headers) {
             this.status = status;
             this.contentType = contentType;
@@ -62,6 +63,10 @@ public interface Server {
 
         public int getStatus() {
             return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
         }
 
         public String getContentType() {
@@ -82,7 +87,23 @@ public interface Server {
 
         public Map<String, String> getHeaders() {
             return headers;
-        }   
+        }
+    }
+
+    public record ErrorResponse(
+            int statusCode,
+            String error,
+            String message,
+            String path,
+            String timestamp) {
+        public ErrorResponse(int statusCode, String error, String message, Request request) {
+            this(
+                    statusCode,
+                    error,
+                    message,
+                    request.getPath(),
+                    Instant.now().toString());
+        }
     }
 
     static Server create(String impl, Handler handler) {

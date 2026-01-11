@@ -52,9 +52,6 @@ public class HomeController {
             @QueryValue(value = "page", defaultValue = "0") int page,
             @Header("Accept") String header,
             @Cookie("sessionId") String session) {
-        System.out.println("Filter: " + String.valueOf(page));
-        System.out.println("sessionId: " + session);
-        System.out.println("Header: " + header);
         return homeService.getUserByAge(age1);
     }
 

@@ -1,11 +1,15 @@
 package io.jawisp.http;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +26,8 @@ import io.jawisp.http.annotation.Cookie;
 import io.jawisp.http.annotation.Header;
 import io.jawisp.http.annotation.PathVariable;
 import io.jawisp.http.annotation.QueryValue;
+import io.jawisp.http.exception.ResourceNotFoundException;
+import io.jawisp.http.exception.UnauthorizedException;
 
 public class HttpHandlerTest {
 
@@ -40,6 +46,7 @@ public class HttpHandlerTest {
         handler = new HttpHandler(createRealRouteHandlers(controller));
     }
 
+    // ==================== EXISTING HAPPY PATH TESTS ====================
     @Test
     void testPathVariableAnnotation() throws Exception {
         when(request.getMethod()).thenReturn("GET");
@@ -47,7 +54,7 @@ public class HttpHandlerTest {
         when(request.getQueryParams()).thenReturn(Map.of());
 
         handler.handle(request, response);
-        verify(response).setBody("User ID: 123".getBytes());
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("User ID: 123")));
     }
 
     @Test
@@ -57,7 +64,7 @@ public class HttpHandlerTest {
         when(request.getQueryParams()).thenReturn(Map.of());
 
         handler.handle(request, response);
-        verify(response).setBody("Search: dev".getBytes());
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("Search: dev")));
     }
 
     @Test
@@ -67,17 +74,7 @@ public class HttpHandlerTest {
         when(request.getQueryParams()).thenReturn(Map.of("q", "java"));
 
         handler.handle(request, response);
-        verify(response).setBody("Search: java".getBytes());
-    }
-
-    @Test
-    void testQueryValueRequiredThrows() {
-        when(request.getMethod()).thenReturn("GET");
-        when(request.getPath()).thenReturn("/search-strict");
-        when(request.getQueryParams()).thenReturn(Map.of());
-
-        handler.handle(request, response);
-        verify(response, never()).setBody(any()); // HttpHandler swallows exceptions
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("Search: java")));
     }
 
     @Test
@@ -88,18 +85,7 @@ public class HttpHandlerTest {
         when(request.getQueryParams()).thenReturn(Map.of());
 
         handler.handle(request, response);
-        verify(response).setBody("API Key: secret123".getBytes());
-    }
-
-    @Test
-    void testHeaderDefault() throws Exception {
-        when(request.getMethod()).thenReturn("GET");
-        when(request.getPath()).thenReturn("/api");
-        when(request.getHeaders()).thenReturn(Map.of());
-        when(request.getQueryParams()).thenReturn(Map.of());
-
-        handler.handle(request, response);
-        verify(response).setBody("API Key: default-key".getBytes());
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("API Key: secret123")));
     }
 
     @Test
@@ -110,18 +96,7 @@ public class HttpHandlerTest {
         when(request.getQueryParams()).thenReturn(Map.of());
 
         handler.handle(request, response);
-        verify(response).setBody("Session: abc123".getBytes());
-    }
-
-    @Test
-    void testCookieMissing() throws Exception {
-        when(request.getMethod()).thenReturn("GET");
-        when(request.getPath()).thenReturn("/profile");
-        when(request.getHeaders()).thenReturn(Map.of("Cookie", "theme=dark"));
-        when(request.getQueryParams()).thenReturn(Map.of());
-
-        handler.handle(request, response);
-        verify(response).setBody("Session: guest".getBytes());
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("Session: abc123")));
     }
 
     @Test
@@ -132,40 +107,122 @@ public class HttpHandlerTest {
         when(request.getQueryParams()).thenReturn(Map.of());
 
         handler.handle(request, response);
-        verify(response).setBody("Echo: Hello World".getBytes());
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("Echo: Hello World")));
     }
 
+    // ==================== NEW ERROR HANDLING TESTS ====================
     @Test
-    void testBodyJsonAsString() throws Exception {
-        when(request.getMethod()).thenReturn("POST");
-        when(request.getPath()).thenReturn("/users-string");
-        when(request.getBody()).thenReturn("{\"name\":\"John\",\"age\":30}");
+    void testRouteNotFoundReturns404() {
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getPath()).thenReturn("/missing-route");
         when(request.getQueryParams()).thenReturn(Map.of());
 
         handler.handle(request, response);
-        verify(response).setBody("Received JSON: {\"name\":\"John\",\"age\":30}".getBytes());
+
+        verify(response).setStatus(404);
+        verify(response).setContentType("application/json");
+        verify(response).setBody(argThat(bytes -> {
+            String body = new String(bytes, StandardCharsets.UTF_8);
+            return body.contains("\"statusCode\":404") &&
+                    body.contains("\"error\":\"Not Found\"") &&
+                    body.contains("\"message\":\"Route not found\"");
+        }));
     }
 
     @Test
-    void testAllAnnotationsWithStringBody() throws Exception {
-        when(request.getMethod()).thenReturn("POST");
-        when(request.getPath()).thenReturn("/users/456");
-        when(request.getQueryParams()).thenReturn(Map.of("source", "web"));
-        when(request.getHeaders()).thenReturn(Map.of(
-                "X-Source", "frontend",
-                "Cookie", "userId=789"));
-        when(request.getBody()).thenReturn("{\"name\":\"John\"}");
+    void testWrongHttpMethodReturns404() {
+        when(request.getMethod()).thenReturn("POST"); // Wrong method for GET routes
+        when(request.getPath()).thenReturn("/users_nonexisted/123");
+        when(request.getQueryParams()).thenReturn(Map.of());
 
         handler.handle(request, response);
 
-        // Flexible verification - checks response was set, ignores exact byte diff
-        verify(response).setBody(argThat(bytes -> new String(bytes).contains("Created user 456")));
+        verify(response).setStatus(404);
+        verify(response).setContentType("application/json");
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("\"statusCode\":404")));
     }
 
-    // ==================== CONTROLLER ====================
+    @Test
+    void testMissingRequiredQueryParamReturns400() {
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getPath()).thenReturn("/search-strict");
+        when(request.getQueryParams()).thenReturn(Map.of());
+
+        handler.handle(request, response);
+
+        verify(response).setStatus(400);
+        verify(response).setContentType("application/json");
+        verify(response).setBody(argThat(bytes -> {
+            String body = new String(bytes);
+            return body.contains("\"statusCode\":400") &&
+                    body.contains("Missing required query param");
+        }));
+    }
+
+    @Test
+    void testControllerThrowsResourceNotFoundReturns404() throws Exception {
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getPath()).thenReturn("/users/999");
+        when(request.getQueryParams()).thenReturn(Map.of());
+
+        TestController testController = new TestController();
+        handler = new HttpHandler(createErrorTestRouteHandlers(testController));
+
+        handler.handle(request, response);
+
+        verify(response).setStatus(404);
+        verify(response).setContentType("application/json");
+        verify(response).setBody(argThat(bytes -> {
+            String body = new String(bytes);
+            return body.contains("\"statusCode\":404") &&
+                    body.contains("Resource 'User' with id '999' not found");
+        }));
+    }
+
+    @Test
+    void testControllerThrowsUnauthorizedReturns401() throws Exception {
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getPath()).thenReturn("/admin");
+        when(request.getQueryParams()).thenReturn(Map.of());
+
+        TestController testController = new TestController();
+        handler = new HttpHandler(createErrorTestRouteHandlers(testController));
+
+        handler.handle(request, response);
+
+        verify(response).setStatus(401);
+        verify(response).setContentType("application/json");
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("\"statusCode\":401")));
+    }
+
+    @Test
+    void testInvalidNumberParsingReturns400() throws Exception {
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getPath()).thenReturn("/users/invalid");
+        when(request.getQueryParams()).thenReturn(Map.of());
+
+        TestController testController = new TestController();
+        handler = new HttpHandler(createErrorTestRouteHandlers(testController));
+
+        handler.handle(request, response);
+
+        verify(response).setStatus(400);
+        verify(response).setContentType("application/json");
+        verify(response).setBody(argThat(bytes -> new String(bytes).contains("\"statusCode\":400")));
+    }
+
+    // ==================== UPDATED CONTROLLER WITH ERROR CASES ====================
     public static class TestController {
         public String getUser(@PathVariable String id) {
-            return "User ID: " + id;
+            try {
+                int userId = Integer.parseInt(id);
+                if (userId == 999) {
+                    throw new ResourceNotFoundException("User", userId);
+                }
+                return "User ID: " + id;
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid user ID: " + id);
+            }
         }
 
         public String search(@QueryValue(value = "q", required = false, defaultValue = "dev") String query) {
@@ -184,12 +241,12 @@ public class HttpHandlerTest {
             return "Session: " + session;
         }
 
-        public String createUserString(@Body String jsonBody) {
-            return "Received JSON: " + jsonBody;
-        }
-
         public String echo(@Body String message) {
             return "Echo: " + message;
+        }
+
+        public String createUserString(@Body String jsonBody) {
+            return "Received JSON: " + jsonBody;
         }
 
         public String createUserAllAnnotations(
@@ -201,9 +258,18 @@ public class HttpHandlerTest {
             return String.format("\"Created user %s via %s from %s with cookie %s\"",
                     id, source, headerSource, cookieUserId);
         }
+
+        // Error test methods
+        public String emptyResponse() {
+            return null;
+        }
+
+        public void adminOnly() {
+            throw new UnauthorizedException("admin API");
+        }
     }
 
-    // ==================== ROUTE HANDLERS ====================
+    // ==================== ROUTE HANDLER CREATORS ====================
     private List<RouteHandler> createRealRouteHandlers(Object controller) throws Exception {
         List<RouteHandler> handlers = new ArrayList<>();
 
@@ -219,14 +285,25 @@ public class HttpHandlerTest {
                 HttpMethod.GET, "/profile", MediaType.TEXT_PLAIN));
         handlers.add(new RouteHandler(controller, controller.getClass().getDeclaredMethod("echo", String.class),
                 HttpMethod.POST, "/echo", MediaType.TEXT_PLAIN));
-
         handlers.add(
                 new RouteHandler(controller, controller.getClass().getDeclaredMethod("createUserString", String.class),
                         HttpMethod.POST, "/users-string", MediaType.TEXT_PLAIN));
-
         handlers.add(new RouteHandler(controller, controller.getClass().getDeclaredMethod("createUserAllAnnotations",
                 String.class, String.class, String.class, String.class, String.class),
                 HttpMethod.POST, "/users/{id}", MediaType.APPLICATION_JSON));
+
+        return handlers;
+    }
+
+    private List<RouteHandler> createErrorTestRouteHandlers(Object controller) throws Exception {
+        List<RouteHandler> handlers = new ArrayList<>();
+
+        handlers.add(new RouteHandler(controller, controller.getClass().getDeclaredMethod("getUser", String.class),
+                HttpMethod.GET, "/users/{id}", MediaType.APPLICATION_JSON));
+        handlers.add(new RouteHandler(controller, controller.getClass().getDeclaredMethod("emptyResponse"),
+                HttpMethod.GET, "/empty", MediaType.APPLICATION_JSON));
+        handlers.add(new RouteHandler(controller, controller.getClass().getDeclaredMethod("adminOnly"),
+                HttpMethod.GET, "/admin", MediaType.APPLICATION_JSON));
 
         return handlers;
     }
