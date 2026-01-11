@@ -18,7 +18,7 @@ class RouteHandlerTest {
     private Method mockMethod;
     private HttpMethod httpMethod = HttpMethod.GET;
     private String path = "/users/{id}/posts/{postId}";
-    private MediaType produces = MediaType.APPLICATION_JSON;
+    private MediaType mediaType = MediaType.APPLICATION_JSON;
 
     @BeforeEach
     void setUp() throws NoSuchMethodException {
@@ -33,14 +33,14 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 path,
-                produces
+                mediaType
         );
 
         assertEquals(mockController, routeHandler.getController());
         assertEquals(mockMethod, routeHandler.getMethod());
         assertEquals(httpMethod, routeHandler.getHttpMethod());
         assertEquals(path, routeHandler.getPath());
-        assertEquals(produces, routeHandler.getProduces());
+        assertEquals(mediaType, routeHandler.getProduces());
     }
 
     @Test
@@ -50,7 +50,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 path,
-                produces
+                mediaType
         );
 
         List<String> pathParams = routeHandler.getPathParams();
@@ -67,7 +67,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 path,
-                produces
+                mediaType
         );
 
         Pattern pattern = routeHandler.getPattern();
@@ -85,7 +85,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 pathWithSpecialChars,
-                produces
+                mediaType
         );
 
         Pattern pattern = routeHandler.getPattern();
@@ -101,7 +101,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 pathWithEmptyParam,
-                produces
+                mediaType
         );
 
         Pattern pattern = routeHandler.getPattern();
@@ -116,7 +116,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 pathWithoutParams,
-                produces
+                mediaType
         );
 
         List<String> pathParams = routeHandler.getPathParams();
@@ -135,7 +135,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 pathWithRepeatedParams,
-                produces
+                mediaType
         );
 
         List<String> pathParams = routeHandler.getPathParams();
@@ -151,7 +151,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 path,
-                produces
+                mediaType
         );
 
         List<String> pathParams = routeHandler.getPathParams();
@@ -172,7 +172,7 @@ class RouteHandlerTest {
                 mockMethod,
                 httpMethod,
                 path,
-                produces
+                mediaType
         );
 
         Pattern pattern = routeHandler.getPattern();

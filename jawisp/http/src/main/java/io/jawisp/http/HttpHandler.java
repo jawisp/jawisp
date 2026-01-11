@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.jawisp.http.Server.ErrorResponse;
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
 import io.jawisp.http.annotation.Body;
@@ -29,7 +28,9 @@ import io.jawisp.http.exception.ResourceNotFoundException;
 import io.jawisp.http.exception.UnauthorizedException;
 
 public class HttpHandler implements Handler {
+
     private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
+
     private final ObjectMapper mapper = new ObjectMapper();
     private final List<RouteHandler> routeHandlers;
 
@@ -46,7 +47,9 @@ public class HttpHandler implements Handler {
             return;
         }
         
-        logRequest(request);
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} {}", request.getMethod(), request.getPath());
+        }
         
         try {
             Object result = executeController(match.handler(), match.pathParams(), request);
@@ -67,7 +70,6 @@ public class HttpHandler implements Handler {
             return RouteMatch.notFound();
         }
         
-        // return RouteMatch.found(handler, extractPathParams(handler, matcher));
         return new RouteMatch(handler, extractPathParams(handler, matcher));
     }
 
@@ -93,12 +95,6 @@ public class HttpHandler implements Handler {
             pathParams.put(paramName, paramValue);
         }
         return pathParams;
-    }
-
-    private void logRequest(Request request) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {}", request.getMethod(), request.getPath());
-        }
     }
 
     private Object executeController(RouteHandler handler, Map<String, Object> pathParams, Request request) 
@@ -206,9 +202,9 @@ public class HttpHandler implements Handler {
     // Error handling
     private void handleError(Exception e, Request request, Response response) {
         ErrorResponse error = classifyError(e, request);
-        logger.error("Error [{} {}]: {}", request.getMethod(), request.getPath(), error.message(), e);
+        logger.error("Error [{} {}]: {}", request.getMethod(), request.getPath(), error.getMessage(), e);
         
-        response.setStatus(error.statusCode());
+        response.setStatus(error.getStatusCode());
         response.setContentType(MediaType.APPLICATION_JSON.getMediaType());
         response.setBody(safeJsonSerialize(error));
     }
@@ -318,4 +314,5 @@ public class HttpHandler implements Handler {
             return handler == null;
         }
     }
+
 }

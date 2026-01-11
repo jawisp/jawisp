@@ -1,6 +1,5 @@
 package io.jawisp.http;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -87,22 +86,6 @@ public interface Server {
 
         public Map<String, String> getHeaders() {
             return headers;
-        }
-    }
-
-    public record ErrorResponse(
-            int statusCode,
-            String error,
-            String message,
-            String path,
-            String timestamp) {
-        public ErrorResponse(int statusCode, String error, String message, Request request) {
-            this(
-                    statusCode,
-                    error,
-                    message,
-                    request.getPath(),
-                    Instant.now().toString());
         }
     }
 
