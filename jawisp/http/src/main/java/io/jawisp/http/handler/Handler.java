@@ -1,4 +1,4 @@
-package io.jawisp.http;
+package io.jawisp.http.handler;
 
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;

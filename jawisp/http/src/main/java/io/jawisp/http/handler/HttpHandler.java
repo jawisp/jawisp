@@ -1,8 +1,7 @@
-package io.jawisp.http;
+package io.jawisp.http.handler;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,9 +13,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
 import io.jawisp.http.annotation.Body;
@@ -24,15 +20,15 @@ import io.jawisp.http.annotation.Cookie;
 import io.jawisp.http.annotation.Header;
 import io.jawisp.http.annotation.PathVariable;
 import io.jawisp.http.annotation.QueryValue;
-import io.jawisp.http.exception.ResourceNotFoundException;
-import io.jawisp.http.exception.UnauthorizedException;
 
 public class HttpHandler implements Handler {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 
-    private final ObjectMapper mapper = new ObjectMapper();
     private final List<RouteHandler> routeHandlers;
+
+    // ThreadLocal builder pool - zero allocation per-request after first use
+    private static final ThreadLocal<BuilderPool> BUILDER_POOL = ThreadLocal.withInitial(BuilderPool::new);
 
     public HttpHandler(List<RouteHandler> routeHandlers) {
         this.routeHandlers = routeHandlers;
@@ -40,25 +36,41 @@ public class HttpHandler implements Handler {
 
     @Override
     public void handle(Request request, Response response) {
+        BuilderPool pool = BUILDER_POOL.get();
         RouteMatch match = findRouteMatch(request);
         
         if (match.isNotFound()) {
-            handleNotFound(request, response);
+            pool.notFound.reset(response, request).execute();
             return;
         }
         
         if (logger.isDebugEnabled()) {
             logger.debug("{} {}", request.getMethod(), request.getPath());
         }
-        
+       
         try {
             Object result = executeController(match.handler(), match.pathParams(), request);
-            handleSuccess(result, match.handler().getProduces(), response);
+            pool.success
+                .reset(response)
+                .result(result)
+                .mediaType(match.handler().getProduces())
+                .execute();
         } catch (Exception e) {
-            handleError(e, request, response);
+            pool.error
+                .reset(response, request)
+                .exception(e)
+                .execute();
         }
     }
 
+    private static class BuilderPool {
+        final SuccessResponseBuilder success = new SuccessResponseBuilder();
+        final ErrorResponseBuilder error = new ErrorResponseBuilder();
+        final NotFoundResponseBuilder notFound = new NotFoundResponseBuilder();
+    }
+
+    // Existing private methods remain unchanged until handleSuccess/handleError...
+    
     private RouteMatch findRouteMatch(Request request) {
         RouteHandler handler = findMatchingRoute(request.getMethod(), request.getPath());
         if (handler == null) {
@@ -105,8 +117,7 @@ public class HttpHandler implements Handler {
         return method.invoke(handler.getController(), params);
     }
 
-    private Object[] resolveMethodParameters(java.lang.reflect.Method method, 
-                                           Map<String, Object> pathParams, Request request) {
+    private Object[] resolveMethodParameters(Method method, Map<String, Object> pathParams, Request request) {
         Parameter[] parameters = method.getParameters();
         Object[] params = new Object[parameters.length];
         
@@ -116,24 +127,19 @@ public class HttpHandler implements Handler {
         return params;
     }
 
-    private Object resolveParameter(Parameter param, Map<String, Object> pathParams, 
-                                  Request request, int index) {
-        // Body annotation has highest priority
+    private Object resolveParameter(Parameter param, Map<String, Object> pathParams, Request request, int index) {
         if (param.isAnnotationPresent(Body.class)) {
             return parseBody(request.getBody(), param.getType());
         }
         
-        // Header annotation
         if (param.isAnnotationPresent(Header.class)) {
             return getHeaderValue(request.getHeaders(), param.getAnnotation(Header.class), param.getType());
         }
         
-        // Cookie annotation
         if (param.isAnnotationPresent(Cookie.class)) {
             return getCookieValue(request.getHeaders(), param.getAnnotation(Cookie.class), param.getType());
         }
         
-        // Regular parameter resolution
         String paramName = extractParamName(param, pathParams, index);
         Map<String, String> source = param.isAnnotationPresent(QueryValue.class) ? 
             request.getQueryParams() : toStringMap(pathParams);
@@ -170,66 +176,10 @@ public class HttpHandler implements Handler {
         }
         
         return convertValue(value, type);
-    }
+    }    
 
-    // Response handling
-    private void handleSuccess(Object result, MediaType produces, Response response) {
-        if (result == null) {
-            response.setStatus(204);
-            return;
-        }
-        
-        response.setContentType(produces.getMediaType());
-        response.setBody(serialize(result, produces));
-    }
-
-    private byte[] serialize(Object result, MediaType produces) {
-        return switch (produces) {
-            case APPLICATION_JSON -> safeJsonSerialize(result);
-            default -> result.toString().getBytes(StandardCharsets.UTF_8);
-        };
-    }
-
-    private byte[] safeJsonSerialize(Object result) {
-        try {
-            return mapper.writeValueAsBytes(result);
-        } catch (JsonProcessingException e) {
-            logger.warn("JSON serialization failed: {}", e.getMessage());
-            return "{}".getBytes(StandardCharsets.UTF_8);
-        }
-    }
-
-    // Error handling
-    private void handleError(Exception e, Request request, Response response) {
-        ErrorResponse error = classifyError(e, request);
-        logger.error("Error [{} {}]: {}", request.getMethod(), request.getPath(), error.getMessage(), e);
-        
-        response.setStatus(error.getStatusCode());
-        response.setContentType(MediaType.APPLICATION_JSON.getMediaType());
-        response.setBody(safeJsonSerialize(error));
-    }
-
-    private ErrorResponse classifyError(Exception e, Request request) {
-        Throwable cause = e.getCause() != null ? e.getCause() : e;
-        
-        return switch (cause) {
-            case IllegalArgumentException ex -> new ErrorResponse(400, "Bad Request", ex.getMessage(), request);
-            case ResourceNotFoundException ex -> new ErrorResponse(404, "Not Found", ex.getMessage(), request);
-            case UnauthorizedException ex -> new ErrorResponse(401, "Unauthorized", "Authentication required", request);
-            case AccessDeniedException ex -> new ErrorResponse(403, "Forbidden", "Access denied", request);
-            case JsonProcessingException ex -> new ErrorResponse(400, "Bad Request", "Invalid JSON", request);
-            default -> new ErrorResponse(500, "Internal Server Error", "Internal server error", request);
-        };
-    }
-
-    private void handleNotFound(Request request, Response response) {
-        ErrorResponse error = new ErrorResponse(404, "Not Found", "Route not found", request);
-        response.setStatus(404);
-        response.setContentType(MediaType.APPLICATION_JSON.getMediaType());
-        response.setBody(safeJsonSerialize(error));
-    }
-
-    // Parameter resolution helpers (consolidated)
+    // Private helpers methods 
+    
     private Object parseBody(String body, Class<?> type) {
         if (body == null || body.trim().isEmpty()) return null;
         return convertValue(body, type);
@@ -303,16 +253,6 @@ public class HttpHandler implements Handler {
     private Map<String, String> toStringMap(Map<String, Object> map) {
         return map.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
-    }
-
-    // Supporting records
-    record RouteMatch(RouteHandler handler, Map<String, Object> pathParams) {
-        static RouteMatch notFound() {
-            return new RouteMatch(null, Map.of());
-        }
-        boolean isNotFound() {
-            return handler == null;
-        }
     }
 
 }

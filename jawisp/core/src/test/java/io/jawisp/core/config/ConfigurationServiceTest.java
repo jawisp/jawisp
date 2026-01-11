@@ -215,5 +215,4 @@ class ConfigurationServiceTest {
         assertEquals("true", result.get("app.features.security.roles.admin.permissions.write"));
     }
 
-
 }

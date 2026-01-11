@@ -1,4 +1,4 @@
-package io.jawisp.http;
+package io.jawisp.http.handler;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import io.jawisp.http.HttpMethod;
+import io.jawisp.http.MediaType;
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
 import io.jawisp.http.annotation.Body;
@@ -41,7 +43,8 @@ public class HttpHandlerTest {
         handler = new HttpHandler(createRealRouteHandlers(controller));
     }
 
-    // ==================== EXISTING HAPPY PATH TESTS ====================
+    // HAPPY PATH TESTS
+    
     @Test
     void testPathVariableAnnotation() throws Exception {
         when(request.getMethod()).thenReturn("GET");
@@ -105,7 +108,8 @@ public class HttpHandlerTest {
         verify(response).setBody(argThat(bytes -> new String(bytes).contains("Echo: Hello World")));
     }
 
-    // ==================== NEW ERROR HANDLING TESTS ====================
+    // ERROR HANDLING TESTS 
+
     @Test
     void testRouteNotFoundReturns404() {
         when(request.getMethod()).thenReturn("GET");
@@ -206,7 +210,8 @@ public class HttpHandlerTest {
         verify(response).setBody(argThat(bytes -> new String(bytes).contains("\"statusCode\":400")));
     }
 
-    // ==================== UPDATED CONTROLLER WITH ERROR CASES ====================
+    // PDATED CONTROLLER WITH ERROR CASES 
+
     public static class TestController {
         public String getUser(@PathVariable String id) {
             try {
@@ -264,7 +269,8 @@ public class HttpHandlerTest {
         }
     }
 
-    // ==================== ROUTE HANDLER CREATORS ====================
+    // ROUTE HANDLER CREATORS 
+    
     private List<RouteHandler> createRealRouteHandlers(Object controller) throws Exception {
         List<RouteHandler> handlers = new ArrayList<>();
 

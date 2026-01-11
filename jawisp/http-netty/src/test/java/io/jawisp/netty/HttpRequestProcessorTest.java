@@ -11,9 +11,9 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.jawisp.http.Handler;
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
+import io.jawisp.http.handler.Handler;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;

@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import io.jawisp.http.handler.Handler;
+
 public interface Server {
+
     void start(int port) throws Exception;
 
     void stop() throws Exception;

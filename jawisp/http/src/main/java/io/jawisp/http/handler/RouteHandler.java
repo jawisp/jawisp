@@ -1,10 +1,13 @@
-package io.jawisp.http;
+package io.jawisp.http.handler;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.jawisp.http.HttpMethod;
+import io.jawisp.http.MediaType;
 
 /**
  * Represents a route handler that maps HTTP requests to controller methods.

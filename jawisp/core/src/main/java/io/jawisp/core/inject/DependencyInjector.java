@@ -15,9 +15,9 @@ import io.jawisp.core.annotation.Inject;
 import io.jawisp.core.annotation.Service;
 import io.jawisp.http.HttpMethod;
 import io.jawisp.http.MediaType;
-import io.jawisp.http.RouteHandler;
 import io.jawisp.http.annotation.Produces;
 import io.jawisp.http.annotation.Route;
+import io.jawisp.http.handler.RouteHandler;
 
 public class DependencyInjector {
     private static final Logger logger = LoggerFactory.getLogger(DependencyInjector.class);

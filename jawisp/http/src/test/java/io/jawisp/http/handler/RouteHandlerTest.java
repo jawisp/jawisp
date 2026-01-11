@@ -1,4 +1,4 @@
-package io.jawisp.http;
+package io.jawisp.http.handler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import io.jawisp.http.HttpMethod;
+import io.jawisp.http.MediaType;
 
 class RouteHandlerTest {
 

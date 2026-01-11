@@ -1,4 +1,4 @@
-package io.jawisp.http;
+package io.jawisp.http.handler;
 
 import java.time.Instant;
 

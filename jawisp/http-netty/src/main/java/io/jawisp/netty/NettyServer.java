@@ -3,8 +3,8 @@ package io.jawisp.netty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jawisp.http.Handler;
 import io.jawisp.http.Server;
+import io.jawisp.http.handler.Handler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

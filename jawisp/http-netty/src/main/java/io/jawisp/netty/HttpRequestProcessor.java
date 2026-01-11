@@ -6,9 +6,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jawisp.http.Handler;
 import io.jawisp.http.Server.Request;
 import io.jawisp.http.Server.Response;
+import io.jawisp.http.handler.Handler;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

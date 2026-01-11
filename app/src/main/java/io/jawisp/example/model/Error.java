@@ -1,8 +1,8 @@
 package io.jawisp.example.model;
 
 import io.jawisp.core.annotation.Entity;
-import io.jawisp.http.ErrorResponse;
 import io.jawisp.http.Server.Request;
+import io.jawisp.http.handler.ErrorResponse;
 
 @Entity
 public class Error extends ErrorResponse {
