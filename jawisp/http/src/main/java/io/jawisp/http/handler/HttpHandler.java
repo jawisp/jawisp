@@ -38,28 +38,28 @@ public class HttpHandler implements Handler {
     public void handle(Request request, Response response) {
         BuilderPool pool = BUILDER_POOL.get();
         RouteMatch match = findRouteMatch(request);
-        
+
         if (match.isNotFound()) {
             pool.notFound.reset(response, request).execute();
             return;
         }
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug("{} {}", request.getMethod(), request.getPath());
         }
-       
+
         try {
             Object result = executeController(match.handler(), match.pathParams(), request);
             pool.success
-                .reset(response)
-                .result(result)
-                .mediaType(match.handler().getProduces())
-                .execute();
+                    .reset(response)
+                    .result(result)
+                    .mediaType(match.handler().getProduces())
+                    .execute();
         } catch (Exception e) {
             pool.error
-                .reset(response, request)
-                .exception(e)
-                .execute();
+                    .reset(response, request)
+                    .exception(e)
+                    .execute();
         }
     }
 
@@ -70,32 +70,32 @@ public class HttpHandler implements Handler {
     }
 
     // Existing private methods remain unchanged until handleSuccess/handleError...
-    
+
     private RouteMatch findRouteMatch(Request request) {
         RouteHandler handler = findMatchingRoute(request.getMethod(), request.getPath());
         if (handler == null) {
             return RouteMatch.notFound();
         }
-        
+
         Matcher matcher = handler.getPattern().matcher(request.getPath());
         if (!matcher.matches()) {
             return RouteMatch.notFound();
         }
-        
+
         return new RouteMatch(handler, extractPathParams(handler, matcher));
     }
 
     private RouteHandler findMatchingRoute(String method, String path) {
         return routeHandlers.stream()
-            .filter(h -> h.getHttpMethod().name().equals(method))
-            .filter(h -> matchesPath(h.getPath(), path))
-            .findFirst()
-            .orElse(null);
+                .filter(h -> h.getHttpMethod().name().equals(method))
+                .filter(h -> matchesPath(h.getPath(), path))
+                .findFirst()
+                .orElse(null);
     }
 
     private boolean matchesPath(String routePattern, String requestPath) {
-        Pattern pattern = Pattern.compile("^" + 
-            routePattern.replaceAll("\\{([^}]+)\\}", "([^/]+)") + "$");
+        Pattern pattern = Pattern.compile("^" +
+                routePattern.replaceAll("\\{([^}]+)\\}", "([^/]+)") + "$");
         return pattern.matcher(requestPath).matches();
     }
 
@@ -109,7 +109,7 @@ public class HttpHandler implements Handler {
         return pathParams;
     }
 
-    private Object executeController(RouteHandler handler, Map<String, Object> pathParams, Request request) 
+    private Object executeController(RouteHandler handler, Map<String, Object> pathParams, Request request)
             throws Exception {
         var method = handler.getMethod();
         Object[] params = resolveMethodParameters(method, pathParams, request);
@@ -120,7 +120,7 @@ public class HttpHandler implements Handler {
     private Object[] resolveMethodParameters(Method method, Map<String, Object> pathParams, Request request) {
         Parameter[] parameters = method.getParameters();
         Object[] params = new Object[parameters.length];
-        
+
         for (int i = 0; i < parameters.length; i++) {
             params[i] = resolveParameter(parameters[i], pathParams, request, i);
         }
@@ -131,19 +131,19 @@ public class HttpHandler implements Handler {
         if (param.isAnnotationPresent(Body.class)) {
             return parseBody(request.getBody(), param.getType());
         }
-        
+
         if (param.isAnnotationPresent(Header.class)) {
             return getHeaderValue(request.getHeaders(), param.getAnnotation(Header.class), param.getType());
         }
-        
+
         if (param.isAnnotationPresent(Cookie.class)) {
             return getCookieValue(request.getHeaders(), param.getAnnotation(Cookie.class), param.getType());
         }
-        
+
         String paramName = extractParamName(param, pathParams, index);
-        Map<String, String> source = param.isAnnotationPresent(QueryValue.class) ? 
-            request.getQueryParams() : toStringMap(pathParams);
-            
+        Map<String, String> source = param.isAnnotationPresent(QueryValue.class) ? request.getQueryParams()
+                : toStringMap(pathParams);
+
         return resolveSimpleType(param.getType(), source, paramName, param);
     }
 
@@ -152,19 +152,19 @@ public class HttpHandler implements Handler {
         if (pathVar != null && !pathVar.value().isEmpty()) {
             return pathVar.value();
         }
-        
+
         var query = param.getAnnotation(QueryValue.class);
         if (query != null && !query.value().isEmpty()) {
             return query.value();
         }
-        
+
         return pathParams.keySet().stream().findFirst().orElse("param" + index);
     }
 
-    private Object resolveSimpleType(Class<?> type, Map<String, String> source, 
-                                   String paramName, Parameter param) {
+    private Object resolveSimpleType(Class<?> type, Map<String, String> source,
+            String paramName, Parameter param) {
         String value = source.get(paramName);
-        
+
         var queryAnno = param.getAnnotation(QueryValue.class);
         if (queryAnno != null) {
             if (value == null) {
@@ -174,14 +174,15 @@ public class HttpHandler implements Handler {
                 return parseDefaultValue(queryAnno.defaultValue(), type);
             }
         }
-        
-        return convertValue(value, type);
-    }    
 
-    // Private helpers methods 
-    
+        return convertValue(value, type);
+    }
+
+    // Private helpers methods
+
     private Object parseBody(String body, Class<?> type) {
-        if (body == null || body.trim().isEmpty()) return null;
+        if (body == null || body.trim().isEmpty())
+            return null;
         return convertValue(body, type);
     }
 
@@ -204,7 +205,7 @@ public class HttpHandler implements Handler {
             }
             return parseDefaultValue(anno.defaultValue(), type);
         }
-        
+
         String value = parseCookieValue(cookieHeader, anno.value());
         if (value == null) {
             if (anno.required()) {
@@ -217,10 +218,10 @@ public class HttpHandler implements Handler {
 
     private String parseCookieValue(String cookieHeader, String cookieName) {
         return Arrays.stream(cookieHeader.split(";"))
-            .map(String::trim)
-            .filter(part -> part.startsWith(cookieName + "="))
-            .map(part -> part.substring(cookieName.length() + 1))
-            .findFirst().orElse(null);
+                .map(String::trim)
+                .filter(part -> part.startsWith(cookieName + "="))
+                .map(part -> part.substring(cookieName.length() + 1))
+                .findFirst().orElse(null);
     }
 
     private Object parseDefaultValue(String defaultValue, Class<?> type) {
@@ -228,10 +229,14 @@ public class HttpHandler implements Handler {
     }
 
     private Object getTypeDefault(Class<?> type) {
-        if (type == int.class || type == Integer.class) return 0;
-        if (type == long.class || type == Long.class) return 0L;
-        if (type == boolean.class || type == Boolean.class) return false;
-        if (type == double.class || type == Double.class) return 0.0;
+        if (type == int.class || type == Integer.class)
+            return 0;
+        if (type == long.class || type == Long.class)
+            return 0L;
+        if (type == boolean.class || type == Boolean.class)
+            return false;
+        if (type == double.class || type == Double.class)
+            return 0.0;
         return null;
     }
 
@@ -239,7 +244,7 @@ public class HttpHandler implements Handler {
         if (value == null || value.trim().isEmpty()) {
             return getTypeDefault(type);
         }
-        
+
         return switch (type.getName()) {
             case "java.lang.String" -> value;
             case "java.lang.Integer", "int" -> Integer.valueOf(value.trim());
@@ -252,7 +257,7 @@ public class HttpHandler implements Handler {
 
     private Map<String, String> toStringMap(Map<String, Object> map) {
         return map.entrySet().stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
     }
 
 }

@@ -7,17 +7,22 @@ package io.jawisp.http;
  */
 public enum HttpMethod {
     /** GET method - used to retrieve information from the server */
-    GET, 
+    GET,
     /** POST method - used to submit data to the server */
-    POST, 
+    POST,
     /** PUT method - used to update or replace existing resources on the server */
-    PUT, 
+    PUT,
     /** DELETE method - used to delete resources from the server */
-    DELETE, 
+    DELETE,
     /** PATCH method - used to apply partial modifications to a resource */
-    PATCH, 
-    /** HEAD method - similar to GET but returns only the headers without the body */
-    HEAD, 
-    /** OPTIONS method - used to describe the communication options for the target resource */
+    PATCH,
+    /**
+     * HEAD method - similar to GET but returns only the headers without the body
+     */
+    HEAD,
+    /**
+     * OPTIONS method - used to describe the communication options for the target
+     * resource
+     */
     OPTIONS
 }

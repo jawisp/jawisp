@@ -5,6 +5,7 @@ public enum MediaType {
     APPLICATION_JSON("application/json"),
     APPLICATION_XML("application/xml"),
     TEXT_HTML("text/html"),
+    
     // Extended types
     APPLICATION_FORM_URLENCODED("application/x-www-form-urlencoded"),
     MULTIPART_FORM_DATA("multipart/form-data"),

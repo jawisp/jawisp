@@ -37,6 +37,9 @@ clean:
 	./gradlew clean
 	find . -type d -name "build" -exec rm -rf {} +
 	find . -type d -name "bin" -exec rm -rf {} +
+	find . -type d -name ".settings" -exec rm -rf {} +
+	find . -type f -name ".project" -exec rm -rf {} +
+	find . -type f -name ".classpath" -exec rm -rf {} +
 
 nativeRun:
 	./gradlew nativeRun

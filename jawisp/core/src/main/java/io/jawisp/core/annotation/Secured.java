@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 public @interface Secured {
     // Security rule to determine access control
     SecurityRule securityRule() default SecurityRule.IS_AUTHENTICATED;
-    
+
     public enum SecurityRule {
         IS_ANONYMOUS,
         IS_AUTHENTICATED
