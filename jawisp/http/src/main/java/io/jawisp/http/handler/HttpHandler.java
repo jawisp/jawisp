@@ -3,12 +3,12 @@ package io.jawisp.http.handler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,13 +100,11 @@ public class HttpHandler implements Handler {
     }
 
     private Map<String, Object> extractPathParams(RouteHandler handler, Matcher matcher) {
-        Map<String, Object> pathParams = new HashMap<>();
-        for (int i = 0; i < handler.getPathParams().size(); i++) {
-            String paramName = handler.getPathParams().get(i);
-            String paramValue = matcher.group(i + 1);
-            pathParams.put(paramName, paramValue);
-        }
-        return pathParams;
+        List<String> pathParamNames = handler.getPathParams();
+        return pathParamNames.stream()
+                .collect(Collectors.toMap(
+                        paramName -> paramName,
+                        paramName -> matcher.group(pathParamNames.indexOf(paramName) + 1)));
     }
 
     private Object executeController(RouteHandler handler, Map<String, Object> pathParams, Request request)
@@ -119,12 +117,9 @@ public class HttpHandler implements Handler {
 
     private Object[] resolveMethodParameters(Method method, Map<String, Object> pathParams, Request request) {
         Parameter[] parameters = method.getParameters();
-        Object[] params = new Object[parameters.length];
-
-        for (int i = 0; i < parameters.length; i++) {
-            params[i] = resolveParameter(parameters[i], pathParams, request, i);
-        }
-        return params;
+        return IntStream.range(0, parameters.length)
+                .mapToObj(i -> resolveParameter(parameters[i], pathParams, request, i))
+                .toArray(Object[]::new);
     }
 
     private Object resolveParameter(Parameter param, Map<String, Object> pathParams, Request request, int index) {
@@ -229,15 +224,13 @@ public class HttpHandler implements Handler {
     }
 
     private Object getTypeDefault(Class<?> type) {
-        if (type == int.class || type == Integer.class)
-            return 0;
-        if (type == long.class || type == Long.class)
-            return 0L;
-        if (type == boolean.class || type == Boolean.class)
-            return false;
-        if (type == double.class || type == Double.class)
-            return 0.0;
-        return null;
+        return switch (type.getName()) {
+            case "int", "java.lang.Integer" -> 0;
+            case "long", "java.lang.Long" -> 0L;
+            case "boolean", "java.lang.Boolean" -> false;
+            case "double", "java.lang.Double" -> 0.0;
+            default -> null;
+        };
     }
 
     private Object convertValue(String value, Class<?> type) {

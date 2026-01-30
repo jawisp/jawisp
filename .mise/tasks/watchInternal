@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+#MISE description="Watch files for changes and run script"
+#MISE hide=true
 
 # Directories to watch (defaults to current directory if not provided)
 DIRS_TO_WATCH=()

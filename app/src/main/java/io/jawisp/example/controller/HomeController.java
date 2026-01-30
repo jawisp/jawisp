@@ -4,9 +4,9 @@ import io.jawisp.core.annotation.Controller;
 import io.jawisp.core.annotation.Inject;
 import io.jawisp.core.annotation.Secured;
 import io.jawisp.core.annotation.Secured.SecurityRule;
-import io.jawisp.http.MediaType;
 import io.jawisp.example.model.User;
 import io.jawisp.example.service.HomeService;
+import io.jawisp.http.MediaType;
 import io.jawisp.http.annotation.Cookie;
 import io.jawisp.http.annotation.Header;
 import io.jawisp.http.annotation.PathVariable;
@@ -36,13 +36,15 @@ public class HomeController {
     @Route(method = "GET", path = "/api")
     @Produces(MediaType.APPLICATION_JSON)
     public User getDefaultUser() {
-        return homeService.getUser("1");
+        return homeService.getUser("1", 33);
     }
 
     @Route(method = "GET", path = "/api/user/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public User getUser(String id) {
-        return homeService.getUser(id);
+    public User getUser(
+            @PathVariable("id") String id, 
+            @QueryValue(value = "age", defaultValue = "33") int age) {
+        return homeService.getUser(id, age);
     }
 
     @Route(method = "GET", path = "/api/user/age/{age}")
@@ -51,7 +53,8 @@ public class HomeController {
             @PathVariable("age") Integer age1,
             @QueryValue(value = "page", defaultValue = "0") int page,
             @Header("Accept") String header,
-            @Cookie("sessionId") String session) {
+            @Cookie("sessionId") String session
+        ) {
         return homeService.getUserByAge(age1);
     }
 
