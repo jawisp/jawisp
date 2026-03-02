@@ -24,9 +24,7 @@ import io.netty.util.CharsetUtil;
 
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
-    // private final Routes routes;
     private final List<Route> routes;
-
 
     public ServerHandler(List<Route> routes) {
         this.routes = routes;
@@ -37,7 +35,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         String uri = request.uri();
         HttpMethod method = request.method();
 
-        Route route = findRoute(method.name(), uri);
+        Route route = findRoute(method, uri);
         if (route != null) {
             Context context = new Context(request);
             route.getHandler().handle(context);
@@ -92,7 +90,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         ctx.close();
     }
 
-    private Route findRoute(String method, String path) {
+    private Route findRoute(HttpMethod method, String path) {
         return routes.stream()
                 .filter(r -> r.getMethod().equals(method) && matchPath(r.getPath(), path))
                 .findFirst()

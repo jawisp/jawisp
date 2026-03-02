@@ -10,35 +10,22 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.netty:netty-buffer:4.2.9.Final'
-    implementation 'io.netty:netty-codec:4.2.9.Final'
-    implementation 'io.netty:netty-codec-http:4.2.9.Final'
-    implementation 'io.netty:netty-common:4.2.9.Final'
-    implementation 'io.netty:netty-handler:4.2.9.Final'
-    implementation 'io.netty:netty-resolver:4.2.9.Final'
-    implementation 'io.netty:netty-transport:4.2.9.Final'
-    // Optional Linux perf boost
-    implementation 'io.netty:netty-transport-native-epoll:4.2.9.Final:linux-x86_64'
-
-    implementation libs.slf4j.api
+    implementation project(':jawisp:core')
     implementation libs.logback.classic
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // This dependency is used by the application.
-    implementation libs.guava
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'io.jawisp.App'
+    mainClass = 'org.example.App'
 }
 
 tasks.named('test') {

@@ -12,3 +12,5 @@ plugins {
 
 rootProject.name = 'jawisp'
 include('app')
+
+include "jawisp:core"

@@ -1,4 +1,4 @@
-package io.jawisp;
+package org.example;
 
 import io.jawisp.core.Jawisp;
 
@@ -13,7 +13,7 @@ public class App {
             });
             routes.get("/api/v1/users/:id", ctx -> {
                 String id = ctx.pathParam("id");
-                ctx.json("{\"userId\":\"" + id + "\", \"name\":\"Taras\"}");
+                ctx.status(200).json("{\"userId\":\"" + id + "\", \"name\":\"Taras\"}");
             });
             routes.post("/users", ctx -> {
                 String body = ctx.body();
