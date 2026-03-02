@@ -1,8 +1,8 @@
-# Jawisp Lightweight Web Server framework
+# Jawisp - lightweight Java framework
 
 ## Getting started
 
-Add dependency for Gradle:
+Jawisp requires Java 21+. Add dependency for Gradle:
 ```
 implementation 'io.jawisp:jawisp:2.0.0'
 ```
