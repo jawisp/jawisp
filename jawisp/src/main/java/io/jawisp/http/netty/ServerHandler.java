@@ -85,8 +85,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     private boolean matchPath(String pattern, String path) {
         // Simple :param matching
-        if (pattern.equals(path))
+        if (pattern.equals(path)) {
             return true;
+        }
         Pattern p = Pattern.compile(pattern.replaceAll(":[^/]+", "([^/]+)"));
         Matcher m = p.matcher(path);
         return m.matches();

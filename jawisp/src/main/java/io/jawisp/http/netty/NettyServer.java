@@ -3,7 +3,7 @@ package io.jawisp.http.netty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jawisp.core.Jawisp.Config;
+import io.jawisp.core.Config;
 import io.jawisp.http.HttpServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -58,7 +58,6 @@ public class NettyServer implements HttpServer {
             ChannelFuture f = b.bind(config.getPort()).sync();
             channel = f.channel();
 
-            // serverChannel = b.bind(config.port).sync().channel();
             long end = System.nanoTime();
             long elapsedMs = (end - start) / 1_000_000;
             logger.info("Server started on {}:{}/ in {} ms", "http://localhost",
