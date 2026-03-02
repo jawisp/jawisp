@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.jawisp.http.ContextAwareRoutes;
-import io.jawisp.http.Route;
 import io.jawisp.http.Routes;
+import io.jawisp.http.Route;
 
 public class Config {
     private int port = 8080;
@@ -30,8 +29,7 @@ public class Config {
     }
     
     public Config routes(Consumer<Routes> routesConfig) {
-        // Routes routing = new Routes();
-        ContextAwareRoutes routing = new ContextAwareRoutes(contextPath);
+        Routes routing = new Routes(contextPath);
         routesConfig.accept(routing);
         this.routes.addAll(routing.getRoutes());
         return this;
@@ -45,15 +43,8 @@ public class Config {
         return routes;
     }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
-
     public String getContextPath() {
         return contextPath;
     }
 
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
-    }
 }

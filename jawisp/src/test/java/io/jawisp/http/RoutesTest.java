@@ -3,7 +3,7 @@ package io.jawisp.http;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ContextAwareRoutesTest {
+public class RoutesTest {
     
     Handler mockHandler = new Handler() {
         @Override
@@ -14,7 +14,7 @@ public class ContextAwareRoutesTest {
     
     @Test
     public void testContextPathRoot() {
-        ContextAwareRoutes routes = new ContextAwareRoutes("/api/v1");
+        Routes routes = new Routes("/api/v1");
         routes.get("/", mockHandler);
         
         Route rootRoute = routes.getRoutes().get(0);
@@ -24,7 +24,7 @@ public class ContextAwareRoutesTest {
 
     @Test
     public void testContextPathUsers() {
-        ContextAwareRoutes routes = new ContextAwareRoutes("/api/v1");
+        Routes routes = new Routes("/api/v1");
         routes.post("/users", mockHandler);
         
         Route userRoute = routes.getRoutes().get(0);
@@ -34,7 +34,7 @@ public class ContextAwareRoutesTest {
     
     @Test
     public void testContextPathUsersId() {
-        ContextAwareRoutes routes = new ContextAwareRoutes("/api/v1");
+        Routes routes = new Routes("/api/v1");
         routes.get("/users/:id", mockHandler);
         
         assertEquals("/api/v1/users/:id", routes.getRoutes().get(0).getPath());
@@ -42,7 +42,7 @@ public class ContextAwareRoutesTest {
 
     @Test
     public void testEmptyContextPath() {
-        ContextAwareRoutes routes = new ContextAwareRoutes("");
+        Routes routes = new Routes("");
         routes.get("/home", mockHandler);
         
         assertEquals("/home", routes.getRoutes().get(0).getPath());
@@ -50,7 +50,7 @@ public class ContextAwareRoutesTest {
 
     @Test
     public void testTrailingSlashContext() {
-        ContextAwareRoutes routes = new ContextAwareRoutes("/api/");
+        Routes routes = new Routes("/api/");
         routes.get("/test", mockHandler);
         
         assertEquals("/api/test", routes.getRoutes().get(0).getPath());
@@ -58,7 +58,7 @@ public class ContextAwareRoutesTest {
 
     @Test
     public void testNoLeadingSlashRoute() {
-        ContextAwareRoutes routes = new ContextAwareRoutes("/api/v1");
+        Routes routes = new Routes("/api/v1");
         routes.get("users", mockHandler);
         
         assertEquals("/api/v1/users", routes.getRoutes().get(0).getPath());
