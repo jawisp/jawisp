@@ -3,6 +3,7 @@ java = '25'
 
 [tasks.dev]
 description = 'Run in development mode'
+quiet = true
 run = '''
 DIRECTORIES='app/src jawisp/core/src jawisp/http/src jawisp/http-netty/src'
 mise watchInternal $DIRECTORIES
@@ -10,6 +11,7 @@ mise watchInternal $DIRECTORIES
 
 [tasks.prod-up]
 description = 'Bring up production environment'
+quiet = true
 run = '''
 docker compose -f deployment/prod/compose.yml up -d --build
 docker image prune -a -f
@@ -17,14 +19,17 @@ docker image prune -a -f
 
 [tasks.prod-down]
 description = 'Take down production environment'
+quiet = true
 run = 'docker compose -f deployment/prod/compose.yml down'
 
 [tasks.test]
 description = 'Clean and run tests'
+quiet = true
 run = './gradlew clean test'
 
 [tasks.clean]
 description = 'Cleaning up task'
+quiet = true
 run = '''
 ./gradlew clean
 find . -type d -name 'build' -exec rm -rf {} +

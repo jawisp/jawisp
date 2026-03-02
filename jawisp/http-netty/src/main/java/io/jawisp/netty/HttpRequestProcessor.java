@@ -37,7 +37,7 @@ public class HttpRequestProcessor extends SimpleChannelInboundHandler<FullHttpRe
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         try {
-            // // 1. Convert Netty → Jawisp Request
+            // 1. Convert Netty → Jawisp Request
             Request jawispRequest = nettyToCore(request);
 
             // 2. Call your framework Handler
@@ -96,8 +96,8 @@ public class HttpRequestProcessor extends SimpleChannelInboundHandler<FullHttpRe
 
     private FullHttpResponse coreToNetty(Response res, HttpVersion version) {
         var content = Unpooled.copiedBuffer(res.getBody());
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                HttpResponseStatus.valueOf(res.getStatus()), Unpooled.copiedBuffer(res.getBody()));
+        FullHttpResponse response = new DefaultFullHttpResponse(version,
+                HttpResponseStatus.valueOf(res.getStatus()), content);
 
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, res.getContentType());
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());

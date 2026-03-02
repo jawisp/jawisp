@@ -39,7 +39,7 @@ public class HomeController {
         return homeService.getUser("1", 33);
     }
 
-    @Route(method = "GET", path = "/api/user/{id}")
+    @Route(method = "GET", path = "/api/v1/users/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public User getUser(
             @PathVariable("id") String id, 
@@ -47,7 +47,7 @@ public class HomeController {
         return homeService.getUser(id, age);
     }
 
-    @Route(method = "GET", path = "/api/user/age/{age}")
+    @Route(method = "GET", path = "/api/v1/users/age/{age}")
     @Produces(MediaType.APPLICATION_JSON)
     public User getUserByAge(
             @PathVariable("age") Integer age1,

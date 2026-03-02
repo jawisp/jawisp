@@ -13,6 +13,8 @@ dependencies {
     implementation project(':jawisp:core')
     implementation project(':jawisp:http')
     implementation project(':jawisp:http-netty')
+
+    // implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.1'
     
     implementation 'org.slf4j:slf4j-api:2.0.17'
     implementation 'org.slf4j:slf4j-simple:2.0.17'

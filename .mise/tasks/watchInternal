@@ -2,6 +2,7 @@
 
 #MISE description="Watch files for changes and run script"
 #MISE hide=true
+#MISE quiet=true
 
 # Directories to watch (defaults to current directory if not provided)
 DIRS_TO_WATCH=()
