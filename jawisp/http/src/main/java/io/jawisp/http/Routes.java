@@ -1,7 +1,8 @@
-package io.jawisp.core;
+package io.jawisp.http;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import io.netty.handler.codec.http.HttpMethod;
 
 public class Routes {

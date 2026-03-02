@@ -1,4 +1,4 @@
-package io.jawisp.core;
+package io.jawisp.netty;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jawisp.http.Context;
+import io.jawisp.http.Route;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -37,16 +39,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
         Route route = findRoute(method, uri);
         if (route != null) {
-            Context context = new Context(request);
+            Context context = new Context(request, route);
             route.getHandler().handle(context);
             response(ctx, context);
         } else {
-            response(ctx, "404 Not Found", HttpResponseStatus.NOT_FOUND, false);
+            Context context = new Context(request, null);
+            context.result("404 Not Found").status(404);
+            response(ctx, context);
         }
-    }
-
-    public static void response(ChannelHandlerContext ctx, String content) {
-        response(ctx, content, HttpResponseStatus.OK, true);
     }
 
     public static void response(ChannelHandlerContext ctx, Context context) {
@@ -57,20 +57,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
 
         if (context.isKeepAlive()) {
-            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-            ctx.writeAndFlush(response);
-        } else {
-            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-        }
-    }
-
-    public static void response(ChannelHandlerContext ctx, String body, HttpResponseStatus status, boolean keepAlive) {
-        var content = Unpooled.copiedBuffer(body, CharsetUtil.UTF_8);
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
-        response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-
-        if (keepAlive) {
             response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
             ctx.writeAndFlush(response);
         } else {
@@ -90,7 +76,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         ctx.close();
     }
 
-    private Route findRoute(HttpMethod method, String path) {
+    Route findRoute(HttpMethod method, String path) {
         return routes.stream()
                 .filter(r -> r.getMethod().equals(method) && matchPath(r.getPath(), path))
                 .findFirst()

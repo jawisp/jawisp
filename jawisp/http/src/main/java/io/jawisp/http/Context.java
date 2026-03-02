@@ -1,4 +1,4 @@
-package io.jawisp.core;
+package io.jawisp.http;
 
 import java.nio.charset.StandardCharsets;
 
@@ -8,14 +8,17 @@ import io.netty.handler.codec.http.HttpUtil;
 public class Context {
     private final String path;
     private final FullHttpRequest request;
-    private StringBuilder result = new StringBuilder();
+    private final StringBuilder result = new StringBuilder();
+    private final Route route;
+
     private int status = 200;
     private String contentType = "text/plain; charset=UTF-8";
     private boolean keepAlive = true;
 
-    public Context(FullHttpRequest request) {
+    public Context(FullHttpRequest request, Route route) {
         this.path = request.uri();
         this.request = request;
+        this.route = route;
         this.keepAlive = HttpUtil.isKeepAlive(request);
     }
 
@@ -40,14 +43,13 @@ public class Context {
     }
 
     public String pathParam(String name) {
-        // Simple extraction for :name params
         String[] parts = path.split("/");
-        String[] patternParts = this.path.split("/");
+        String[] patternParts = route.getPath().split("/");
         for (int i = 0; i < patternParts.length; i++) {
-            if (patternParts[i].startsWith(":")) {
-                if (patternParts[i].substring(1).equals(name) && i < parts.length) {
-                    return parts[i];
-                }
+            if (patternParts[i].startsWith(":") &&
+                    patternParts[i].substring(1).equals(name) &&
+                    i < parts.length) {
+                return parts[i];
             }
         }
         return null;

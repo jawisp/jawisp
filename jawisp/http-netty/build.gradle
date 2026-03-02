@@ -17,17 +17,18 @@ repositories {
 }
 
 dependencies {
+    implementation project(':jawisp:core')
     implementation project(':jawisp:http')
 
-    // implementation 'io.netty:netty-buffer:4.2.10.Final'
-    // implementation 'io.netty:netty-codec:4.2.10.Final'
-    // implementation 'io.netty:netty-codec-http:4.2.10.Final'
-    // implementation 'io.netty:netty-common:4.2.10.Final'
-    // implementation 'io.netty:netty-handler:4.2.10.Final'
-    // implementation 'io.netty:netty-resolver:4.2.10.Final'
-    // implementation 'io.netty:netty-transport:4.2.10.Final'
-    // // Optional Linux perf boost
-    // implementation 'io.netty:netty-transport-native-epoll:4.2.10.Final:linux-x86_64'
+    implementation 'io.netty:netty-buffer:4.2.10.Final'
+    implementation 'io.netty:netty-codec:4.2.10.Final'
+    implementation 'io.netty:netty-codec-http:4.2.10.Final'
+    implementation 'io.netty:netty-common:4.2.10.Final'
+    implementation 'io.netty:netty-handler:4.2.10.Final'
+    implementation 'io.netty:netty-resolver:4.2.10.Final'
+    implementation 'io.netty:netty-transport:4.2.10.Final'
+    // Optional Linux perf boost
+    implementation 'io.netty:netty-transport-native-epoll:4.2.10.Final:linux-x86_64'
 
     implementation libs.slf4j.api
     // implementation libs.logback.classic

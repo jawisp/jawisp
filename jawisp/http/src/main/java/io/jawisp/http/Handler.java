@@ -1,4 +1,4 @@
-package io.jawisp.core;
+package io.jawisp.http;
 
 @FunctionalInterface
 public interface Handler {

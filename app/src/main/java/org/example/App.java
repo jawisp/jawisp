@@ -4,11 +4,9 @@ import io.jawisp.core.Jawisp;
 
 public class App {
 
-    public static void main(String[] args) {
+    void main() {
         Jawisp.create().routes(routes -> {
-            routes.get("/", ctx -> {
-                ctx.result("Hello World!");
-            });
+            routes.get("/", ctx -> ctx.result("Hello World!"));
             routes.get("/api/v1/users/:id", ctx -> {
                 String id = ctx.pathParam("id");
                 ctx.status(200).json("{\"userId\":\"" + id + "\", \"name\":\"Taras\"}");

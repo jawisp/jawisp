@@ -1,19 +1,17 @@
-package io.jawisp.core;
-
-import io.netty.handler.codec.http.HttpMethod;
+package io.jawisp.http;
 
 public class Route {
-    private final HttpMethod method;
+    private final String method;
     private final String path;
     private final Handler handler;
 
-    public Route(HttpMethod method, String path, Handler handler) {
+    public Route(String method, String path, Handler handler) {
         this.method = method;
         this.path = path;
         this.handler = handler;
     }
 
-    public HttpMethod getMethod() {
+    public String getMethod() {
         return method;
     }
 
