@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import io.jawisp.http.ContextAwareRoutes;
 import io.jawisp.http.Route;
 import io.jawisp.http.Routes;
 
@@ -23,8 +24,14 @@ public class Config {
         return this;
     }
 
+    public Config contextPath(String contextPath) {
+        this.contextPath = contextPath;
+        return this;
+    }
+    
     public Config routes(Consumer<Routes> routesConfig) {
-        Routes routing = new Routes();
+        // Routes routing = new Routes();
+        ContextAwareRoutes routing = new ContextAwareRoutes(contextPath);
         routesConfig.accept(routing);
         this.routes.addAll(routing.getRoutes());
         return this;
