@@ -1,0 +1,45 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'io.jawisp'
+version = '2.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.netty:netty-buffer:4.2.10.Final'
+    implementation 'io.netty:netty-codec:4.2.10.Final'
+    implementation 'io.netty:netty-codec-http:4.2.10.Final'
+    implementation 'io.netty:netty-common:4.2.10.Final'
+    implementation 'io.netty:netty-handler:4.2.10.Final'
+    implementation 'io.netty:netty-resolver:4.2.10.Final'
+    implementation 'io.netty:netty-transport:4.2.10.Final'
+    // Optional Linux perf boost
+    implementation 'io.netty:netty-transport-native-epoll:4.2.10.Final:linux-x86_64'
+
+    implementation libs.slf4j.api
+    // implementation libs.logback.classic
+
+    testImplementation libs.junit.jupiter
+    // JUnit Platform Launcher (if needed)
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Mockito for mocking
+    testImplementation 'org.mockito:mockito-core:5.20.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}

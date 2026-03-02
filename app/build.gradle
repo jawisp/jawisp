@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(':jawisp:core')
+    implementation project(':jawisp')
     implementation libs.logback.classic
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

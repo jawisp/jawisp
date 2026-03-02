@@ -13,6 +13,4 @@ plugins {
 rootProject.name = 'jawisp'
 include('app')
 
-include "jawisp:core"
-include "jawisp:http"
-include "jawisp:http-netty"
+include "jawisp"
