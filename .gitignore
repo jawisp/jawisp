@@ -3,12 +3,6 @@
 
 # Ignore Gradle build output directory
 build
-bin
 
-# VS Code settings
-.vscode
-
-# Zed java extensions
-.project
-.settings
-.classpath
+# Ignore Kotlin plugin data
+.kotlin
