@@ -4,7 +4,7 @@ import io.jawisp.core.Jawisp;
 
 public class App {
 
-    public static void main(String[] args) {
+    void main() {
         Jawisp.run(config -> config
                 .contextPath("/api/v1")
                 .routes(route -> {
