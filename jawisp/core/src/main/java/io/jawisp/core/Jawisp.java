@@ -28,7 +28,7 @@ public class Jawisp {
     private final EventLoopGroup workerGroup;
 
     private Jawisp(Config config) {
-        logger.info("Starting JAWISP v1.0.0 ...");
+        logger.info("Starting Web JAWISP v2.0.0 ...");
 
         AtomicInteger index = new AtomicInteger(1);
         config.routes.stream()
@@ -80,8 +80,8 @@ public class Jawisp {
         workerGroup.shutdownGracefully();
     }
 
-    public static Config create(Consumer<Config> config) {
-        return new Config().configure(config);
+    public static Config create() {
+        return new Config();
     }
 
     public static class Config {
@@ -105,10 +105,13 @@ public class Jawisp {
             this.routes.addAll(routing.getRoutes());
             return this;
         }
-
+        
         public Jawisp start() {
             return new Jawisp(this);
         }
-    }
 
+        public Jawisp start(Consumer<Config> config) {
+            return new Jawisp(configure(config));
+        }
+    }
 }

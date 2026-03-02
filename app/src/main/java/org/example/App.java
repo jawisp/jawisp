@@ -5,9 +5,7 @@ import io.jawisp.core.Jawisp;
 public class App {
 
     public static void main(String[] args) {
-        Jawisp.create(config -> {
-            config.port(8080);
-        }).routes(routes -> {
+        Jawisp.create().routes(routes -> {
             routes.get("/", ctx -> {
                 ctx.result("Hello World!");
             });
