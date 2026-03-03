@@ -2,6 +2,7 @@ package io.jawisp.http;
 
 import java.nio.charset.StandardCharsets;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpUtil;
 
@@ -38,7 +39,18 @@ public class Context {
     }
 
     public String body() {
-        return request.content().toString(StandardCharsets.UTF_8);
+        ByteBuf content = request.content();
+        return content == null ? "" : content.toString(StandardCharsets.UTF_8);
+    }
+
+    public byte[] bodyAsBytes() {
+        ByteBuf content = request.content();
+        if (content == null || content.readableBytes() == 0) {
+            return new byte[0]; // Return an empty byte array if the content is null or empty
+        }
+        byte[] bytes = new byte[content.readableBytes()];
+        content.readBytes(bytes);
+        return bytes;
     }
 
     public String pathParam(String name) {

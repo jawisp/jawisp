@@ -1,10 +1,16 @@
 package io.jawisp.http;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -89,4 +95,102 @@ class ContextTest {
         assertEquals(200, ctx.getStatus());
         assertTrue(ctx.isKeepAlive());
     }
+
+    @Test
+    void testBodyNotNullContent() {
+        // Arrange
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        String body = "Hello, World!";
+        ByteBuf content = Unpooled.wrappedBuffer(body.getBytes());
+        when(request.content()).thenReturn(content);
+        Context context = new Context(request, new Route(HttpMethod.GET, "/", null));
+
+        // Act
+        String result = context.body();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(body, result);
+    }
+
+    @Test
+    void testBodyNullContent() {
+        // Arrange
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        when(request.content()).thenReturn(null);
+        Context context = new Context(request, new Route(HttpMethod.GET, "/", null));
+
+        // Act
+        String result = context.body();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("", result);
+    }
+
+    @Test
+    void testBodyEmptyContent() {
+        // Arrange
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        ByteBuf content = Unpooled.buffer(0);
+        when(request.content()).thenReturn(content);
+        Context context = new Context(request, new Route(HttpMethod.GET, "/", null));
+
+        // Act
+        String result = context.body();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("", result);
+    }
+    
+    @Test
+    void testBodyAsBytesNotNullContent() {
+        // Arrange
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        String body = "Hello, World!";
+        ByteBuf content = Unpooled.wrappedBuffer(body.getBytes());
+        when(request.content()).thenReturn(content);
+        Context context = new Context(request, new Route(HttpMethod.GET, "/", null));
+
+        // Act
+        byte[] result = context.bodyAsBytes();
+
+        // Assert
+        assertNotNull(result);
+        assertArrayEquals(body.getBytes(), result);
+    }
+
+    @Test
+    void testBodyAsBytesNullContent() {
+        // Arrange
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        when(request.content()).thenReturn(null);
+        Context context = new Context(request, new Route(HttpMethod.GET, "/", null));
+
+        // Act
+        byte[] result = context.bodyAsBytes();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.length == 0);
+    }
+
+    @Test
+    void testBodyAsBytesEmptyContent() {
+        // Arrange
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        ByteBuf content = Unpooled.buffer(0);
+        when(request.content()).thenReturn(content);
+        Context context = new Context(request, new Route(HttpMethod.GET, "/", null));
+
+        // Act
+        byte[] result = context.bodyAsBytes();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.length == 0);
+    }
+
+
 }
