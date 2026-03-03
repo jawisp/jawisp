@@ -36,7 +36,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         executeFilters(ctx, request, HttpMethod.BEFORE_FILTER);
 
         var route = ServerHandlerUtils.findRoute(request, routes);
-        Context context = new Context(request, route.orElse(null));
+        Context context = new NettyContext(request, route.orElse(null));
         if (route.isPresent()) {
             // Run main handler
             route.get().getHandler().handle(context);
@@ -53,16 +53,16 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     private void executeFilters(ChannelHandlerContext ctx, FullHttpRequest request, HttpMethod filterType) {
         ServerHandlerUtils.findFilter(filterType, routes).ifPresent(route -> {
-            Context context = new Context(request, route);
+            Context context = new NettyContext(request, route);
             route.getHandler().handle(context);
         });
     }
 
     private static void response(ChannelHandlerContext ctx, Context context) {
-        var content = Unpooled.copiedBuffer(context.getResult(), CharsetUtil.UTF_8);
-        var status = HttpResponseStatus.valueOf(context.getStatus());
+        var content = Unpooled.copiedBuffer(context.result(), CharsetUtil.UTF_8);
+        var status = HttpResponseStatus.valueOf(context.status());
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, context.getContentType());
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, context.contentType());
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
 
         if (context.isKeepAlive()) {
