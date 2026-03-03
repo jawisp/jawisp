@@ -27,6 +27,8 @@ dependencies {
     // Optional Linux perf boost
     implementation 'io.netty:netty-transport-native-epoll:4.2.10.Final:linux-x86_64'
 
+    compileOnly("com.fasterxml.jackson.core:jackson-databind:2.21.1")
+
     implementation libs.slf4j.api
     // implementation libs.logback.classic
 
