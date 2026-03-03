@@ -26,3 +26,16 @@ void main() {
 }
 ```
 By default, server will run on port 8080
+
+## Context
+
+The context object provides all data to process an HTTP request. It contains the request and response, as well as a set of getters and setters.
+
+```
+/* Methods for the request */
+
+- body()            // request body as string
+- bodyAsBytes()     // request body as array of bytes
+
+
+```
