@@ -1,15 +1,30 @@
 package io.jawisp.http.netty;
 
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
+/**
+ * Utility class containing methods for handling Netty {@link FullHttpRequest}.
+ */
 public class Utils {
-    
+
+    /**
+     * Checks if the content type of the request is JSON.
+     *
+     * @param request the {@link FullHttpRequest} object
+     * @return true if the content type is JSON or a wildcard that includes JSON,
+     *         false otherwise
+     */
     public static boolean isJson(FullHttpRequest request) {
         HttpHeaders headers = request.headers();
         String contentType = headers.get(HttpHeaderNames.CONTENT_TYPE);
@@ -19,6 +34,15 @@ public class Utils {
                         contentType.contains("*/*"));
     }
 
+    /**
+     * Extracts path parameters from the request path and route pattern.
+     *
+     * @param requestPath the request path
+     * @param routePath   the route path containing parameter placeholders (e.g.,
+     *                    /users/:id)
+     * @return a map of path parameters where the key is the parameter name and the
+     *         value is the parameter value
+     */
     public static Map<String, String> pathParamMap(String requestPath, String routePath) {
         String[] parts = requestPath.split("/");
         String[] patternParts = routePath.split("/");
@@ -30,4 +54,5 @@ public class Utils {
                         i -> patternParts[i].substring(1),
                         i -> parts[i]));
     }
+
 }

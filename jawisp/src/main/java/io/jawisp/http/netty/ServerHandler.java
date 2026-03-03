@@ -36,7 +36,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         executeFilters(ctx, request, HttpMethod.BEFORE_FILTER);
 
         var route = ServerHandlerUtils.findRoute(request, routes);
-        Context context = new NettyContext(request, route.orElse(null));
+        Context context = new NettyContext(ctx, request, route.orElse(null));
         if (route.isPresent()) {
             // Run main handler
             route.get().getHandler().handle(context);
@@ -53,7 +53,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     private void executeFilters(ChannelHandlerContext ctx, FullHttpRequest request, HttpMethod filterType) {
         ServerHandlerUtils.findFilter(filterType, routes).ifPresent(route -> {
-            Context context = new NettyContext(request, route);
+            Context context = new NettyContext(ctx, request, route);
             route.getHandler().handle(context);
         });
     }

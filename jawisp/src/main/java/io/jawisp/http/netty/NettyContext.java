@@ -9,13 +9,16 @@ import io.jawisp.http.Route;
 import io.jawisp.http.json.JsonMapper;
 import io.jawisp.http.json.JsonMapperProvider;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.util.AttributeKey;
 
 public class NettyContext implements Context {
 
-    private final String path;
+    private final ChannelHandlerContext ctx;
     private final FullHttpRequest request;
+    private final String path;
     private final Route route;
     private String result;
     private int status;
@@ -23,10 +26,11 @@ public class NettyContext implements Context {
     private boolean keepAlive;
     private JsonMapper jsonMapper;
 
-    public NettyContext(FullHttpRequest request, Route route) {
-        this.path = request.uri();
+    public NettyContext(ChannelHandlerContext ctx, FullHttpRequest request, Route route) {
+        this.ctx = ctx;
         this.request = request;
         this.route = route;
+        this.path = request.uri();
         this.keepAlive = HttpUtil.isKeepAlive(request);
         this.contentType = "text/plain; charset=UTF-8";
         this.result = "";
@@ -125,6 +129,32 @@ public class NettyContext implements Context {
     @Override
     public Map<String, String> pathParamMap() {
         return Utils.pathParamMap(path, route.getPath());
+    }
+
+    /**
+     * Sets an attribute on the request.
+     *
+     * @param name  the name of the attribute
+     * @param value the value of the attribute
+     * @return the current Context object for method chaining
+     */
+    @Override
+    public Context attribute(String name, Object value) {
+        ctx.channel().attr(AttributeKey.valueOf(name)).set(value);
+        return this;
+    }
+
+    /**
+     * Retrieves an attribute from the request.
+     *
+     * @param name the name of the attribute
+     * @param <T>  the type of the attribute value
+     * @return the attribute value or null if the attribute does not exist
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T attribute(String name) {
+        return (T) ctx.channel().attr(AttributeKey.valueOf(name)).get();
     }
 
 }
