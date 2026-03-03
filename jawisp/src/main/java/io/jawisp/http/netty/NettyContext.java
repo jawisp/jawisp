@@ -17,7 +17,7 @@ public class NettyContext implements Context {
     private final String path;
     private final FullHttpRequest request;
     private final Route route;
-    private final StringBuilder result;
+    private String result;
     private int status;
     private String contentType;
     private boolean keepAlive;
@@ -29,19 +29,19 @@ public class NettyContext implements Context {
         this.route = route;
         this.keepAlive = HttpUtil.isKeepAlive(request);
         this.contentType = "text/plain; charset=UTF-8";
-        this.result = new StringBuilder();
+        this.result = "";
         this.status = 200;
     }
 
     @Override
     public Context result(String result) {
-        this.result.append(result);
+        this.result = result;
         return this;
     }
-
+    
     @Override
     public String result() {
-        return result.toString();
+        return result;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class NettyContext implements Context {
     @Override
     public Context json(String json) {
         this.contentType = "application/json; charset=UTF-8";
-        this.result.append(json);
+        this.result = json;
         return this;
     }
 

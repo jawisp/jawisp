@@ -43,14 +43,17 @@ class ContextTest {
     }
 
     @Test
-    void result_chainsCorrectly() {
+    void result_overwriteCorrectly() {
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         when(request.uri()).thenReturn("/");
         when(request.protocolVersion()).thenReturn(HttpVersion.HTTP_1_1); // FIX: HttpUtil safe
 
         Context ctx = new NettyContext(request, new Route(HttpMethod.GET, "/", null));
-        ctx.result("Hello").result(" World"); // Line 51 - PASSES
+
+        ctx.result("Hello World");
         assertEquals("Hello World", ctx.result().toString());
+        ctx.result("Hello");
+        assertEquals("Hello", ctx.result().toString());
     }
 
     @Test

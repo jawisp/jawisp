@@ -37,10 +37,15 @@ The context object provides all data to process an HTTP request. It contains the
 - body()                // request body as string
 - bodyAsBytes()         // request body as array of bytes
 - pathParam("name")     // path parameter by name as string
+- pathParamMap()        // map of all path parameters
+- path()                // request path
+- isKeepAlive()         // is keep alive request
 
 /* Methods for the response */
 
-- result("result")      // set result stream to specified string (overwrites any previously set result)
+- result("result")      // set result stream to specified string
 - json(obj)             // calls result(jsonString), and also sets content type to json
+- status()              // get the response status
+- status(code)          // set the response status code
 
 ```
