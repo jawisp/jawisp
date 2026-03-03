@@ -16,10 +16,10 @@ public class NettyContext implements Context {
     private final String path;
     private final FullHttpRequest request;
     private final Route route;
-    private final StringBuilder result = new StringBuilder();
-    private int status = 200;
-    private String contentType = "text/plain; charset=UTF-8";
-    private boolean keepAlive = true;
+    private final StringBuilder result;
+    private int status;
+    private String contentType;
+    private boolean keepAlive;
     private JsonMapper jsonMapper;
 
     public NettyContext(FullHttpRequest request, Route route) {
@@ -27,6 +27,9 @@ public class NettyContext implements Context {
         this.request = request;
         this.route = route;
         this.keepAlive = HttpUtil.isKeepAlive(request);
+        this.contentType = "text/plain; charset=UTF-8";
+        this.result = new StringBuilder();
+        this.status = 200;
     }
 
     @Override
