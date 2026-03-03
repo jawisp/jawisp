@@ -17,10 +17,6 @@ public class App {
     void main() {
         Jawisp.run(config -> config
                 .routes(route -> {
-                    route.before("/", ctx -> {
-                    });
-                    route.after("/", ctx -> {
-                    });
                     route.get("/", ctx -> ctx.result("Hello World!"));
                     route.get("/api/v1/users/:id", ctx -> ctx
                             .status(200)
