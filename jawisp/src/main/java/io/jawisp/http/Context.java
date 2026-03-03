@@ -1,6 +1,7 @@
 package io.jawisp.http;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import io.jawisp.http.json.JsonMapper;
 
@@ -22,8 +23,6 @@ public interface Context {
 
     <T> T bodyAsClass(Type type);
 
-    String pathParam(String name);
-
     JsonMapper jsonMapper();
 
     boolean isKeepAlive();
@@ -33,5 +32,9 @@ public interface Context {
     Context contentType(String contentType);
 
     String path();
-    
+
+    String pathParam(String name);
+
+    Map<String, String> pathParamMap();
+
 }
