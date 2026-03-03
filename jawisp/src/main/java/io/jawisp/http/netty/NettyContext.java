@@ -2,6 +2,7 @@ package io.jawisp.http.netty;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import io.jawisp.http.Context;
 import io.jawisp.http.Route;
@@ -88,19 +89,6 @@ public class NettyContext implements Context {
     }
 
     @Override
-    public String pathParam(String name) {
-        String[] parts = path.split("/");
-        String[] patternParts = route.getPath().split("/");
-        for (int i = 0; i < patternParts.length; i++) {
-            if (patternParts[i].startsWith(":") &&
-                    patternParts[i].substring(1).equals(name) &&
-                    i < parts.length) {
-                return parts[i];
-            }
-        }
-        return null;
-    }
-
     public boolean isKeepAlive() {
         return keepAlive;
     }
@@ -127,6 +115,16 @@ public class NettyContext implements Context {
             jsonMapper = JsonMapperProvider.load();
         }
         return jsonMapper;
+    }
+
+    @Override
+    public String pathParam(String name) {
+        return pathParamMap().get(name);
+    }
+
+    @Override
+    public Map<String, String> pathParamMap() {
+        return Utils.pathParamMap(path, route.getPath());
     }
 
 }
