@@ -114,12 +114,6 @@ public class Context {
         return keepAlive;
     }
 
-    // Setter for config - chainable
-    // public Context jsonMapper(JsonMapper jsonMapper) {
-    //     this.jsonMapper = jsonMapper;
-    //     return this;
-    // }
-
     public JsonMapper jsonMapper() {
         if (jsonMapper == null) {
             jsonMapper = JsonMapperProvider.load();  
