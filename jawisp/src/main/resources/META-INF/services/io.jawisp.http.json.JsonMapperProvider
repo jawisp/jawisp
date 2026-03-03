@@ -1,0 +1,2 @@
+io.jawisp.http.json.JacksonJsonMapperProvider
+# Optional comment: Default Jackson provider

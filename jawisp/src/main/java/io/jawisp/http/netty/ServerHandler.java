@@ -81,7 +81,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             ctx.close();
             return;
         }
-        logger.error(cause.getMessage());
+        // cause.printStackTrace();
+        logger.error(cause.getLocalizedMessage());
         ctx.close();
     }
 
