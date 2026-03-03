@@ -6,8 +6,9 @@ public class App {
 
     void main() {
         Jawisp.run(config -> config
-                .contextPath("/api/v1")
                 .routes(route -> {
+                    route.before("/", ctx -> {});
+                    route.after("/", ctx -> {});
                     route.get("/", ctx -> ctx.result("Hello World!"));
                     route.get("/users/:id", ctx -> ctx
                             .status(200)

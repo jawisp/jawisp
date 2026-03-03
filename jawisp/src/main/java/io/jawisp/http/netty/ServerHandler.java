@@ -2,13 +2,12 @@ package io.jawisp.http.netty;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.jawisp.http.Context;
+import io.jawisp.http.HttpMethod;
 import io.jawisp.http.Route;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -19,7 +18,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
@@ -34,22 +32,33 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        String uri = request.uri();
-        HttpMethod method = request.method();
+        // Run BEFORE filter
+        executeFilters(ctx, request, HttpMethod.BEFORE_FILTER);
 
-        Route route = findRoute(method, uri);
-        if (route != null) {
-            Context context = new Context(request, route);
-            route.getHandler().handle(context);
-            response(ctx, context);
+        var route = ServerHandlerUtils.findRoute(request, routes);
+        Context context = new Context(request, route.orElse(null));
+        if (route.isPresent()) {
+            // Run main handler
+            route.get().getHandler().handle(context);
         } else {
-            Context context = new Context(request, null);
+            // 404 result
             context.result("404 Not Found").status(404);
-            response(ctx, context);
         }
+
+        response(ctx, context);
+
+        // Always run AFTER filter
+        executeFilters(ctx, request, HttpMethod.AFTER_FILTER);
     }
 
-    public static void response(ChannelHandlerContext ctx, Context context) {
+    private void executeFilters(ChannelHandlerContext ctx, FullHttpRequest request, HttpMethod filterType) {
+        ServerHandlerUtils.findFilter(filterType, routes).ifPresent(route -> {
+            Context context = new Context(request, route);
+            route.getHandler().handle(context);
+        });
+    }
+
+    private static void response(ChannelHandlerContext ctx, Context context) {
         var content = Unpooled.copiedBuffer(context.getResult(), CharsetUtil.UTF_8);
         var status = HttpResponseStatus.valueOf(context.getStatus());
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
@@ -66,31 +75,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        if (cause instanceof IOException && 
-            cause.getMessage().contains("Connection reset")) {
+        if (cause instanceof IOException &&
+                cause.getMessage().contains("Connection reset")) {
             // Normal client disconnect - ignore
             ctx.close();
             return;
         }
         logger.error(cause.getMessage());
         ctx.close();
-    }
-
-    private Route findRoute(HttpMethod method, String path) {
-        return routes.stream()
-                .filter(r -> r.getMethod().name().equals(method.name()) && matchPath(r.getPath(), path))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private boolean matchPath(String pattern, String path) {
-        // Simple :param matching
-        if (pattern.equals(path)) {
-            return true;
-        }
-        Pattern p = Pattern.compile(pattern.replaceAll(":[^/]+", "([^/]+)"));
-        Matcher m = p.matcher(path);
-        return m.matches();
     }
 
 }
