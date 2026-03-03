@@ -37,4 +37,8 @@ public interface Context {
 
     Map<String, String> pathParamMap();
 
+    Context attribute(String name, Object value);
+
+    <T> T attribute(String name);
+
 }
