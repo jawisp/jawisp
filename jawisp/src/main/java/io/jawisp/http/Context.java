@@ -11,7 +11,7 @@ import io.jawisp.http.json.JsonMapper;
  * content type, path parameters, and attributes.
  *
  * @author reftch
- * @version 1.0.0
+ * @version 1.0.2
  */
 public interface Context {
 

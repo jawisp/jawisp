@@ -6,7 +6,7 @@ package io.jawisp.http;
  * the request and response.
  *
  * @author reftch
- * @version 1.0.0
+ * @version 1.0.2
  */
 @FunctionalInterface
 public interface Handler {

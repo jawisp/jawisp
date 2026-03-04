@@ -6,11 +6,11 @@ public class App {
 
     void main() {
         Jawisp.build(config -> config
-                .routes(route -> {
-                    route.get("/", ctx -> ctx.text("Hello World!"));
-                    route.get("/api/v1/users/:id", UserController::getUser);
-                    route.post("/api/v1/users", UserController::createUser);
-                })).start();
+                .routes(route -> route
+                    .get("/", ctx -> ctx.text("Hello World!"))
+                    .get("/api/v1/users/:id", UserController::getUser)
+                    .post("/api/v1/users", UserController::createUser)
+                )).start();
     }
 
 }

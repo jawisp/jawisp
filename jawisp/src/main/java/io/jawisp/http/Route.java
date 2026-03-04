@@ -5,7 +5,7 @@ package io.jawisp.http;
  * It contains the HTTP method, the path pattern, and the handler that processes requests to this route.
  *
  * @author reftch
- * @version 1.0.0
+ * @version 1.0.2
  */
 public class Route {
 

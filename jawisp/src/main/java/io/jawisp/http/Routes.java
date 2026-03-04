@@ -9,7 +9,7 @@ import java.util.List;
  * The class also ensures that paths are cleaned and properly formatted.
  *
  * @author reftch
- * @version 1.0.0
+ * @version 1.0.2
  */
 public class Routes {
 
@@ -42,9 +42,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void get(String path, Handler handler) {
+    public Routes get(String path, Handler handler) {
         routes.add(new Route(HttpMethod.GET, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -52,9 +54,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void post(String path, Handler handler) {
+    public Routes post(String path, Handler handler) {
         routes.add(new Route(HttpMethod.POST, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -62,9 +66,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void put(String path, Handler handler) {
+    public Routes put(String path, Handler handler) {
         routes.add(new Route(HttpMethod.PUT, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -72,9 +78,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void patch(String path, Handler handler) {
+    public Routes patch(String path, Handler handler) {
         routes.add(new Route(HttpMethod.PATCH, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -82,9 +90,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void delete(String path, Handler handler) {
+    public Routes delete(String path, Handler handler) {
         routes.add(new Route(HttpMethod.DELETE, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -92,9 +102,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void head(String path, Handler handler) {
+    public Routes head(String path, Handler handler) {
         routes.add(new Route(HttpMethod.HEAD, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -102,9 +114,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void options(String path, Handler handler) {
+    public Routes options(String path, Handler handler) {
         routes.add(new Route(HttpMethod.OPTIONS, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -112,9 +126,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void trace(String path, Handler handler) {
+    public Routes trace(String path, Handler handler) {
         routes.add(new Route(HttpMethod.TRACE, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -122,9 +138,11 @@ public class Routes {
      *
      * @param path    the path pattern for the route
      * @param handler the handler to process requests to this route
+     * @return the current Routes instance
      */
-    public void connect(String path, Handler handler) {
+    public Routes connect(String path, Handler handler) {
         routes.add(new Route(HttpMethod.CONNECT, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -132,9 +150,11 @@ public class Routes {
      *
      * @param path    the path pattern for the filter
      * @param handler the handler to process requests before the route
+     * @return the current Routes instance
      */
-    public void before(String path, Handler handler) {
+    public Routes before(String path, Handler handler) {
         routes.add(new Route(HttpMethod.BEFORE_FILTER, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
@@ -142,9 +162,11 @@ public class Routes {
      *
      * @param path    the path pattern for the filter
      * @param handler the handler to process requests after the route
+     * @return the current Routes instance
      */
-    public void after(String path, Handler handler) {
+    public Routes after(String path, Handler handler) {
         routes.add(new Route(HttpMethod.AFTER_FILTER, forceCleanPath(path), handler));
+        return this;
     }
 
     /**
