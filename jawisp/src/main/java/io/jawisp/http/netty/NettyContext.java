@@ -2,7 +2,9 @@ package io.jawisp.http.netty;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.jawisp.http.Context;
 import io.jawisp.http.Route;
@@ -15,11 +17,13 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.AttributeKey;
 
 /**
- * The NettyContext class implements the Context interface for use with the Netty framework.
- * It provides methods to handle HTTP requests and responses, manage attributes, and interact with the Netty ChannelHandlerContext.
+ * The NettyContext class implements the Context interface for use with the
+ * Netty framework.
+ * It provides methods to handle HTTP requests and responses, manage attributes,
+ * and interact with the Netty ChannelHandlerContext.
  *
  * @author reftch
- * @version 1.0.2
+ * @version 1.0.3
  */
 public class NettyContext implements Context {
 
@@ -34,21 +38,22 @@ public class NettyContext implements Context {
     private JsonMapper jsonMapper;
 
     /**
-     * Constructs a new NettyContext instance with the given ChannelHandlerContext, FullHttpRequest, and Route.
+     * Constructs a new NettyContext instance with the given ChannelHandlerContext,
+     * FullHttpRequest, and Route.
      *
-     * @param ctx the ChannelHandlerContext for the request
+     * @param ctx     the ChannelHandlerContext for the request
      * @param request the FullHttpRequest object representing the HTTP request
-     * @param route the Route object representing the matched route
+     * @param route   the Route object representing the matched route
      */
     public NettyContext(ChannelHandlerContext ctx, FullHttpRequest request, Route route) {
         this.ctx = ctx;
         this.request = request;
         this.route = route;
         this.path = request.uri();
-        this.keepAlive = HttpUtil.isKeepAlive(request);
         this.contentType = "text/plain; charset=UTF-8";
         this.result = "";
         this.status = 200;
+        this.keepAlive = request != null ? HttpUtil.isKeepAlive(request) : false;
     }
 
     /**
@@ -62,7 +67,7 @@ public class NettyContext implements Context {
     }
 
     /**
-     * Sets the result of the HTTP response. 
+     * Sets the result of the HTTP response.
      *
      * @param text the string result to set
      * @return the current NettyContext instance
@@ -71,7 +76,7 @@ public class NettyContext implements Context {
     public Context text(String text) {
         this.result = text;
         return this;
-    }    
+    }
 
     /**
      * Sets the status code of the HTTP response.
@@ -139,7 +144,7 @@ public class NettyContext implements Context {
      * Converts the body of the HTTP request to an object of the specified type.
      *
      * @param type the type of the class to convert to
-     * @param <T> the type of the class
+     * @param <T>  the type of the class
      * @return the converted object
      */
     @Override
@@ -230,7 +235,7 @@ public class NettyContext implements Context {
     /**
      * Sets an attribute on the request.
      *
-     * @param name the name of the attribute
+     * @param name  the name of the attribute
      * @param value the value of the attribute
      * @return the current Context object for method chaining
      */
@@ -244,13 +249,40 @@ public class NettyContext implements Context {
      * Retrieves an attribute from the request.
      *
      * @param name the name of the attribute
-     * @param <T> the type of the attribute value
+     * @param <T>  the type of the attribute value
      * @return the attribute value or null if the attribute does not exist
      */
     @Override
     @SuppressWarnings("unchecked")
     public <T> T attribute(String name) {
         return (T) ctx.channel().attr(AttributeKey.valueOf(name)).get();
+    }
+
+    /**
+     * Retrieves the value of the header with the specified name.
+     *
+     * @param name the name of the header to retrieve
+     * @return the value of the header, or null if the header is not present
+     */    
+    @Override
+    public String header(String name) {
+        return headerMap().get(name);
+    }
+
+    /**
+     * Retrieves a map containing all the headers in this context.
+     *
+     * @return a map where the keys are header names and the values are header values
+     */
+    @Override
+    public Map<String, String> headerMap() {
+        if (request == null || request.headers() == null) {
+            return Collections.emptyMap();
+        }
+        return request.headers().entries().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue));
     }
 
 }

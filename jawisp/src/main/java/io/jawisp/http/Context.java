@@ -11,7 +11,7 @@ import io.jawisp.http.json.JsonMapper;
  * content type, path parameters, and attributes.
  *
  * @author reftch
- * @version 1.0.2
+ * @version 1.0.3
  */
 public interface Context {
 
@@ -144,4 +144,20 @@ public interface Context {
      * @return the value of the attribute
      */
     <T> T attribute(String name);
+
+    /**
+     * Retrieves the value of the header with the specified name.
+     *
+     * @param name the name of the header to retrieve
+     * @return the value of the header, or null if the header is not present
+     */
+    String header(String name);
+
+    /**
+     * Retrieves a map containing all the headers in this context.
+     *
+     * @return a map where the keys are header names and the values are header values
+     */
+    Map<String, String> headerMap();
+
 }

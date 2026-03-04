@@ -9,7 +9,7 @@ import java.util.List;
  * The class also ensures that paths are cleaned and properly formatted.
  *
  * @author reftch
- * @version 1.0.2
+ * @version 1.0.3
  */
 public class Routes {
 

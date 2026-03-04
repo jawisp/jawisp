@@ -8,7 +8,7 @@ import java.util.ServiceLoader;
  * using the ServiceLoader mechanism.
  *
  * @author reftch
- * @version 1.0.2
+ * @version 1.0.3
  */
 public interface JsonMapperProvider {
 

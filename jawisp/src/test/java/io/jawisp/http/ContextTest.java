@@ -28,9 +28,9 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpVersion;
 
 class ContextTest {
-    
+
     private ChannelHandlerContext context = mock(ChannelHandlerContext.class);
-    
+
     @Test
     void body_returnsContentAsString() {
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);

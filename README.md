@@ -42,6 +42,8 @@ The context object provides all data to process an HTTP request. It contains the
 - pathParamMap()                    // map of all path parameters
 - path()                            // request path
 - isKeepAlive()                     // is keep alive request
+- headerMap()                       // get all header key/values as map
+- header("key")                     // get a header
 
 /* Methods for the response */
 
