@@ -1,3 +1,9 @@
+/**
+ * Utility class containing methods for handling Netty {@link FullHttpRequest}.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 package io.jawisp.http.netty;
 
 import java.util.Map;
@@ -8,9 +14,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 
-/**
- * Utility class containing methods for handling Netty {@link FullHttpRequest}.
- */
 public class Utils {
 
     /**

@@ -1,9 +1,10 @@
 plugins {
     id 'java-library'
+    id "com.vanniktech.maven.publish" version "0.36.0"
 }
 
 group = 'io.jawisp'
-version = '2.0.0'
+version = '1.0.0'
 
 java {
     toolchain {
@@ -44,4 +45,34 @@ dependencies {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+mavenPublishing {
+  coordinates(group.toString(), name.toString(), version.toString())
+
+  pom {
+    name = "Jawisp"
+    description = "Jawisp lightweight Java framework"
+    inceptionYear = "2026"
+    url = "https://github.com/jawisp/jawisp"
+    licenses {
+      license {
+        name = "The Apache License, Version 2.0"
+        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      }
+    }
+    developers {
+      developer {
+        id = "reftch"
+        name = "Taras Chornyi"
+        url = "https://github.com/reftch/"
+      }
+    }
+    scm {
+      url = "https://github.com/jawisp/jawisp/"
+      connection = "scm:git:git://github.com/jawisp/jawisp.git"
+      developerConnection = "scm:git:ssh://git@github.com/jawisp/jawisp.git"
+    }
+  }
 }

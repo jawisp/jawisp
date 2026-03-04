@@ -19,10 +19,10 @@ Start implementing your perfect web application:
 import io.jawisp.core.Jawisp;
 
 void main() {
-    Jawisp.run(config -> config
+    Jawisp.build(config -> config
             .routes(route -> {
                 route.get("/", ctx -> ctx.result("Hello World!"));
-            }));
+            })).start();
 }
 ```
 By default, server will run on port 8080

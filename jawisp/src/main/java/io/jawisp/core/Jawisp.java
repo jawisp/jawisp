@@ -1,3 +1,10 @@
+/**
+ * The Jawisp class is the main entry point for the JAWISP application.
+ * It initializes the HTTP server and manages its lifecycle.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 package io.jawisp.core;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -10,12 +17,21 @@ import io.jawisp.http.HttpServer;
 import io.jawisp.http.netty.NettyServer;
 
 public class Jawisp {
+
     private static final Logger logger = LoggerFactory.getLogger(Jawisp.class);
 
+    private final Config config;
+    private final HttpServer server;
     private long start = System.nanoTime();
 
+    /**
+     * Constructs a Jawisp instance with the given configuration.
+     *
+     * @param config the configuration object for Jawisp
+     */
     private Jawisp(Config config) {
-        logger.info("Starting Web JAWISP v2.0.0 ...");
+        this.config = config;
+        logger.info("JAWISP v1.0.0 starting ...");
 
         AtomicInteger index = new AtomicInteger(1);
         config.getRoutes().stream()
@@ -24,29 +40,56 @@ public class Jawisp {
                         route.getMethod().name(),
                         route.getPath()));
 
+        this.server = new NettyServer(config);
+    }
+
+    /**
+     * Builds a Jawisp instance with default configuration.
+     *
+     * @return a new Jawisp instance
+     */
+    public static Jawisp build() {
+        return build(config -> {
+        });
+    }
+
+    /**
+     * Builds a Jawisp instance with a custom configuration.
+     *
+     * @param config a consumer to configure the Jawisp instance
+     * @return a new Jawisp instance
+     */
+    public static Jawisp build(Consumer<Config> config) {
+        Config cfg = new Config();
+        config.accept(cfg);
+        return new Jawisp(cfg);
+    }
+
+    /**
+     * Starts the HTTP server.
+     * Logs the start time and the time taken to start the server.
+     */
+    public void start() {
         try {
-            HttpServer server = new NettyServer(config);
             server.start();
         } catch (Exception e) {
             logger.error("Error during starting server {}", e.getMessage());
         }
-        
         long end = System.nanoTime();
         long elapsedMs = (end - start) / 1_000_000;
         logger.info("Server started on {}:{}/ in {} ms", "http://localhost",
                 String.valueOf(config.getPort()), elapsedMs);
     }
 
-    // Default config
-    public static Jawisp run() {
-        return run(config -> {
-        });
-    }
-
-    // Custom config
-    public static Jawisp run(Consumer<Config> config) {
-        Config cfg = new Config();
-        config.accept(cfg);
-        return new Jawisp(cfg);
+    /**
+     * Stops the HTTP server.
+     * Logs any errors that occur during the stop process.
+     */
+    public void stop() {
+        try {
+            server.stop();
+        } catch (Exception e) {
+            logger.error("Error during stopping server {}", e.getMessage());
+        }
     }
 }

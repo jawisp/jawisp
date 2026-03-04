@@ -1,66 +1,159 @@
+/**
+ * The Routes class manages a collection of HTTP routes within the application.
+ * It provides methods to add routes for various HTTP methods and to retrieve the list of routes.
+ * The class also ensures that paths are cleaned and properly formatted.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 package io.jawisp.http;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Routes {
+
     private final String contextPath;
     private final List<Route> routes = new ArrayList<>();
 
+    /**
+     * Constructs a new Routes instance with the specified context path.
+     * The context path is cleaned to remove leading and trailing slashes.
+     *
+     * @param contextPath the context path for the routes
+     */
     public Routes(String contextPath) {
         // FORCE empty to be truly empty
         this.contextPath = (contextPath == null || contextPath.trim().isEmpty()) ? ""
                 : contextPath.trim().replaceAll("^/+", "/").replaceAll("/+$", "");
     }
 
+    /**
+     * Gets the list of all configured routes.
+     *
+     * @return a list of Route objects
+     */
     public List<Route> getRoutes() {
         return routes;
     }
 
+    /**
+     * Adds a new route for the GET method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void get(String path, Handler handler) {
         routes.add(new Route(HttpMethod.GET, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the POST method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void post(String path, Handler handler) {
         routes.add(new Route(HttpMethod.POST, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the PUT method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void put(String path, Handler handler) {
         routes.add(new Route(HttpMethod.PUT, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the PATCH method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void patch(String path, Handler handler) {
         routes.add(new Route(HttpMethod.PATCH, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the DELETE method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void delete(String path, Handler handler) {
         routes.add(new Route(HttpMethod.DELETE, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the HEAD method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void head(String path, Handler handler) {
         routes.add(new Route(HttpMethod.HEAD, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the OPTIONS method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void options(String path, Handler handler) {
         routes.add(new Route(HttpMethod.OPTIONS, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the TRACE method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void trace(String path, Handler handler) {
         routes.add(new Route(HttpMethod.TRACE, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for the CONNECT method.
+     *
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     */
     public void connect(String path, Handler handler) {
         routes.add(new Route(HttpMethod.CONNECT, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for a before filter.
+     *
+     * @param path    the path pattern for the filter
+     * @param handler the handler to process requests before the route
+     */
     public void before(String path, Handler handler) {
         routes.add(new Route(HttpMethod.BEFORE_FILTER, forceCleanPath(path), handler));
     }
 
+    /**
+     * Adds a new route for an after filter.
+     *
+     * @param path    the path pattern for the filter
+     * @param handler the handler to process requests after the route
+     */
     public void after(String path, Handler handler) {
         routes.add(new Route(HttpMethod.AFTER_FILTER, forceCleanPath(path), handler));
     }
 
+    /**
+     * Cleans and formats the given path.
+     * Ensures that the path has no leading or trailing slashes and handles multiple slashes.
+     *
+     * @param path the original path
+     * @return the cleaned and formatted path
+     */
     private String forceCleanPath(String path) {
         if (path == null || path.trim().isEmpty()) {
             return "/";
@@ -83,5 +176,4 @@ public class Routes {
 
         return prefix + "/" + route;
     }
-
 }

@@ -1,3 +1,10 @@
+/**
+ * The NettyServer class implements the HttpServer interface and uses the Netty framework to handle HTTP requests.
+ * It sets up the Netty server with appropriate configurations and event loop groups.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 package io.jawisp.http.netty;
 
 import org.slf4j.Logger;
@@ -28,12 +35,23 @@ public class NettyServer implements HttpServer {
 
     private Channel channel;
 
+    /**
+     * Constructs a new NettyServer instance with the given configuration.
+     *
+     * @param config the configuration object for the server
+     */
     public NettyServer(Config config) {
         this.config = config;
         bossGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
     }
 
+    /**
+     * Starts the Netty server.
+     * Binds the server to the specified port and sets up the necessary handlers.
+     *
+     * @throws Exception if an error occurs during server startup
+     */
     @Override
     public void start() throws Exception {
         ServerBootstrap b = new ServerBootstrap();
@@ -60,6 +78,12 @@ public class NettyServer implements HttpServer {
         }
     }
 
+    /**
+     * Stops the Netty server.
+     * Closes the channel and shuts down the event loop groups.
+     *
+     * @throws Exception if an error occurs during server shutdown
+     */
     @Override
     public void stop() throws Exception {
         if (channel != null) {
@@ -71,7 +95,7 @@ public class NettyServer implements HttpServer {
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
         }
-        logger.info("Jawisp Netty stopped");
+        logger.info("Jawisp server stopped");
     }
 
 }
