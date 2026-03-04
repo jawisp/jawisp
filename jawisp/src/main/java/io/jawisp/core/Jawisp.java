@@ -3,7 +3,8 @@ package io.jawisp.core;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.jawisp.http.HttpServer;
@@ -18,7 +19,7 @@ import io.jawisp.http.netty.NettyServer;
  */
 public class Jawisp {
 
-    private static final Logger logger = LoggerFactory.getLogger(Jawisp.class);
+    private static final Logger logger = (Logger) LoggerFactory.getLogger(Jawisp.class);
 
     private final Config config;
     private final HttpServer server;
@@ -31,6 +32,13 @@ public class Jawisp {
      */
     private Jawisp(Config config) {
         this.config = config;
+
+        // Set default logging level for Netty server
+        Logger nettyLogger = (Logger) LoggerFactory.getLogger("io.netty");
+        nettyLogger.setLevel(Level.INFO);
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(Level.INFO);
+
         logger.info("JAWISP v1.0.0 starting ...");
 
         AtomicInteger index = new AtomicInteger(1);

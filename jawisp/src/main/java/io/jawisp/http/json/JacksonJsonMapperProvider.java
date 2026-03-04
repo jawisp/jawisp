@@ -12,6 +12,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JacksonJsonMapperProvider implements JsonMapperProvider {
 
     /**
+     * Default constructor for the JacksonJsonMapperProvider class.
+     */
+    public JacksonJsonMapperProvider() {
+    }
+    
+    /**
      * Creates a new JsonMapper instance using the Jackson library.
      *
      * @return a new JsonMapper instance

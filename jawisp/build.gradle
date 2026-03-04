@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'io.jawisp'
-version = '1.0.0'
+version = '1.0.1'
 
 java {
     toolchain {
@@ -31,7 +31,7 @@ dependencies {
     compileOnly("com.fasterxml.jackson.core:jackson-databind:2.21.1")
 
     implementation libs.slf4j.api
-    // implementation libs.logback.classic
+    compileOnly libs.logback.classic
 
     testImplementation libs.junit.jupiter
     // JUnit Platform Launcher (if needed)

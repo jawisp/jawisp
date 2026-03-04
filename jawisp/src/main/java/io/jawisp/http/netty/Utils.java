@@ -17,6 +17,12 @@ import io.netty.handler.codec.http.HttpHeaders;
 public class Utils {
 
     /**
+     * Default constructor for the Utils class.
+     */
+    public Utils() {
+    }
+
+    /**
      * Checks if the content type of the request is JSON.
      *
      * @param request the {@link FullHttpRequest} object

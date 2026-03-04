@@ -56,9 +56,9 @@ class ContextTest {
 
         Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
 
-        ctx.result("Hello World");
+        ctx.text("Hello World");
         assertEquals("Hello World", ctx.result().toString());
-        ctx.result("Hello");
+        ctx.text("Hello");
         assertEquals("Hello", ctx.result().toString());
     }
 

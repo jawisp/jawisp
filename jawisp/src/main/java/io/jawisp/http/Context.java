@@ -16,19 +16,19 @@ import io.jawisp.http.json.JsonMapper;
 public interface Context {
 
     /**
-     * Sets the result of the HTTP response.
+     * Gets the text result of the HTTP response.
      *
-     * @param result the result to set
-     * @return the current Context instance
-     */
-    Context result(String result);
-
-    /**
-     * Gets the result of the HTTP response.
-     *
-     * @return the result of the HTTP response
+     * @return the text of the HTTP response
      */
     String result();
+
+    /**
+     * Sets the result of the HTTP response.
+     *
+     * @param text the text to set
+     * @return the current Context instance
+     */
+    Context text(String text);
 
     /**
      * Sets the status code of the HTTP response.

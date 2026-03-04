@@ -16,10 +16,18 @@ import io.jawisp.http.Route;
  */
 public class Config {
 
-    private int port = 8080;
-    private String contextPath = "/";
+    private int port;
+    private String contextPath;
 
     private final List<Route> routes = new ArrayList<>();
+
+    /**
+     * Default constructor for the Config class.
+     */
+    public Config() {
+        this.port = 8080;
+        this.contextPath = "/";
+    }
 
     /**
      * Configures the Jawisp instance using the provided consumer.

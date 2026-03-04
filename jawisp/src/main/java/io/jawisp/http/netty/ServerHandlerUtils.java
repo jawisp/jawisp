@@ -21,6 +21,12 @@ public class ServerHandlerUtils {
     private static final Pattern PARAM_PATTERN = Pattern.compile(":[^/]+");
 
     /**
+     * Default constructor for the ServerHandlerUtils class.
+     */
+    public ServerHandlerUtils() {
+    }
+
+    /**
      * Finds the appropriate route for the given HTTP request.
      *
      * @param request the FullHttpRequest object representing the HTTP request

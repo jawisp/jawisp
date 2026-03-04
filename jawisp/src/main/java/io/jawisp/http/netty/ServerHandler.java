@@ -61,7 +61,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             route.get().getHandler().handle(context);
         } else {
             // 404 result
-            context.result("404 Not Found").status(404);
+            context.text("404 Not Found").status(404);
         }
 
         response(ctx, context);

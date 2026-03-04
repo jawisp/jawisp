@@ -52,26 +52,26 @@ public class NettyContext implements Context {
     }
 
     /**
-     * Sets the result of the HTTP response.
+     * Gets the text of the HTTP response.
      *
-     * @param result the result to set
-     * @return the current NettyContext instance
-     */
-    @Override
-    public Context result(String result) {
-        this.result = result;
-        return this;
-    }
-
-    /**
-     * Gets the result of the HTTP response.
-     *
-     * @return the result of the HTTP response
+     * @return the text of the HTTP response
      */
     @Override
     public String result() {
         return result;
     }
+
+    /**
+     * Sets the result of the HTTP response. 
+     *
+     * @param text the string result to set
+     * @return the current NettyContext instance
+     */
+    @Override
+    public Context text(String text) {
+        this.result = text;
+        return this;
+    }    
 
     /**
      * Sets the status code of the HTTP response.

@@ -45,7 +45,7 @@ The context object provides all data to process an HTTP request. It contains the
 
 /* Methods for the response */
 
-- result("result")                  // set result stream to specified string
+- text("string")                    // set result stream to specified string
 - json(obj)                         // calls result(jsonString), and also sets content type to json
 - status()                          // get the response status
 - status(code)                      // set the response status code
