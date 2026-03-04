@@ -1,10 +1,3 @@
-/**
- * The ServerHandler class extends SimpleChannelInboundHandler and is used to handle incoming HTTP requests
- * in the Netty server. It processes the requests, routes them to the appropriate handlers, and sends back the responses.
- *
- * @author reftch
- * @version 1.0.0
- */
 package io.jawisp.http.netty;
 
 import java.io.IOException;
@@ -29,6 +22,13 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
 
+/**
+ * The ServerHandler class extends SimpleChannelInboundHandler and is used to handle incoming HTTP requests
+ * in the Netty server. It processes the requests, routes them to the appropriate handlers, and sends back the responses.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
     private final List<Route> routes;

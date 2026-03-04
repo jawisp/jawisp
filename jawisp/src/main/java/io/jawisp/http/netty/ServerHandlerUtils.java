@@ -1,10 +1,3 @@
-/**
- * The ServerHandlerUtils class provides utility methods for handling HTTP routes and filters in the Netty server.
- * It includes methods for finding routes and filters, as well as matching request paths to route patterns.
- *
- * @author reftch
- * @version 1.0.0
- */
 package io.jawisp.http.netty;
 
 import java.util.List;
@@ -16,6 +9,13 @@ import io.jawisp.http.HttpMethod;
 import io.jawisp.http.Route;
 import io.netty.handler.codec.http.FullHttpRequest;
 
+/**
+ * The ServerHandlerUtils class provides utility methods for handling HTTP routes and filters in the Netty server.
+ * It includes methods for finding routes and filters, as well as matching request paths to route patterns.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 public class ServerHandlerUtils {
 
     private static final Pattern PARAM_PATTERN = Pattern.compile(":[^/]+");

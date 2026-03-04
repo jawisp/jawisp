@@ -1,10 +1,3 @@
-/**
- * The Jawisp class is the main entry point for the JAWISP application.
- * It initializes the HTTP server and manages its lifecycle.
- *
- * @author reftch
- * @version 1.0.0
- */
 package io.jawisp.core;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,6 +9,13 @@ import org.slf4j.LoggerFactory;
 import io.jawisp.http.HttpServer;
 import io.jawisp.http.netty.NettyServer;
 
+/**
+ * The Jawisp class is the main entry point for the JAWISP application.
+ * It initializes the HTTP server and manages its lifecycle.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 public class Jawisp {
 
     private static final Logger logger = LoggerFactory.getLogger(Jawisp.class);

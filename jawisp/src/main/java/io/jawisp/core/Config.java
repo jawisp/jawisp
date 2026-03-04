@@ -1,10 +1,3 @@
-/**
- * The Config class is used to configure the Jawisp application.
- * It allows setting various parameters such as the server port, context path, and routes.
- *
- * @author reftch
- * @version 1.0.0
- */
 package io.jawisp.core;
 
 import java.util.ArrayList;
@@ -14,6 +7,13 @@ import java.util.function.Consumer;
 import io.jawisp.http.Routes;
 import io.jawisp.http.Route;
 
+/**
+ * The Config class is used to configure the Jawisp application.
+ * It allows setting various parameters such as the server port, context path, and routes.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 public class Config {
 
     private int port = 8080;

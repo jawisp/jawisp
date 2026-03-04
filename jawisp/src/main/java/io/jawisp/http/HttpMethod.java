@@ -1,3 +1,5 @@
+package io.jawisp.http;
+
 /**
  * An enumeration of HTTP methods supported by the server.
  * This enum defines the standard HTTP methods that can be used
@@ -6,8 +8,6 @@
  * @author reftch
  * @version 1.0.0
  */
-package io.jawisp.http;
-
 public enum HttpMethod {
     /**
      * A special method used to define a filter that runs before the main handler.

@@ -1,3 +1,7 @@
+package io.jawisp.http.json;
+
+import java.util.ServiceLoader;
+
 /**
  * The JsonMapperProvider interface provides a contract for creating JsonMapper instances.
  * It includes a method to create a JsonMapper and a static method to load the first available JsonMapperProvider
@@ -6,10 +10,6 @@
  * @author reftch
  * @version 1.0.0
  */
-package io.jawisp.http.json;
-
-import java.util.ServiceLoader;
-
 public interface JsonMapperProvider {
 
     /**

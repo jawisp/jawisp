@@ -1,3 +1,8 @@
+package io.jawisp.http;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The Routes class manages a collection of HTTP routes within the application.
  * It provides methods to add routes for various HTTP methods and to retrieve the list of routes.
@@ -6,11 +11,6 @@
  * @author reftch
  * @version 1.0.0
  */
-package io.jawisp.http;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Routes {
 
     private final String contextPath;

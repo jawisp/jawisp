@@ -1,13 +1,13 @@
+package io.jawisp.http;
+
 /**
  * The HttpServer interface defines the contract for an HTTP server.
  * It includes methods to start and stop the server, and may throw an Exception
  * if any error occurs during these operations.
  *
- * @author Your Name
+ * @author reftch
  * @version 1.0.0
  */
-package io.jawisp.http;
-
 public interface HttpServer {
 
     /**

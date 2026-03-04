@@ -1,3 +1,5 @@
+package io.jawisp.http;
+
 /**
  * The Route class represents a single HTTP route within the application.
  * It contains the HTTP method, the path pattern, and the handler that processes requests to this route.
@@ -5,8 +7,6 @@
  * @author reftch
  * @version 1.0.0
  */
-package io.jawisp.http;
-
 public class Route {
 
     private final HttpMethod method;

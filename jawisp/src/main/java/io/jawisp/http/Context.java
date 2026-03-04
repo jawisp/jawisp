@@ -1,3 +1,10 @@
+package io.jawisp.http;
+
+import java.lang.reflect.Type;
+import java.util.Map;
+
+import io.jawisp.http.json.JsonMapper;
+
 /**
  * The Context interface provides a contract for managing the context of an HTTP request and response.
  * It includes methods for setting and getting various properties such as result, status, JSON, body,
@@ -6,13 +13,6 @@
  * @author reftch
  * @version 1.0.0
  */
-package io.jawisp.http;
-
-import java.lang.reflect.Type;
-import java.util.Map;
-
-import io.jawisp.http.json.JsonMapper;
-
 public interface Context {
 
     /**

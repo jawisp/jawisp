@@ -1,10 +1,3 @@
-/**
- * The NettyContext class implements the Context interface for use with the Netty framework.
- * It provides methods to handle HTTP requests and responses, manage attributes, and interact with the Netty ChannelHandlerContext.
- *
- * @author reftch
- * @version 1.0.0
- */
 package io.jawisp.http.netty;
 
 import java.lang.reflect.Type;
@@ -21,6 +14,13 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.AttributeKey;
 
+/**
+ * The NettyContext class implements the Context interface for use with the Netty framework.
+ * It provides methods to handle HTTP requests and responses, manage attributes, and interact with the Netty ChannelHandlerContext.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 public class NettyContext implements Context {
 
     private final ChannelHandlerContext ctx;

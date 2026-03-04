@@ -1,3 +1,5 @@
+package io.jawisp.http;
+
 /**
  * The Handler interface represents a functional interface that defines a method to handle an HTTP request.
  * The handle method takes a Context object as a parameter, which provides various methods to interact with
@@ -6,8 +8,6 @@
  * @author reftch
  * @version 1.0.0
  */
-package io.jawisp.http;
-
 @FunctionalInterface
 public interface Handler {
     /**

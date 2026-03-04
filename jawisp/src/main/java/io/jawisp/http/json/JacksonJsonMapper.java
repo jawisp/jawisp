@@ -1,10 +1,3 @@
-/**
- * The JacksonJsonMapper class is an implementation of the JsonMapper interface.
- * It uses the Jackson library to serialize and deserialize objects to and from JSON.
- *
- * @author reftch
- * @version 1.0.0
- */
 package io.jawisp.http.json;
 
 import java.io.ByteArrayInputStream;
@@ -14,6 +7,13 @@ import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * The JacksonJsonMapper class is an implementation of the JsonMapper interface.
+ * It uses the Jackson library to serialize and deserialize objects to and from JSON.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 public class JacksonJsonMapper implements JsonMapper {
     private final ObjectMapper mapper;
 

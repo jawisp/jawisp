@@ -1,10 +1,3 @@
-/**
- * The NettyServer class implements the HttpServer interface and uses the Netty framework to handle HTTP requests.
- * It sets up the Netty server with appropriate configurations and event loop groups.
- *
- * @author reftch
- * @version 1.0.0
- */
 package io.jawisp.http.netty;
 
 import org.slf4j.Logger;
@@ -25,6 +18,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
+/**
+ * The NettyServer class implements the HttpServer interface and uses the Netty framework to handle HTTP requests.
+ * It sets up the Netty server with appropriate configurations and event loop groups.
+ *
+ * @author reftch
+ * @version 1.0.0
+ */
 public class NettyServer implements HttpServer {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
