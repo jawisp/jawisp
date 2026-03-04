@@ -12,6 +12,8 @@ import io.jawisp.http.netty.NettyServer;
 public class Jawisp {
     private static final Logger logger = LoggerFactory.getLogger(Jawisp.class);
 
+    private long start = System.nanoTime();
+
     private Jawisp(Config config) {
         logger.info("Starting Web JAWISP v2.0.0 ...");
 
@@ -28,17 +30,22 @@ public class Jawisp {
         } catch (Exception e) {
             logger.error("Error during starting server {}", e.getMessage());
         }
+        
+        long end = System.nanoTime();
+        long elapsedMs = (end - start) / 1_000_000;
+        logger.info("Server started on {}:{}/ in {} ms", "http://localhost",
+                String.valueOf(config.getPort()), elapsedMs);
     }
 
     // Default config
     public static Jawisp run() {
         return run(config -> {
-        }); 
+        });
     }
 
-    // Custom config 
+    // Custom config
     public static Jawisp run(Consumer<Config> config) {
-        Config cfg = new Config(); 
+        Config cfg = new Config();
         config.accept(cfg);
         return new Jawisp(cfg);
     }

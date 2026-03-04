@@ -17,13 +17,11 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import io.jawisp.http.json.JsonMapper;
 import io.jawisp.http.netty.NettyContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFactory;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;

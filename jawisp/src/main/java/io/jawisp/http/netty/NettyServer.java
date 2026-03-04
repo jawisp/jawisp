@@ -36,8 +36,6 @@ public class NettyServer implements HttpServer {
 
     @Override
     public void start() throws Exception {
-        long start = System.nanoTime();
-
         ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -57,11 +55,6 @@ public class NettyServer implements HttpServer {
         try {
             ChannelFuture f = b.bind(config.getPort()).sync();
             channel = f.channel();
-
-            long end = System.nanoTime();
-            long elapsedMs = (end - start) / 1_000_000;
-            logger.info("Server started on {}:{}/ in {} ms", "http://localhost",
-                    String.valueOf(config.getPort()), elapsedMs);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
