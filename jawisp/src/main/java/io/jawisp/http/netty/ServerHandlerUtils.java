@@ -14,7 +14,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
  * It includes methods for finding routes and filters, as well as matching request paths to route patterns.
  *
  * @author reftch
- * @version 1.0.2
+ * @version 1.0.3
  */
 public class ServerHandlerUtils {
 

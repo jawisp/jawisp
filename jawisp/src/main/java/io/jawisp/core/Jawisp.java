@@ -15,7 +15,7 @@ import io.jawisp.http.netty.NettyServer;
  * It initializes the HTTP server and manages its lifecycle.
  *
  * @author reftch
- * @version 1.0.2
+ * @version 1.0.3
  */
 public class Jawisp {
 
