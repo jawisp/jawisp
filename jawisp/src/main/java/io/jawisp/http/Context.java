@@ -279,4 +279,15 @@ public interface Context {
      * @param html the HTML content to be set in the response
      */
     void html(String html);
+
+    /**
+     * Renders a template using the provided model and outputs the result as HTML.
+     *
+     * @param template The template string to be rendered.
+     * @param model    A map containing key-value pairs that will be used to
+     *                 populate the template.
+     * @throws UnsupportedOperationException if no renderer is configured.
+     */
+    void render(String template, Map<String, Object> model) throws UnsupportedOperationException;
+
 }

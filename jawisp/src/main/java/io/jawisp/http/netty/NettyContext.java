@@ -14,6 +14,7 @@ import io.jawisp.http.Context;
 import io.jawisp.http.Route;
 import io.jawisp.http.json.JsonMapper;
 import io.jawisp.http.json.JsonMapperProvider;
+import io.jawisp.plugin.template.TemplateEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultHttpResponse;
@@ -56,6 +57,7 @@ public class NettyContext implements Context {
     private String contentType;
     private boolean keepAlive;
     private JsonMapper jsonMapper;
+    private TemplateEngine templateEngine;
 
     /**
      * Constructs a new NettyContext instance with the given ChannelHandlerContext,
@@ -77,6 +79,12 @@ public class NettyContext implements Context {
         this.response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
                 HttpResponseStatus.valueOf(status));
+    }
+
+    public NettyContext(ChannelHandlerContext ctx, FullHttpRequest request, Route route,
+            TemplateEngine templateEngine) {
+        this(ctx, request, route);
+        this.templateEngine = templateEngine;
     }
 
     /**
@@ -489,6 +497,22 @@ public class NettyContext implements Context {
     public void html(String html) {
         this.contentType = "text/html; charset=UTF-8";
         this.result = html;
+    }
+
+    /**
+     * Renders a template using the provided model and outputs the result as HTML.
+     *
+     * @param template The template string to be rendered.
+     * @param model    A map containing key-value pairs that will be used to
+     *                 populate the template.
+     * @throws UnsupportedOperationException if no renderer is configured.
+     */
+    public void render(String template, Map<String, Object> model) throws UnsupportedOperationException {
+        if (templateEngine == null) {
+            throw new UnsupportedOperationException(
+                    "No renderer configured. You can configure one in config.usePlugin(...)");
+        }
+        html(templateEngine.render(template, model));
     }
 
 }

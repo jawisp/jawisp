@@ -30,6 +30,10 @@ dependencies {
     // Jackson mapper 
     compileOnly("com.fasterxml.jackson.core:jackson-databind:2.21.1")
 
+    // Template engines
+    compileOnly 'io.pebbletemplates:pebble:4.1.1'
+    compileOnly 'org.thymeleaf:thymeleaf:3.1.3.RELEASE'
+
     implementation libs.slf4j.api
 
     testImplementation libs.junit.jupiter
