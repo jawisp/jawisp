@@ -110,6 +110,35 @@ Create src/main/resources/logback.xml - Jawisp automatically loads this:
 </configuration>
 ```
 
+## Jawisp Framework - Template Rendering Guide
+
+Jawisp provides a plugin-based template rendering system supporting Pebble, Thymeleaf engines through a unified TemplateEngine API. Drop plugin JARs on the classpath and configure with config.usePlugin().
+
+### Quick start
+
+1. Add Dependencies
+```
+implementation 'io.pebbletemplates:pebble:4.1.1'
+implementation 'org.thymeleaf:thymeleaf:3.1.3.RELEASE'
+```
+2. Configure Template Engine with engine name: 'pebble', 'thymeleaf'
+```
+Jawisp.build(config -> config
+        .usePlugin("pebble")
+        .routes(route -> route.get("/", App::homePage))
+      ).start();
+```
+3. Render Templates
+```
+static void homePage(Context ctx) {
+    ctx.render("home.html", Map.of("name", "John Smith"));
+}
+```
+### Template Locations
+
+Default: templates/ (classpath)
+
+
 
 
 

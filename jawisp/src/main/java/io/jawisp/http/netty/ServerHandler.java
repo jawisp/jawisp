@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.jawisp.http.Context;
 import io.jawisp.http.HttpMethod;
 import io.jawisp.http.Route;
+import io.jawisp.plugin.template.TemplateEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -31,14 +32,16 @@ import io.netty.util.CharsetUtil;
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
     private final List<Route> routes;
+    private final TemplateEngine templateEngine;
 
     /**
      * Constructs a new ServerHandler instance with the given list of routes.
      *
      * @param routes the list of routes to handle incoming requests
      */
-    public ServerHandler(List<Route> routes) {
+    public ServerHandler(List<Route> routes, TemplateEngine templateEngine) {
         this.routes = routes;
+        this.templateEngine = templateEngine;
     }
 
     /**
@@ -54,7 +57,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         executeFilters(ctx, request, HttpMethod.BEFORE_FILTER);
 
         var route = ServerHandlerUtils.findRoute(request, routes);
-        Context context = new NettyContext(ctx, request, route.orElse(null));
+        Context context = new NettyContext(ctx, request, route.orElse(null), templateEngine);
         if (route.isPresent()) {
             // Run main handler
             route.get().getHandler().handle(context);

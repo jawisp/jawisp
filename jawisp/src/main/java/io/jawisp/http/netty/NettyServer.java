@@ -66,7 +66,7 @@ public class NettyServer implements HttpServer {
                         ch.pipeline().addLast(
                                 new HttpServerCodec(),
                                 new HttpObjectAggregator(65536),
-                                new ServerHandler(config.getRoutes()));
+                                new ServerHandler(config.getRoutes(), config.templateEngine()));
                     }
                 });
 
