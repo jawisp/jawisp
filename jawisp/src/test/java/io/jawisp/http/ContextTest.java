@@ -9,7 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
@@ -22,10 +24,13 @@ import io.jawisp.http.json.JsonMapper;
 import io.jawisp.http.netty.NettyContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 
 class ContextTest {
 
@@ -286,4 +291,58 @@ class ContextTest {
         assertNull(result);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    void sessionAttributeSet_getsSameValue() {
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        when(request.headers().get(HttpHeaderNames.CONTENT_TYPE)).thenReturn("application/json");
+
+        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+        Channel channel = mock(Channel.class);
+        Attribute<Object> attr = mock(Attribute.class);
+        AttributeKey<Object> key = AttributeKey.valueOf("session.userId");
+
+        when(ctx.channel()).thenReturn(channel);
+        when(channel.attr(key)).thenReturn(attr);
+
+        when(attr.get()).thenReturn("alice");
+
+        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+
+        // When
+        nettyCtx.sessionAttribute("userId", "alice");
+        String result = nettyCtx.sessionAttribute("userId");
+
+        // Then
+        assertEquals("alice", result);
+        verify(channel, atLeast(1)).attr(key);
+        verify(attr).set("alice");
+        verify(attr, atLeast(1)).get();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void sessionAttributeGet_notSet_returnsNull() {
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        when(request.headers().get(HttpHeaderNames.CONTENT_TYPE)).thenReturn("application/json");
+
+        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+        Channel channel = mock(Channel.class);
+        Attribute<Object> attr = mock(Attribute.class);
+        AttributeKey<Object> key = AttributeKey.valueOf("session.missing");
+
+        when(ctx.channel()).thenReturn(channel);
+        when(channel.attr(key)).thenReturn(attr);
+        when(attr.get()).thenReturn(null);
+
+        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+
+        // When
+        String result = nettyCtx.sessionAttribute("missing");
+
+        // Then
+        assertNull(result);
+        verify(channel).attr(key);
+        verify(attr).get();
+    }
 }

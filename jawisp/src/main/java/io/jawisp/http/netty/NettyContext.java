@@ -27,6 +27,7 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
+import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
 /**
@@ -40,6 +41,7 @@ import io.netty.util.AttributeKey;
  */
 public class NettyContext implements Context {
 
+    private static final AttributeKey<Object> SESSION_ATTR_PREFIX = AttributeKey.valueOf("session.");
     private static final String COOKIE_HEADER = "Cookie";
 
     private final ChannelHandlerContext ctx;
@@ -386,6 +388,43 @@ public class NettyContext implements Context {
     @Override
     public HttpResponse response() {
         return response;
+    }
+
+    /**
+     * Sets a session attribute with the specified name and value.
+     *
+     * @param <T>   the type of the value to be stored
+     * @param name  the name of the session attribute
+     * @param value the value to be associated with the session attribute
+     */
+    @Override
+    public <T> void sessionAttribute(String name, T value) {
+        ctx.channel().attr(getSessionKey(name)).set(value);
+    }
+
+    /**
+     * Retrieves the value of a session attribute with the specified name.
+     *
+     * @param <T>  the expected type of the session attribute value
+     * @param name the name of the session attribute
+     * @return the value of the session attribute, or null if it does not exist
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T sessionAttribute(String name) {
+        Attribute<Object> attr = ctx.channel().attr(getSessionKey(name));
+        return (T) attr.get();
+    }
+
+    /**
+     * Helper method to build the full attribute key by appending the specified name
+     * to the session attribute prefix.
+     *
+     * @param name the name of the attribute
+     * @return the full attribute key
+     */
+    private AttributeKey<Object> getSessionKey(String name) {
+        return AttributeKey.valueOf(SESSION_ATTR_PREFIX + name);
     }
 
 }
