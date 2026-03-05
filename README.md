@@ -1,31 +1,95 @@
-# Jawisp - lightweight Java framework
+# Jawisp 
 
-## Getting started
+## Overview
 
-Jawisp requires Java 21+. Add dependency for Gradle:
-```
-implementation 'io.jawisp:jawisp:2.0.0'
-```
-For Maven:
-```
-<dependency>
-    <groupId>io.jawisp</groupId>
-    <artifactId>jawisp</artifactId>
-    <version>2.0.0</version>
-</dependency>
-```
-Start implementing your perfect web application:
-```
-import io.jawisp.core.Jawisp;
+**Jawisp** is a lightweight Java Web framework that leverages the powerful Netty framework, which is renowned for its asynchronous event-driven architecture. Designed to simplify web
+development, **Jawisp** is accessible to developers without requiring extensive knowledge of web technologies. Its primary objective is to enable rapid and efficient development
+processes.
 
-void main() {
-    Jawisp.build(config -> config
-            .routes(route -> route
-                .get("/", ctx -> ctx.result("Hello World!"))
-            )).start();
+The **Jawisp** framework is particularly suited for applications that benefit from the non-blocking I/O model provided by Netty, allowing for high performance and scalability. By
+abstracting many of the complexities associated with traditional Java web frameworks, **Jawisp** provides a streamlined development experience. This is achieved through its intuitive
+API and minimalistic design, which focus on essential features while reducing boilerplate code.
+
+Key features of **Jawisp** include:
+
+1. **Asynchronous Processing**: Leveraging Netty's capabilities, **Jawisp** supports asynchronous request handling, enabling high throughput and low latency.
+2. **Lightweight**: The framework is designed to be lightweight, minimizing resource consumption and ensuring efficient performance even on resource-constrained environments.
+3. **Ease of Use**: With its straightforward API and minimal configuration requirements, **Jawisp** is easy to learn and integrate into existing projects.
+4. **Rapid Development**: The framework's simplicity facilitates rapid development cycles, allowing developers to focus more on application logic rather than infrastructure.
+5. **Scalability**: Built on Netty's robust architecture, **Jawisp** is scalable, capable of handling a large number of concurrent connections without significant performance
+degradation.
+
+Overall, **Jawisp** is an excellent choice for developers looking to build high-performance, scalable web applications with minimal complexity and effort. Its integration of Netty's
+capabilities with a user-friendly interface makes it an attractive option for both new and experienced Java developers.
+
+## Getting Started
+
+**Jawisp** requires Java 21 or higher. To begin using **Jawisp** in your project, you need to add the appropriate dependency to your build configuration. Below are the instructions
+for both Gradle and Maven.
+
+### Gradle Dependency
+
+For Gradle, add the following line to your `build.gradle` file:
+
+```gradle
+dependencies {
+    implementation 'io.jawisp:jawisp:2.0.0'
 }
 ```
-By default, server will run on port 8080
+
+### Maven Dependency
+
+For Maven, add the following snippet to your `pom.xml` file:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>io.jawisp</groupId>
+        <artifactId>jawisp</artifactId>
+        <version>2.0.0</version>
+    </dependency>
+</dependencies>
+```
+
+### Quick Start Example
+
+Once you have added the dependency, you can start implementing your web application. Below is a simple example to get you started:
+
+```java
+import io.jawisp.core.Jawisp;
+
+public class MyWebApplication {
+    public static void main(String[] args) {
+        Jawisp.build(config -> config
+            .routes(route -> route
+                .get("/", ctx -> ctx.result("Hello World!"))
+            )
+        ).start();
+    }
+}
+```
+
+### Default Server Configuration
+
+By default, the **Jawisp** server will run on port `8080`. You can customize this and other configuration options as needed. For example, to specify a different port, you can modify
+the configuration like this:
+
+```java
+Jawisp.build(config -> config
+    .port(8081)
+    .routes(route -> route
+        .get("/", ctx -> ctx.result("Hello World!"))
+    )
+).start();
+```
+
+### Running Your Application
+
+To run your application, simply execute the `main` method. Your web server will start, and you should be able to access your "Hello World!" message by navigating to
+`http://localhost:8080` in your web browser.
+
+With these steps, you are now ready to start building your web application using **Jawisp**. The framework's simplicity and efficiency will help you focus on developing your
+application's core features without getting bogged down in complex configurations.
 
 ## Context
 
