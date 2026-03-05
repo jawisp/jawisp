@@ -1,7 +1,5 @@
 package org.example;
 
-import java.util.Map;
-
 import io.jawisp.core.Jawisp;
 import io.jawisp.http.Context;
 

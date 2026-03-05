@@ -9,9 +9,15 @@ import io.jawisp.plugin.template.TemplateEnginePlugin;
  * and provides a method to create a ThymeleafTemplateEngine instance.
  *
  * @author reftch
- * @version 1.0.4
+ * @version 1.0.5
  */
 public class ThymeleafPlugin implements TemplateEnginePlugin {
+
+    /**
+     * Constructs a new ThymeleafPlugin instance.
+     */
+    public ThymeleafPlugin() {
+    }
 
     /**
      * Returns the name of the plugin.

@@ -23,11 +23,13 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.CharsetUtil;
 
 /**
- * The ServerHandler class extends SimpleChannelInboundHandler and is used to handle incoming HTTP requests
- * in the Netty server. It processes the requests, routes them to the appropriate handlers, and sends back the responses.
+ * The ServerHandler class extends SimpleChannelInboundHandler and is used to
+ * handle incoming HTTP requests
+ * in the Netty server. It processes the requests, routes them to the
+ * appropriate handlers, and sends back the responses.
  *
  * @author reftch
- * @version 1.0.4
+ * @version 1.0.5
  */
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
@@ -35,9 +37,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     private final TemplateEngine templateEngine;
 
     /**
-     * Constructs a new ServerHandler instance with the given list of routes.
+     * Constructs a new ServerHandler instance with the given list of routes and a
+     * template engine.
      *
-     * @param routes the list of routes to handle incoming requests
+     * @param routes         the list of routes to handle incoming requests
+     * @param templateEngine the template engine to use for rendering templates
      */
     public ServerHandler(List<Route> routes, TemplateEngine templateEngine) {
         this.routes = routes;
@@ -45,9 +49,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     }
 
     /**
-     * Handles the incoming HTTP request by routing it to the appropriate handler and sending back the response.
+     * Handles the incoming HTTP request by routing it to the appropriate handler
+     * and sending back the response.
      *
-     * @param ctx the ChannelHandlerContext for the request
+     * @param ctx     the ChannelHandlerContext for the request
      * @param request the FullHttpRequest object representing the HTTP request
      * @throws Exception if an error occurs during request processing
      */
@@ -75,8 +80,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     /**
      * Executes the filters of the specified type for the given request.
      *
-     * @param ctx the ChannelHandlerContext for the request
-     * @param request the FullHttpRequest object representing the HTTP request
+     * @param ctx        the ChannelHandlerContext for the request
+     * @param request    the FullHttpRequest object representing the HTTP request
      * @param filterType the type of the filter to execute
      */
     private void executeFilters(ChannelHandlerContext ctx, FullHttpRequest request, HttpMethod filterType) {
@@ -89,7 +94,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     /**
      * Sends back the response to the client.
      *
-     * @param ctx the ChannelHandlerContext for the request
+     * @param ctx     the ChannelHandlerContext for the request
      * @param context the Context object representing the HTTP request and response
      */
     private static void response(ChannelHandlerContext ctx, Context context) {
@@ -122,7 +127,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      * Handles exceptions that occur during request processing.
      * Closes the connection if an exception is caught.
      *
-     * @param ctx the ChannelHandlerContext for the request
+     * @param ctx   the ChannelHandlerContext for the request
      * @param cause the Throwable that caused the exception
      */
     @Override

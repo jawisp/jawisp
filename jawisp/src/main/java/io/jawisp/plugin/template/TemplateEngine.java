@@ -10,7 +10,7 @@ import java.util.Set;
  * different templating engines.
  *
  * @author reftch
- * @version 1.0.4
+ * @version 1.0.5
  */
 public interface TemplateEngine {
 

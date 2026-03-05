@@ -40,7 +40,7 @@ import io.netty.util.AttributeKey;
  * and interact with the Netty ChannelHandlerContext.
  *
  * @author reftch
- * @version 1.0.4
+ * @version 1.0.5
  */
 public class NettyContext implements Context {
 
@@ -81,6 +81,16 @@ public class NettyContext implements Context {
                 HttpResponseStatus.valueOf(status));
     }
 
+    /**
+     * Constructs a new NettyContext instance with the given ChannelHandlerContext,
+     * FullHttpRequest, Route, and TemplateEngine.
+     *
+     * @param ctx            the ChannelHandlerContext for the request
+     * @param request        the FullHttpRequest object representing the HTTP
+     *                       request
+     * @param route          the Route object representing the matched route
+     * @param templateEngine the TemplateEngine for rendering templates
+     */
     public NettyContext(ChannelHandlerContext ctx, FullHttpRequest request, Route route,
             TemplateEngine templateEngine) {
         this(ctx, request, route);

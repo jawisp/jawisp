@@ -10,9 +10,15 @@ import java.util.stream.StreamSupport;
  * It provides methods to load all available plugins and to debug them.
  *
  * @author reftch
- * @version 1.0.4
+ * @version 1.0.5
  */
 public class PluginLoader {
+
+    /**
+     * Constructs a new PluginLoader instance.
+     */
+    public PluginLoader() {
+    }
 
     /**
      * Loads all available template engine plugins.

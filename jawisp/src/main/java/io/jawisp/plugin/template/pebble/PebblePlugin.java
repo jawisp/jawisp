@@ -9,9 +9,15 @@ import io.jawisp.plugin.template.TemplateEnginePlugin;
  * and provides a method to create a PebbleTemplateEngine instance.
  *
  * @author reftch
- * @version 1.0.4
+ * @version 1.0.5
  */
 public class PebblePlugin implements TemplateEnginePlugin {
+
+    /**
+     * Constructs a new PebblePlugin instance.
+     */
+    public PebblePlugin() {
+    }
 
     /**
      * Returns the name of the plugin.
