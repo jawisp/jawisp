@@ -9,17 +9,16 @@ import org.slf4j.LoggerFactory;
 import io.jawisp.http.Context;
 import io.jawisp.http.HttpMethod;
 import io.jawisp.http.Route;
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.CharsetUtil;
 
 /**
@@ -91,17 +90,28 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      * @param context the Context object representing the HTTP request and response
      */
     private static void response(ChannelHandlerContext ctx, Context context) {
-        var content = Unpooled.copiedBuffer(context.result(), CharsetUtil.UTF_8);
-        var status = HttpResponseStatus.valueOf(context.status());
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, context.contentType());
-        response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        ByteBuf content = ctx.alloc().buffer();
+        content.writeCharSequence(context.result(), CharsetUtil.UTF_8);
+
+        // return already created response object
+        var response = context.response();
+
+        HttpHeaders headers = response.headers();
+        headers.set(HttpHeaderNames.CONTENT_TYPE, context.contentType());
+        headers.setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
 
         if (context.isKeepAlive()) {
-            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-            ctx.writeAndFlush(response);
-        } else {
-            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        }
+
+        // send headers
+        ctx.write(response);
+
+        // send body + end
+        ChannelFuture future = ctx.writeAndFlush(new DefaultLastHttpContent(content));
+
+        if (!context.isKeepAlive()) {
+            future.addListener(ChannelFutureListener.CLOSE);
         }
     }
 

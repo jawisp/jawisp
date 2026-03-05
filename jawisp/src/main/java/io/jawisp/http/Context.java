@@ -4,6 +4,8 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 import io.jawisp.http.json.JsonMapper;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 /**
  * The Context interface provides a contract for managing the context of an HTTP request and response.
@@ -160,4 +162,49 @@ public interface Context {
      */
     Map<String, String> headerMap();
 
+    /**
+     * Retrieves a map containing all the cookies in this context.
+     *
+     * @return a map where the keys are cookie names and the values are cookie values
+     */
+    Map<String, String> cookieMap();
+
+    /**
+     * Retrieves the value of the cookie with the specified name.
+     *
+     * @param name the name of the cookie to retrieve
+     * @return the value of the cookie, or null if the cookie is not present
+     */
+    String cookie(String name);
+
+    /**
+     * Sets a response cookie by name, with value and max-age (optional).
+     *
+     * @param name   the name of the cookie
+     * @param value  the value of the cookie
+     * @param maxAge the max-age of the cookie in seconds (optional)
+     */
+    void cookie(String name, String value, int maxAge);
+
+    /**
+     * Removes a cookie by name and path (optional).
+     *
+     * @param name the name of the cookie to remove
+     * @param path the path of the cookie to remove (optional)
+     */
+    void removeCookie(String name, String path);
+
+    /**
+     * Retrieves the original HTTP request.
+     *
+     * @return the HTTP request
+     */
+    HttpRequest request();
+
+    /**
+     * Retrieves the original HTTP response.
+     *
+     * @return the HTTP response
+     */
+    HttpResponse response();
 }

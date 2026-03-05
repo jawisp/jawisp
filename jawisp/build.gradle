@@ -27,11 +27,10 @@ dependencies {
     implementation 'io.netty:netty-transport:4.2.10.Final'
     // Optional Linux perf boost
     implementation 'io.netty:netty-transport-native-epoll:4.2.10.Final:linux-x86_64'
-
+    // Jackson mapper 
     compileOnly("com.fasterxml.jackson.core:jackson-databind:2.21.1")
 
     implementation libs.slf4j.api
-    compileOnly libs.logback.classic
 
     testImplementation libs.junit.jupiter
     // JUnit Platform Launcher (if needed)
