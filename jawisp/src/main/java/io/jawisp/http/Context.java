@@ -8,8 +8,10 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 
 /**
- * The Context interface provides a contract for managing the context of an HTTP request and response.
- * It includes methods for setting and getting various properties such as result, status, JSON, body,
+ * The Context interface provides a contract for managing the context of an HTTP
+ * request and response.
+ * It includes methods for setting and getting various properties such as
+ * result, status, JSON, body,
  * content type, path parameters, and attributes.
  *
  * @author reftch
@@ -70,7 +72,8 @@ public interface Context {
     byte[] bodyAsBytes();
 
     /**
-     * Converts the body of the HTTP request or response to a class of the specified type.
+     * Converts the body of the HTTP request or response to a class of the specified
+     * type.
      *
      * @param type the type of the class to convert to
      * @param <T>  the type of the class
@@ -158,14 +161,16 @@ public interface Context {
     /**
      * Retrieves a map containing all the headers in this context.
      *
-     * @return a map where the keys are header names and the values are header values
+     * @return a map where the keys are header names and the values are header
+     *         values
      */
     Map<String, String> headerMap();
 
     /**
      * Retrieves a map containing all the cookies in this context.
      *
-     * @return a map where the keys are cookie names and the values are cookie values
+     * @return a map where the keys are cookie names and the values are cookie
+     *         values
      */
     Map<String, String> cookieMap();
 
@@ -207,4 +212,23 @@ public interface Context {
      * @return the HTTP response
      */
     HttpResponse response();
+
+    /**
+     * Sets a session attribute with the specified name and value.
+     *
+     * @param <T>   the type of the value
+     * @param name  the name of the attribute
+     * @param value the value of the attribute
+     */
+    <T> void sessionAttribute(String name, T value);
+
+    /**
+     * Retrieves a session attribute with the specified name.
+     *
+     * @param <T>  the type of the value
+     * @param name the name of the attribute
+     * @return the value of the attribute, or null if the attribute does not exist
+     */
+    <T> T sessionAttribute(String name);
+
 }
