@@ -94,46 +94,59 @@ application's core features without getting bogged down in complex configuration
 ## Context
 
 The context object in **Jawisp** provides comprehensive access to all data required to process an HTTP request. It encapsulates both the request and response, offering a range of
-methods for interacting with these components. Below is a detailed table outlining the available methods for the context object, categorized into request and response methods.
+methods for interacting with these components. Below is a detailed list of the available methods for the context object, categorized into request and response methods.
 
 ### Request Methods
 
-| Method                     | Description                                                                 |
-|----------------------------|-----------------------------------------------------------------------------|
-| `attribute("name", value)`  | Sets an attribute on the request.                                        |
-| `attribute("name")`         | Retrieves an attribute from the request.                                   |
-| `body()`                   | Retrieves the request body as a string.                                    |
-| `bodyAsBytes()`              | Retrieves the request body as an array of bytes.                           |
-| `pathParam("name")`        | Retrieves a path parameter by name as a string.                             |
-| `pathParamMap()`           | Retrieves a map of all path parameters.                                    |
-| `path()`                   | Retrieves the request path.                                               |
-| `isKeepAlive()`            | Checks if the request is a keep-alive request.                              |
-| `headerMap()`              | Retrieves all header key-value pairs as a map.                              |
-| `header("key")`             | Retrieves a header value by its key.                                      |
-| `cookieMap()`              | Retrieves a map of all request cookies.                                    |
-| `cookie("name")`            | Retrieves a request cookie by name.                                       |
-| `sessionAttribute("name", value)` | Sets a session attribute.                                              |
-| `sessionAttribute("name")`  | Retrieves a session attribute by name.                                     |
-| `ip()`                     | Retrieves the IP address of the request.                                    |
-| `host()`                   | Retrieves the host of the request.                                          |
-| `request()`                | Retrieves the underlying `HttpRequest` object.                              |
+#### Retrieving Attributes
+- **`attribute("name")`**: Retrieves an attribute from the request.
+- **`attribute("name", value)`**: Sets an attribute on the request.
+
+#### Retrieving Request Body
+- **`body()`**: Retrieves the request body as a string.
+- **`bodyAsBytes()`**: Retrieves the request body as an array of bytes.
+
+#### Path Parameters
+- **`pathParam("name")`**: Retrieves a path parameter by name as a string.
+- **`pathParamMap()`**: Retrieves a map of all path parameters.
+
+#### Request Information
+- **`path()`**: Retrieves the request path.
+- **`isKeepAlive()`**: Checks if the request is a keep-alive request.
+- **`headerMap()`**: Retrieves all header key-value pairs as a map.
+- **`header("key")`**: Retrieves a header value by its key.
+- **`cookieMap()`**: Retrieves a map of all request cookies.
+- **`cookie("name")`**: Retrieves a request cookie by name.
+- **`sessionAttribute("name", value)`**: Sets a session attribute.
+- **`sessionAttribute("name")`**: Retrieves a session attribute by name.
+- **`ip()`**: Retrieves the IP address of the request.
+- **`host()`**: Retrieves the host of the request.
+- **`request()`**: Retrieves the underlying `HttpRequest` object.
 
 ### Response Methods
 
-| Method                       | Description                                                                 |
-|------------------------------|-----------------------------------------------------------------------------|
-| `text("string")`            | Sets the response body to the specified string.                            |
-| `json(obj)`                  | Converts the object to a JSON string, sets the response body, and sets the content type to JSON. |
-| `status()`                   | Retrieves the current response status.                                      |
-| `status(code)`                | Sets the response status code.                                            |
-| `cookie("name", "value", maxAge)` | Sets a response cookie with the specified name, value, and optional max-age. |
-| `removeCookie("name", "/path")` | Removes a response cookie by name and optional path.                      |
-| `header("name", "value")`    | Sets a response header with the specified name and value.                    |
-| `removeHeader("name")`       | Removes a response header by name.                                          |
-| `redirect("/path", code)`    | Redirects to the specified path with the given status code.                  |
-| `response()`                 | Retrieves the underlying `HttpResponse` object.                              |
-| `html("html")`               | Sets the response body to the specified HTML string and sets the content type to HTML. |
-| `render("/template.tmpl", model)` | Renders a template with the given model and sets the response body to the rendered HTML. |
+#### Setting Response Body
+- **`text("string")`**: Sets the response body to the specified string.
+- **`json(obj)`**: Converts the object to a JSON string, sets the response body, and sets the content type to JSON.
+- **`html("html")`**: Sets the response body to the specified HTML string and sets the content type to HTML.
+- **`render("/template.tmpl", model)`**: Renders a template with the given model and sets the response body to the rendered HTML.
+
+#### Response Status
+- **`status()`**: Retrieves the current response status.
+- **`status(code)`**: Sets the response status code.
+
+#### Response Headers and Cookies
+- **`cookie("name", "value", maxAge)`**: Sets a response cookie with the specified name, value, and optional max-age.
+- **`removeCookie("name", "/path")`**: Removes a response cookie by name and optional path.
+- **`header("name", "value")`**: Sets a response header with the specified name and value.
+- **`removeHeader("name")`**: Removes a response header by name.
+- **`headerMap()`**: Retrieves all response header key-value pairs as a map.
+
+#### Redirects
+- **`redirect("/path", code)`**: Redirects to the specified path with the given status code.
+
+#### Retrieving Response Object
+- **`response()`**: Retrieves the underlying `HttpResponse` object.
 
 These methods provide a comprehensive toolkit for handling HTTP requests and responses within the **Jawisp** framework. They allow developers to easily manipulate and access request
 and response data, enabling the construction of robust and efficient web applications.
