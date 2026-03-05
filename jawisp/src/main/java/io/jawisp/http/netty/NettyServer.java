@@ -75,7 +75,7 @@ public class NettyServer implements HttpServer {
             channel = f.channel();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        } 
     }
 
     /**
@@ -98,4 +98,5 @@ public class NettyServer implements HttpServer {
         logger.info("Jawisp server stopped");
     }
 
+    
 }

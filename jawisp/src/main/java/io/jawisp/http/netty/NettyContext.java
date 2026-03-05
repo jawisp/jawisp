@@ -3,7 +3,9 @@ package io.jawisp.http.netty;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.jawisp.http.Context;
@@ -12,8 +14,19 @@ import io.jawisp.http.json.JsonMapper;
 import io.jawisp.http.json.JsonMapperProvider;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.DefaultCookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.netty.util.AttributeKey;
 
 /**
@@ -27,8 +40,11 @@ import io.netty.util.AttributeKey;
  */
 public class NettyContext implements Context {
 
+    private static final String COOKIE_HEADER = "Cookie";
+
     private final ChannelHandlerContext ctx;
     private final FullHttpRequest request;
+    private final DefaultHttpResponse response;
     private final String path;
     private final Route route;
     private String result;
@@ -54,6 +70,9 @@ public class NettyContext implements Context {
         this.result = "";
         this.status = 200;
         this.keepAlive = request != null ? HttpUtil.isKeepAlive(request) : false;
+        this.response = new DefaultHttpResponse(
+                HttpVersion.HTTP_1_1,
+                HttpResponseStatus.valueOf(status));
     }
 
     /**
@@ -263,7 +282,7 @@ public class NettyContext implements Context {
      *
      * @param name the name of the header to retrieve
      * @return the value of the header, or null if the header is not present
-     */    
+     */
     @Override
     public String header(String name) {
         return headerMap().get(name);
@@ -272,7 +291,8 @@ public class NettyContext implements Context {
     /**
      * Retrieves a map containing all the headers in this context.
      *
-     * @return a map where the keys are header names and the values are header values
+     * @return a map where the keys are header names and the values are header
+     *         values
      */
     @Override
     public Map<String, String> headerMap() {
@@ -283,6 +303,89 @@ public class NettyContext implements Context {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue));
+    }
+
+    /**
+     * Retrieves the value of the cookie with the specified name.
+     *
+     * @param name the name of the cookie to retrieve
+     * @return the value of the cookie, or null if the cookie is not present
+     */
+    @Override
+    public String cookie(String name) {
+        return cookieMap().get(name);
+    }
+
+    /**
+     * Retrieves a map containing all the cookies in this context.
+     *
+     * @return a map where the keys are cookie names and the values are cookie
+     *         values
+     */
+    @Override
+    public Map<String, String> cookieMap() {
+        Map<String, String> cookies = new LinkedHashMap<>();
+        String cookieHeader = request.headers().get(COOKIE_HEADER);
+
+        if (cookieHeader != null) {
+            Set<Cookie> nettyCookies = ServerCookieDecoder.LAX.decode(cookieHeader);
+            for (Cookie c : nettyCookies) {
+                cookies.put(c.name(), c.value());
+            }
+        }
+        return cookies;
+    }
+
+    /**
+     * Sets a cookie in the HTTP response.
+     *
+     * @param name   the name of the cookie
+     * @param value  the value of the cookie
+     * @param maxAge the maximum age of the cookie in seconds
+     */
+    @Override
+    public void cookie(String name, String value, int maxAge) {
+        HttpHeaders headers = response.headers();
+        DefaultCookie cookie = new DefaultCookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        headers.add(HttpHeaderNames.SET_COOKIE, ServerCookieEncoder.LAX.encode(cookie));
+    }
+
+    /**
+     * Removes a cookie from the HTTP response.
+     *
+     * @param name the name of the cookie to remove
+     * @param path the path of the cookie
+     */
+    @Override
+    public void removeCookie(String name, String path) {
+        HttpHeaders headers = response.headers();
+        DefaultCookie cookie = new DefaultCookie(name, "");
+        cookie.setPath(path);
+        cookie.setMaxAge(0); // instruct browser to delete
+        headers.add(HttpHeaderNames.SET_COOKIE, ServerCookieEncoder.LAX.encode(cookie));
+    }
+
+    /**
+     * Gets the original HTTP request object.
+     *
+     * @return the HTTP request object
+     */
+    @Override
+    public HttpRequest request() {
+        return request;
+    }
+
+    /**
+     * Gets the HTTP response object.
+     *
+     * @return the HTTP response object
+     */
+    @Override
+    public HttpResponse response() {
+        return response;
     }
 
 }
