@@ -65,6 +65,8 @@ The context object provides all data to process an HTTP request. It contains the
 - redirect("/path", code)           // redirect to the given path with the given status code
 - response()                        // get the underlying HttpResponse
 - html("html")                      // calls result(string), and also sets content type to html
+- render("/template.tmpl", model)   // calls html(renderedTemplate)
+
 
 ```
 
