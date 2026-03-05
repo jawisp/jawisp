@@ -27,13 +27,4 @@ public interface TemplateEnginePlugin {
      */
     TemplateEngine createEngine(Config config);
 
-    /**
-     * Checks if the plugin supports the specified file extension.
-     *
-     * @param extension the file extension to check
-     * @return true if the plugin supports the extension, false otherwise
-     */
-    default boolean supportsExtension(String extension) {
-        return getName().equals(extension.replace(".", ""));
-    }
 }

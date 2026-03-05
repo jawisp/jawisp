@@ -2,7 +2,6 @@ package io.jawisp.plugin.template;
 
 import java.io.Writer;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * The TemplateEngine interface defines methods for rendering templates.
@@ -34,10 +33,4 @@ public interface TemplateEngine {
      */
     void render(String templateName, Map<String, Object> model, Writer writer);
 
-    /**
-     * Returns the supported file extensions for this template engine.
-     *
-     * @return a set of supported file extensions
-     */
-    Set<String> getExtensions();
 }

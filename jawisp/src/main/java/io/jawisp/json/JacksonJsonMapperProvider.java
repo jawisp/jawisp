@@ -1,4 +1,4 @@
-package io.jawisp.http.json;
+package io.jawisp.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

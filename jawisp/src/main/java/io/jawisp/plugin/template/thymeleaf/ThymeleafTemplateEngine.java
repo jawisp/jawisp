@@ -2,7 +2,6 @@ package io.jawisp.plugin.template.thymeleaf;
 
 import java.io.Writer;
 import java.util.Map;
-import java.util.Set;
 
 import io.jawisp.plugin.template.TemplateEngine;
 
@@ -58,15 +57,5 @@ public class ThymeleafTemplateEngine implements TemplateEngine {
         org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
         context.setVariables(model);
         engine.process(templateName, context, writer);
-    }
-
-    /**
-     * Returns the set of supported file extensions for this template engine.
-     *
-     * @return a set of supported file extensions
-     */
-    @Override
-    public Set<String> getExtensions() {
-        return Set.of("html");
     }
 }

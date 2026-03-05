@@ -3,7 +3,7 @@ package io.jawisp.http;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import io.jawisp.http.json.JsonMapper;
+import io.jawisp.json.JsonMapper;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
-import java.util.Set;
 
 import io.jawisp.plugin.template.TemplateEngine;
 import io.pebbletemplates.pebble.PebbleEngine;
@@ -66,15 +65,5 @@ public class PebbleTemplateEngine implements TemplateEngine {
         } catch (IOException e) {
             throw new RuntimeException("Failed to render template: " + templateName, e);
         }
-    }
-
-    /**
-     * Returns the supported file extensions for this template engine.
-     *
-     * @return a set of supported file extensions
-     */
-    @Override
-    public Set<String> getExtensions() {
-        return Set.of("html", "peb", "pebble");
     }
 }

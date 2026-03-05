@@ -1,4 +1,4 @@
-package io.jawisp.http.json;
+package io.jawisp.json;
 
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 import io.jawisp.http.Context;
 import io.jawisp.http.Route;
-import io.jawisp.http.json.JsonMapper;
-import io.jawisp.http.json.JsonMapperProvider;
+import io.jawisp.json.JsonMapper;
+import io.jawisp.json.JsonMapperProvider;
 import io.jawisp.plugin.template.TemplateEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

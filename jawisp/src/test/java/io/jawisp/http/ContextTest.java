@@ -22,8 +22,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
-import io.jawisp.http.json.JsonMapper;
 import io.jawisp.http.netty.NettyContext;
+import io.jawisp.json.JsonMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
