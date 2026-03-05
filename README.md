@@ -46,6 +46,8 @@ The context object provides all data to process an HTTP request. It contains the
 - header("key")                     // get a header
 - cookieMap()                       // map of all request cookies
 - cookie("name")                    // request cookie by name
+- sessionAttribute("name", value)   // set a session attribute
+- sessionAttribute("name")          // get a session attribute
 
 /* Methods for the response */
 
