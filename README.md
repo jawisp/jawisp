@@ -89,6 +89,7 @@ For Maven:
 </dependency>
 ```
 ### Configuration File
+
 Create src/main/resources/logback.xml - Jawisp automatically loads this:
 ```xml
 <configuration debug="true">
@@ -110,7 +111,7 @@ Create src/main/resources/logback.xml - Jawisp automatically loads this:
 </configuration>
 ```
 
-## Jawisp Framework - Template Rendering Guide
+## Template Rendering Guide
 
 Jawisp provides a plugin-based template rendering system supporting Pebble, Thymeleaf engines through a unified TemplateEngine API. Drop plugin JARs on the classpath and configure with config.usePlugin().
 
@@ -136,9 +137,5 @@ static void homePage(Context ctx) {
 ```
 ### Template Locations
 
-Default: templates/ (classpath)
-
-
-
-
+Default: **templates/** (classpath)
 
