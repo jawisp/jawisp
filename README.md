@@ -154,17 +154,28 @@ and response data, enabling the construction of robust and efficient web applica
 
 ## Logging with SLF4J and Logback
 
-Jawisp uses SLF4J as the logging facade with Logback as the default implementation for all framework components and your application code.
+**Jawisp** uses SLF4J as the logging facade, with Logback as the default implementation for all framework components and your application code. This setup provides a flexible and
+powerful logging infrastructure that can be easily configured and extended.
 
 ### Dependencies
 
-Jawisp core includes SLF4J and Logback transitively. Explicitly declare in your build file for version control:
-```groovy
+Jawisp core includes SLF4J and Logback transitively, meaning they are automatically included when you add the **Jawisp** dependency to your project. However, for version control and
+explicit management, it is recommended to explicitly declare these dependencies in your build file.
+
+#### Gradle
+
+For Gradle, add the following line to your `build.gradle` file:
+
+```gradle
 dependencies {
     implementation 'ch.qos.logback:logback-classic:1.5.12'
 }
 ```
-For Maven:
+
+#### Maven
+
+For Maven, add the following snippet to your `pom.xml` file:
+
 ```xml
 <dependency>
     <groupId>ch.qos.logback</groupId>
@@ -172,9 +183,13 @@ For Maven:
     <version>1.5.12</version>
 </dependency>
 ```
+
 ### Configuration File
 
-Create src/main/resources/logback.xml - Jawisp automatically loads this:
+**Jawisp** automatically loads the `logback.xml` configuration file located in `src/main/resources`. This allows you to easily customize logging behavior without additional setup.
+
+#### Example `logback.xml`
+
 ```xml
 <configuration debug="true">
   <!-- Console appender for output -->
@@ -184,7 +199,7 @@ Create src/main/resources/logback.xml - Jawisp automatically loads this:
     </encoder>
   </appender>
 
-  <!-- Set Netty to INFO -->
+  <!-- Set logging levels for specific packages -->
   <logger name="io.netty" level="DEBUG" />
   <logger name="io.jawisp" level="INFO" />
 
@@ -195,31 +210,147 @@ Create src/main/resources/logback.xml - Jawisp automatically loads this:
 </configuration>
 ```
 
+### Explanation of Configuration
+
+- **Console Appender**: The `STDOUT` appender directs log messages to the console. The pattern specified (`%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n`) includes the
+timestamp, thread name, log level, logger name, and message.
+
+- **Logger Levels**:
+  - `io.netty` is set to `DEBUG` to capture detailed logs from the Netty framework.
+  - `io.jawisp` is set to `INFO` to capture general logs from the **Jawisp** framework.
+
+- **Root Logger**: The root logger is set to `WARN` to minimize noise from less important log messages, capturing only warnings and errors.
+
+### Customization
+
+You can customize the logging behavior by modifying the `logback.xml` file. Some additional configuration options include:
+
+- **File Appender**: To log messages to a file, you can add a `FileAppender`:
+
+  ```xml
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>jawisp.log</file>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  ```
+
+- **Rolling File Appender**: For managing log files over time, use a `RollingFileAppender`:
+
+  ```xml
+  <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>jawisp.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>jawisp.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  ```
+
+- **Asynchronous Logging**: To improve logging performance, especially under high load, use an `AsyncAppender`:
+
+  ```xml
+  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="STDOUT" />
+  </appender>
+  ```
+
 ## Template Rendering Guide
 
-Jawisp provides a plugin-based template rendering system supporting Pebble, Thymeleaf engines through a unified TemplateEngine API. Drop plugin JARs on the classpath and configure with config.usePlugin().
+**Jawisp** provides a flexible and extensible template rendering system that supports multiple template engines through a unified `TemplateEngine` API. This allows developers to use
+popular template engines like Pebble and Thymeleaf seamlessly within their applications. The system is designed to be easy to set up and extend, with support for additional template
+engines through plugins.
 
-### Quick start
+### Quick Start
 
-1. Add Dependencies
-```
-implementation 'io.pebbletemplates:pebble:4.1.1'
-implementation 'org.thymeleaf:thymeleaf:3.1.3.RELEASE'
-```
-2. Configure Template Engine with engine name: 'pebble', 'thymeleaf'
-```
-Jawisp.build(config -> config
-        .usePlugin("pebble")
-        .routes(route -> route.get("/", App::homePage))
-      ).start();
-```
-3. Render Templates
-```
-static void homePage(Context ctx) {
-    ctx.render("home.html", Map.of("name", "John Smith"));
+Follow these steps to get started with template rendering in **Jawisp**:
+
+#### 1. Add Dependencies
+
+First, add the necessary dependencies for the template engine you want to use. For example, to use Pebble and Thymeleaf, include the following in your build file:
+
+**Gradle:**
+
+```groovy
+dependencies {
+    implementation 'io.pebbletemplates:pebble:4.1.1'
+    implementation 'org.thymeleaf:thymeleaf:3.1.3.RELEASE'
 }
 ```
+
+**Maven:**
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>io.pebbletemplates</groupId>
+        <artifactId>pebble</artifactId>
+        <version>4.1.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.thymeleaf</groupId>
+        <artifactId>thymeleaf</artifactId>
+        <version>3.1.3.RELEASE</version>
+    </dependency>
+</dependencies>
+```
+
+#### 2. Configure Template Engine
+
+Next, configure the **Jawisp** framework to use the desired template engine. This is done by specifying the engine name using `config.usePlugin()`.
+
+```java
+import io.jawisp.core.Jawisp;
+import io.jawisp.core.Context;
+
+public class MyWebApplication {
+    public static void main(String[] args) {
+        Jawisp.build(config -> config
+            .usePlugin("pebble") // or "thymeleaf"
+            .routes(route -> route.get("/", App::homePage))
+        ).start();
+    }
+}
+```
+
+#### 3. Render Templates
+
+With the template engine configured, you can now render templates in your route handlers. The `ctx.render()` method is used to render a template with the specified model.
+
+```java
+import io.jawisp.core.Context;
+
+public class App {
+    static void homePage(Context ctx) {
+        ctx.render("home.html", Map.of("name", "John Smith"));
+    }
+}
+```
+
 ### Template Locations
 
-Default: **templates/** (classpath)
+By default, **Jawisp** looks for templates in the `templates/` directory on the classpath. This means you can place your template files in `src/main/resources/templates/` and they
+will be automatically detected and loaded.
 
+### Supported Template Engines
+
+**Jawisp** currently supports the following template engines:
+
+- **Pebble**: A simple, flexible, and powerful templating engine for Java.
+- **Thymeleaf**: A modern server-side Java template engine.
+
+### Customizing Template Locations
+
+If you want to specify a different location for your templates, you can configure the `templateDirectory` option in your `logback.xml` file.
+
+```java
+Jawisp.build(config -> config
+    .usePlugin("pebble")
+    .templateDirectory("myTemplates/")
+    .routes(route -> route.get("/", App::homePage))
+).start();
+```
