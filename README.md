@@ -48,6 +48,9 @@ The context object provides all data to process an HTTP request. It contains the
 - cookie("name")                    // request cookie by name
 - sessionAttribute("name", value)   // set a session attribute
 - sessionAttribute("name")          // get a session attribute
+- ip()                              // ip as string
+- host()                            // host as string
+- request()                         // get underlying HttpRequest
 
 /* Methods for the response */
 
@@ -57,6 +60,11 @@ The context object provides all data to process an HTTP request. It contains the
 - status(code)                      // set the response status code
 - cookie("name", "value", maxAge)   // set response cookie by name, with value and max-age (optional).
 - removeCookie("name", "/path")     // removes cookie by name and path (optional)
+- header("name", "value")           // set response header by name (can be used with Header.HEADERNAME)
+- removeHeader("name")              // remove a response header by name
+- redirect("/path", code)           // redirect to the given path with the given status code
+- response()                        // get the underlying HttpResponse
+- html("html")                      // calls result(string), and also sets content type to html
 
 ```
 

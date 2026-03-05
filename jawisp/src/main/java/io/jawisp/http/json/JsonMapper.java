@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
  * Implementations of this interface should provide the actual logic for JSON serialization and deserialization.
  *
  * @author reftch
- * @version 1.0.3
+ * @version 1.0.4
  */
 public interface JsonMapper {
 

@@ -15,7 +15,7 @@ import io.netty.handler.codec.http.HttpResponse;
  * content type, path parameters, and attributes.
  *
  * @author reftch
- * @version 1.0.3
+ * @version 1.0.4
  */
 public interface Context {
 
@@ -167,6 +167,25 @@ public interface Context {
     Map<String, String> headerMap();
 
     /**
+     * Sets a response header by name.
+     *
+     * @param name  the name of the header
+     * @param value the value of the header
+     */
+    default void header(String name, String value) {
+        response().headers().add(name, value);
+    }
+
+    /**
+     * Removes a response header by name.
+     *
+     * @param name the name of the header to be removed
+     */
+    default void removeHeader(String name) {
+        response().headers().remove(name);
+    }
+
+    /**
      * Retrieves a map containing all the cookies in this context.
      *
      * @return a map where the keys are cookie names and the values are cookie
@@ -231,4 +250,33 @@ public interface Context {
      */
     <T> T sessionAttribute(String name);
 
+    /**
+     * Retrieves the IP address.
+     *
+     * @return the IP address as a String
+     */
+    String ip();
+
+    /**
+     * Retrieves the host name.
+     *
+     * @return the host name as a String
+     */
+    String host();
+
+    /**
+     * Redirects to the given path with the specified status code.
+     *
+     * @param path the path to redirect to
+     * @param code the status code for the redirect
+     */
+    void redirect(String path, int code);
+
+    /**
+     * Sets the response content to the given HTML and sets the content type to
+     * "text/html".
+     *
+     * @param html the HTML content to be set in the response
+     */
+    void html(String html);
 }

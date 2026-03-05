@@ -16,6 +16,8 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
@@ -345,4 +347,69 @@ class ContextTest {
         verify(channel).attr(key);
         verify(attr).get();
     }
+
+    @Test
+    void clientIp_returnsRemoteAddress() {
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+        Channel channel = mock(Channel.class);
+
+        InetSocketAddress remoteAddr = new InetSocketAddress("192.168.1.100", 12345);
+        when(ctx.channel()).thenReturn(channel);
+        when(channel.remoteAddress()).thenReturn(remoteAddr);
+
+        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+
+        String result = nettyCtx.ip();
+        assertEquals("192.168.1.100", result);
+    }
+
+    @Test
+    void clientHost_returnsHostname() {
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        when(request.headers().get(HttpHeaderNames.CONTENT_TYPE)).thenReturn("application/json");
+
+        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+        Channel channel = mock(Channel.class);
+        InetSocketAddress remoteAddr = mock(InetSocketAddress.class, RETURNS_DEEP_STUBS);
+
+        when(ctx.channel()).thenReturn(channel);
+        when(channel.remoteAddress()).thenReturn(remoteAddr);
+        when(remoteAddr.getAddress()).thenReturn(mock(InetAddress.class));
+        when(remoteAddr.getAddress().getHostName()).thenReturn("client.example.com");
+        when(remoteAddr.getAddress().getHostAddress()).thenReturn("192.168.1.100");
+
+        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+
+        String result = nettyCtx.host();
+        assertEquals("client.example.com", result);
+    }
+
+    @Test
+    void redirect_setsLocationHeader() {
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+
+        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+
+        nettyCtx.redirect("/login", 302);
+
+        assertEquals(302, nettyCtx.status());
+        assertEquals("/login", nettyCtx.response().headers().get(HttpHeaderNames.LOCATION));
+        assertEquals("0", nettyCtx.response().headers().get(HttpHeaderNames.CONTENT_LENGTH));
+    }
+
+    @Test
+    void html_setsContentTypeAndContent() {
+        FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+
+        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+
+        nettyCtx.html("<h1>Hello</h1>");
+
+        assertEquals("text/html; charset=UTF-8", nettyCtx.contentType());
+        assertEquals("<h1>Hello</h1>", nettyCtx.result());
+    }
+
 }

@@ -12,7 +12,7 @@ import io.jawisp.http.Route;
  * It allows setting various parameters such as the server port, context path, and routes.
  *
  * @author reftch
- * @version 1.0.3
+ * @version 1.0.4
  */
 public class Config {
 

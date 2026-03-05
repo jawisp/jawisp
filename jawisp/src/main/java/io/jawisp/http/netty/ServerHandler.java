@@ -26,7 +26,7 @@ import io.netty.util.CharsetUtil;
  * in the Netty server. It processes the requests, routes them to the appropriate handlers, and sends back the responses.
  *
  * @author reftch
- * @version 1.0.3
+ * @version 1.0.4
  */
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);

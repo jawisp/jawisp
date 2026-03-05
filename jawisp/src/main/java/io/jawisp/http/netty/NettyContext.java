@@ -1,6 +1,9 @@
 package io.jawisp.http.netty;
 
 import java.lang.reflect.Type;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -37,7 +40,7 @@ import io.netty.util.AttributeKey;
  * and interact with the Netty ChannelHandlerContext.
  *
  * @author reftch
- * @version 1.0.3
+ * @version 1.0.4
  */
 public class NettyContext implements Context {
 
@@ -425,6 +428,68 @@ public class NettyContext implements Context {
      */
     private AttributeKey<Object> getSessionKey(String name) {
         return AttributeKey.valueOf(SESSION_ATTR_PREFIX + name);
+    }
+
+    /**
+     * Retrieves the IP address.
+     *
+     * @return the IP address as a String
+     */
+    @Override
+    public String ip() {
+        SocketAddress remoteAddress = ctx.channel().remoteAddress();
+        if (remoteAddress instanceof InetSocketAddress) {
+            return ((InetSocketAddress) remoteAddress).getAddress().getHostAddress();
+        }
+        return remoteAddress.toString();
+    }
+
+    /**
+     * Retrieves the host name.
+     *
+     * @return the host name as a String
+     */
+    @Override
+    public String host() {
+        SocketAddress remoteAddress = ctx.channel().remoteAddress();
+        if (remoteAddress instanceof InetSocketAddress) {
+            InetSocketAddress addr = (InetSocketAddress) remoteAddress;
+            return addr.getAddress().getHostName(); // Returns hostname like "client.example.com"
+        }
+        return remoteAddress.toString();
+    }
+
+    /**
+     * Redirects to the given path with the specified status code.
+     *
+     * @param path the path to redirect to
+     * @param code the status code for the redirect
+     */
+    public void redirect(String path, int code) {
+        this.status = code;
+        this.result = ""; // Clear body
+
+        HttpResponseStatus status = HttpResponseStatus.valueOf(code);
+        this.response.setStatus(status);
+
+        // Simple Location header - handles both relative and absolute paths
+        response.headers().set(HttpHeaderNames.LOCATION, path);
+
+        // Standard redirects have no body
+        if (code == 301 || code == 302 || code == 303 || code == 307 || code == 308) {
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, "0");
+        }
+    }
+
+    /**
+     * Sets the response content to the given HTML and sets the content type to
+     * "text/html".
+     *
+     * @param html the HTML content to be set in the response
+     */
+    public void html(String html) {
+        this.contentType = "text/html; charset=UTF-8";
+        this.result = html;
     }
 
 }

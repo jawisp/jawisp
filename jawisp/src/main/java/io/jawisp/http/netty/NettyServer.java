@@ -23,7 +23,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
  * It sets up the Netty server with appropriate configurations and event loop groups.
  *
  * @author reftch
- * @version 1.0.3
+ * @version 1.0.4
  */
 public class NettyServer implements HttpServer {
 

@@ -12,7 +12,7 @@ import io.netty.handler.codec.http.HttpHeaders;
  * Utility class containing methods for handling Netty {@link FullHttpRequest}.
  *
  * @author reftch
- * @version 1.0.3
+ * @version 1.0.4
  */
 public class Utils {
 
