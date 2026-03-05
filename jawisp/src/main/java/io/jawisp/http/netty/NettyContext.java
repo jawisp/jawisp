@@ -3,7 +3,6 @@ package io.jawisp.http.netty;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
