@@ -5,7 +5,7 @@ package io.jawisp.http;
  * This enum defines the standard HTTP methods that can be used
  * in handling HTTP requests within the application.
  * 
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public enum HttpMethod {

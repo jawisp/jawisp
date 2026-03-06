@@ -5,7 +5,7 @@ package io.jawisp.http;
  * The handle method takes a Context object as a parameter, which provides various methods to interact with
  * the request and response.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 @FunctionalInterface

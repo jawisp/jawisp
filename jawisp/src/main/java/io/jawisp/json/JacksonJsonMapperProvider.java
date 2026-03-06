@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * The JacksonJsonMapperProvider class is an implementation of the JsonMapperProvider interface.
  * It uses the Jackson library to provide JsonMapper functionality.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class JacksonJsonMapperProvider implements JsonMapperProvider {

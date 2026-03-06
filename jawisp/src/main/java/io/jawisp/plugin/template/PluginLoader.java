@@ -9,7 +9,7 @@ import java.util.stream.StreamSupport;
  * The PluginLoader class is responsible for loading template engine plugins.
  * It provides methods to load all available plugins and to debug them.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class PluginLoader {

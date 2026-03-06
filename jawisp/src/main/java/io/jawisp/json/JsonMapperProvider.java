@@ -7,7 +7,7 @@ import java.util.ServiceLoader;
  * It includes a method to create a JsonMapper and a static method to load the first available JsonMapperProvider
  * using the ServiceLoader mechanism.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public interface JsonMapperProvider {

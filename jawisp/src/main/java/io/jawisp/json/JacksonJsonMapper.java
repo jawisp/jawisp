@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * The JacksonJsonMapper class is an implementation of the JsonMapper interface.
  * It uses the Jackson library to serialize and deserialize objects to and from JSON.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class JacksonJsonMapper implements JsonMapper {

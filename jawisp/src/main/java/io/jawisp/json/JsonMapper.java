@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
  * It includes methods for converting objects to JSON strings or streams, and vice versa.
  * Implementations of this interface should provide the actual logic for JSON serialization and deserialization.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public interface JsonMapper {

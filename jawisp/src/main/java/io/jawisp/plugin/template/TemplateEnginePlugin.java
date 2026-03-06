@@ -7,7 +7,7 @@ import io.jawisp.core.Config;
  * Implementing classes should provide the logic to create a template engine
  * and check if they support a specific file extension.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0‚
  */
 public interface TemplateEnginePlugin {

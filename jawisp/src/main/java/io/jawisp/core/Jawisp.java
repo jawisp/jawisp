@@ -13,7 +13,7 @@ import io.jawisp.http.netty.NettyServer;
  * The Jawisp class is the main entry point for the JAWISP application.
  * It initializes the HTTP server and manages its lifecycle.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class Jawisp {
@@ -24,6 +24,10 @@ public class Jawisp {
     private final HttpServer server;
     private long start = System.nanoTime();
 
+    static {
+        logger.info("JAWISP v1.0.0 starting ...");
+    }
+
     /**
      * Constructs a Jawisp instance with the given configuration.
      *
@@ -32,7 +36,7 @@ public class Jawisp {
     private Jawisp(Config config) {
         this.config = config;
 
-        logger.info("JAWISP v1.0.0 starting ...");
+        // logger.info("JAWISP v1.0.0 starting ...");
 
         AtomicInteger index = new AtomicInteger(1);
         config.getRoutes().stream()

@@ -14,10 +14,24 @@ import io.netty.handler.codec.http.HttpResponse;
  * result, status, JSON, body,
  * content type, path parameters, and attributes.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public interface Context {
+
+    /**
+     * Retrieves the original HTTP request.
+     *
+     * @return the HTTP request
+     */
+    HttpRequest request();
+
+    /**
+     * Retrieves the original HTTP response.
+     *
+     * @return the HTTP response
+     */
+    HttpResponse response();
 
     /**
      * Gets the text result of the HTTP response.
@@ -217,20 +231,6 @@ public interface Context {
      * @param path the path of the cookie to remove (optional)
      */
     void removeCookie(String name, String path);
-
-    /**
-     * Retrieves the original HTTP request.
-     *
-     * @return the HTTP request
-     */
-    HttpRequest request();
-
-    /**
-     * Retrieves the original HTTP response.
-     *
-     * @return the HTTP response
-     */
-    HttpResponse response();
 
     /**
      * Sets a session attribute with the specified name and value.

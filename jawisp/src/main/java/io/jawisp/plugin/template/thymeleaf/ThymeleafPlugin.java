@@ -8,7 +8,7 @@ import io.jawisp.plugin.template.TemplateEnginePlugin;
  * The ThymeleafPlugin class implements the TemplateEnginePlugin interface
  * and provides a method to create a ThymeleafTemplateEngine instance.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class ThymeleafPlugin implements TemplateEnginePlugin {

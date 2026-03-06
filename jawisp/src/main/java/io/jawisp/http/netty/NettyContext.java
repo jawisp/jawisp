@@ -39,7 +39,7 @@ import io.netty.util.AttributeKey;
  * It provides methods to handle HTTP requests and responses, manage attributes,
  * and interact with the Netty ChannelHandlerContext.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class NettyContext implements Context {

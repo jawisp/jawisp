@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'io.jawisp'
-version = '1.0.6'
+version = '1.0.7'
 
 java {
     toolchain {
@@ -33,6 +33,7 @@ dependencies {
     // Template engines
     compileOnly 'io.pebbletemplates:pebble:4.1.1'
     compileOnly 'org.thymeleaf:thymeleaf:3.1.3.RELEASE'
+    
     // Logback 
     compileOnly 'ch.qos.logback:logback-classic:1.5.23'
 

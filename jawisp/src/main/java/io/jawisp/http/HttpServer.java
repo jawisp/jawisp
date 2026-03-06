@@ -5,7 +5,7 @@ package io.jawisp.http;
  * It includes methods to start and stop the server, and may throw an Exception
  * if any error occurs during these operations.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public interface HttpServer {

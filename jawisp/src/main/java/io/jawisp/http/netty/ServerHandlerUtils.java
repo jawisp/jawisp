@@ -13,7 +13,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
  * The ServerHandlerUtils class provides utility methods for handling HTTP routes and filters in the Netty server.
  * It includes methods for finding routes and filters, as well as matching request paths to route patterns.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class ServerHandlerUtils {

@@ -13,7 +13,7 @@ import io.pebbletemplates.pebble.loader.ClasspathLoader;
  * The PebbleTemplateEngine class implements the TemplateEngine interface
  * and provides methods to render templates using the Pebble templating engine.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class PebbleTemplateEngine implements TemplateEngine {

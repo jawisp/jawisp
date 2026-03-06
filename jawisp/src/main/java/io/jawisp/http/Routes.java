@@ -9,7 +9,7 @@ import java.util.List;
  * the list of routes.
  * The class also ensures that paths are cleaned and properly formatted.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class Routes {

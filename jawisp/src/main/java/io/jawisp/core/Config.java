@@ -19,12 +19,12 @@ import io.jawisp.http.Route;
  * It allows setting various parameters such as the server port, context path,
  * and routes.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public class Config {
 
-    private static final Logger log = LoggerFactory.getLogger(PluginLoader.class);
+    private static final Logger log = LoggerFactory.getLogger(Config.class);
 
     private int port;
     private String contextPath;
@@ -122,14 +122,13 @@ public class Config {
      */
     public Config usePlugin(String pluginName) {
         List<TemplateEnginePlugin> plugins = PluginLoader.loadAll();
-        log.info("Found {} plugins:", plugins.size());
-        plugins.forEach(p -> log.info("  - {}", p.getName()));
-
         TemplateEnginePlugin plugin = plugins.stream()
                 .filter(p -> p.getName().equals(pluginName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Plugin '" + pluginName + "' not found"));
 
+        log.info("Plugins: use '{}' template rendering plugin", plugin.getName());
+        
         this.templateEngine = Optional.of(plugin.createEngine(this));
         return this;
     }

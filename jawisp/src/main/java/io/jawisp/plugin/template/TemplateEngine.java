@@ -8,7 +8,7 @@ import java.util.Map;
  * Implementing classes should provide the logic to render templates using
  * different templating engines.
  *
- * @author reftch
+ * @author Taras Chornyi
  * @since 1.0.0
  */
 public interface TemplateEngine {
