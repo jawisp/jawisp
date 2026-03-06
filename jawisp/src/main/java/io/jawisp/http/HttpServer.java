@@ -6,7 +6,7 @@ package io.jawisp.http;
  * if any error occurs during these operations.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public interface HttpServer {
 

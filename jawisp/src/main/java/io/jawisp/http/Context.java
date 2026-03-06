@@ -15,7 +15,7 @@ import io.netty.handler.codec.http.HttpResponse;
  * content type, path parameters, and attributes.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public interface Context {
 

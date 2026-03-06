@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * It uses the Jackson library to provide JsonMapper functionality.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public class JacksonJsonMapperProvider implements JsonMapperProvider {
 

@@ -10,7 +10,7 @@ import java.util.stream.StreamSupport;
  * It provides methods to load all available plugins and to debug them.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public class PluginLoader {
 

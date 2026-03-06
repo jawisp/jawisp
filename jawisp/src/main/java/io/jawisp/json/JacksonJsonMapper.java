@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * It uses the Jackson library to serialize and deserialize objects to and from JSON.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public class JacksonJsonMapper implements JsonMapper {
     private final ObjectMapper mapper;

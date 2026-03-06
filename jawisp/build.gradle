@@ -4,23 +4,7 @@ plugins {
 }
 
 group = 'io.jawisp'
-version = '1.0.5'
-
-tasks.javadoc {
-    inputs.property("version", project.version)
-
-    doFirst {
-        source = source.collect { file ->
-            def tmpDir = new File(buildDir, "filteredSources")
-            tmpDir.mkdirs()
-
-            def newFile = new File(tmpDir, file.name)
-            newFile.text = file.text.replace("\${version}", project.version.toString())
-
-            return newFile
-        }
-    }
-}
+version = '1.0.6'
 
 java {
     toolchain {

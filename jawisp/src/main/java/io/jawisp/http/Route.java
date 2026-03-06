@@ -6,7 +6,7 @@ package io.jawisp.http;
  * requests to this route.
  *
  * @author reftch
- * @version ${version}
+ * @since 1.0.0
  */
 public class Route {
 

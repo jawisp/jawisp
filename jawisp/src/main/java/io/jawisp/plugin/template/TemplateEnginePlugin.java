@@ -8,7 +8,7 @@ import io.jawisp.core.Config;
  * and check if they support a specific file extension.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0‚
  */
 public interface TemplateEnginePlugin {
 

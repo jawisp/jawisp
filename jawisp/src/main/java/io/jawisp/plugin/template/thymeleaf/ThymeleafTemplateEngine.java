@@ -10,7 +10,7 @@ import io.jawisp.plugin.template.TemplateEngine;
  * and provides methods for rendering templates using Thymeleaf.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public class ThymeleafTemplateEngine implements TemplateEngine {
     private final org.thymeleaf.TemplateEngine engine;

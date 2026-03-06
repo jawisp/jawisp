@@ -9,7 +9,7 @@ import io.jawisp.plugin.template.TemplateEnginePlugin;
  * and provides a method to create a PebbleTemplateEngine instance.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public class PebblePlugin implements TemplateEnginePlugin {
 

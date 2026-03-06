@@ -40,7 +40,7 @@ import io.netty.util.AttributeKey;
  * and interact with the Netty ChannelHandlerContext.
  *
  * @author reftch
- * ${version}
+ * @since 1.0.0
  */
 public class NettyContext implements Context {
 
