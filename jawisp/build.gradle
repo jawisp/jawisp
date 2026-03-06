@@ -6,6 +6,31 @@ plugins {
 group = 'io.jawisp'
 version = '1.0.5'
 
+ext {
+    author = 'reftch'
+}
+
+tasks.withType(Javadoc).configureEach {
+
+    def replacements = [
+        version: project.version,
+        author : project.author
+    ]
+
+    doFirst {
+        source = source.collect { file ->
+            def text = file.text
+            replacements.each { key, value ->
+                text = text.replace("\${$key}", value.toString())
+            }
+
+            def temp = File.createTempFile("javadoc", ".java")
+            temp.text = text
+            temp
+        }
+    }
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)

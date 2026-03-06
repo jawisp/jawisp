@@ -1,14 +1,15 @@
 package org.example;
 
+import java.util.Map;
+
 import io.jawisp.core.Jawisp;
 import io.jawisp.http.Context;
 
 public class App {
 
     static void homePage(Context ctx) {
-        // ctx.render("thymeleaf.html", Map.of("name", "Taras!!!"));
-        // ctx.render("home.html", Map.of("name", "Taras!!!"));
-        ctx.text("Welcome to home page!");
+        // ctx.status(404);
+        ctx.render("home.html", Map.of("name", "John Smith"));
     }
 
     public static void main(String[] args) {
@@ -18,6 +19,7 @@ public class App {
                     .get("/", App::homePage)
                     .get("/api/v1/users/:id", UserController::getUser)
                     .post("/api/v1/users", UserController::createUser)
+                    .error(404, ctx -> ctx.text("Generic 404 Error"))
                 )).start();
     }
 
