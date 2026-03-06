@@ -38,11 +38,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     private final Supplier<ResourceHandler> resourceHandler = () -> ResourceHandler.getInstance();
 
     /**
-     * Constructs a new ServerHandler instance with the given list of routes and a
-     * template engine.
+     * Constructs a new ServerHandler instance with the given configuration.
      *
-     * @param routes         the list of routes to handle incoming requests
-     * @param templateEngine the template engine to use for rendering templates
+     * @param config the configuration object containing routes and other settings
      */
     public ServerHandler(Config config) {
         this.config = config;

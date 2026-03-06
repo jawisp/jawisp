@@ -89,6 +89,11 @@ public class Config {
         return this;
     }
 
+    /**
+     * Returns the list of routes associated with this object.
+     *
+     * @return a {@link List} containing the {@link Route} objects
+     */
     public List<Route> routes() {
         return this.routes;
     }
