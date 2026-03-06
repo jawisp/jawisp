@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 
 /**
@@ -28,8 +29,8 @@ import io.netty.util.CharsetUtil;
  * in the Netty server. It processes the requests, routes them to the
  * appropriate handlers, and sends back the responses.
  *
- * @author reftch
- * @version 1.0.5
+ * @author ${author}
+ * @version ${version}
  */
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
@@ -58,11 +59,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        // Run BEFORE filter
-        executeFilters(ctx, request, HttpMethod.BEFORE_FILTER);
-
         var route = ServerHandlerUtils.findRoute(request, routes);
         Context context = new NettyContext(ctx, request, route.orElse(null), templateEngine);
+
+        // Run BEFORE filter
+        executeFilters(ctx, context, HttpMethod.BEFORE_FILTER);
         if (route.isPresent()) {
             // Run main handler
             route.get().getHandler().handle(context);
@@ -71,10 +72,28 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             context.text("404 Not Found").status(404);
         }
 
-        response(ctx, context);
+        // check on error handlers
+        executeErrors(ctx, context);
 
         // Always run AFTER filter
-        executeFilters(ctx, request, HttpMethod.AFTER_FILTER);
+        executeFilters(ctx, context, HttpMethod.AFTER_FILTER);
+
+        response(ctx, context);
+    }
+
+    /**
+     * Executes the error handlers for the given request context.
+     *
+     * @param ctx     the ChannelHandlerContext for the request
+     * @param context the Context object representing the request and response
+     *                context
+     */
+    private void executeErrors(ChannelHandlerContext ctx, Context context) {
+        ServerHandlerUtils.findFilter(HttpMethod.ERROR, routes).ifPresent(route -> {
+            if (context.status() == route.status()) {
+                route.getHandler().handle(context);
+            }
+        });
     }
 
     /**
@@ -84,9 +103,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      * @param request    the FullHttpRequest object representing the HTTP request
      * @param filterType the type of the filter to execute
      */
-    private void executeFilters(ChannelHandlerContext ctx, FullHttpRequest request, HttpMethod filterType) {
+    private void executeFilters(ChannelHandlerContext ctx, Context context, HttpMethod filterType) {
         ServerHandlerUtils.findFilter(filterType, routes).ifPresent(route -> {
-            Context context = new NettyContext(ctx, request, route);
             route.getHandler().handle(context);
         });
     }
@@ -103,6 +121,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
         // return already created response object
         var response = context.response();
+        // set current status
+        response.setStatus(HttpResponseStatus.valueOf(context.status()));
 
         HttpHeaders headers = response.headers();
         headers.set(HttpHeaderNames.CONTENT_TYPE, context.contentType());

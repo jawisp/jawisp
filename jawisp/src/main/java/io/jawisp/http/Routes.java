@@ -5,11 +5,12 @@ import java.util.List;
 
 /**
  * The Routes class manages a collection of HTTP routes within the application.
- * It provides methods to add routes for various HTTP methods and to retrieve the list of routes.
+ * It provides methods to add routes for various HTTP methods and to retrieve
+ * the list of routes.
  * The class also ensures that paths are cleaned and properly formatted.
  *
- * @author reftch
- * @version 1.0.5
+ * @author ${author}
+ * @version ${version}
  */
 public class Routes {
 
@@ -170,8 +171,21 @@ public class Routes {
     }
 
     /**
+     * Adds a new route to handle error responses.
+     *
+     * @param code    the HTTP status code for which this error handler is registered
+     * @param handler the handler to process requests when the specified error code is encountered
+     * @return the current Routes instance
+     */
+    public Routes error(int code, Handler handler) {
+        routes.add(new Route(HttpMethod.ERROR, "/", handler, code));
+        return this;
+    }
+
+    /**
      * Cleans and formats the given path.
-     * Ensures that the path has no leading or trailing slashes and handles multiple slashes.
+     * Ensures that the path has no leading or trailing slashes and handles multiple
+     * slashes.
      *
      * @param path the original path
      * @return the cleaned and formatted path
