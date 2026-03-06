@@ -2,7 +2,7 @@ package org.example;
 
 import java.util.Map;
 
-import io.jawisp.core.Jawisp;
+import io.jawisp.Jawisp;
 import io.jawisp.http.Context;
 
 public class App {
@@ -15,6 +15,7 @@ public class App {
     public static void main(String[] args) {
         Jawisp.build(config -> config
                 .usePlugin("pebble")
+                .staticResources("/static")
                 .routes(route -> route
                     .get("/", App::homePage)
                     .get("/api/v1/users/:id", UserController::getUser)

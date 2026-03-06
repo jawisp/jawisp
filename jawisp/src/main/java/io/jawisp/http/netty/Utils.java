@@ -1,5 +1,6 @@
 package io.jawisp.http.netty;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -57,6 +58,15 @@ public class Utils {
                 .collect(Collectors.toMap(
                         i -> patternParts[i].substring(1),
                         i -> parts[i]));
+    }
+
+    public static boolean containsAny(List<String> staticResources, FullHttpRequest request) {
+        var target = request.uri();
+        if (staticResources == null || target == null) {
+            return false;
+        }
+        return staticResources.stream()
+                .anyMatch(target::contains); // Java 8+ streams (efficient short-circuit)
     }
 
 }

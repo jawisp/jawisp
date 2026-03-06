@@ -3,7 +3,7 @@ package io.jawisp.http.netty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jawisp.core.Config;
+import io.jawisp.config.Config;
 import io.jawisp.http.HttpServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -66,7 +66,7 @@ public class NettyServer implements HttpServer {
                         ch.pipeline().addLast(
                                 new HttpServerCodec(),
                                 new HttpObjectAggregator(65536),
-                                new ServerHandler(config.getRoutes(), config.templateEngine()));
+                                new ServerHandler(config));
                     }
                 });
 

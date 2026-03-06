@@ -1,4 +1,4 @@
-package io.jawisp.core;
+package io.jawisp.config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +8,11 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jawisp.http.Route;
 import io.jawisp.http.Routes;
 import io.jawisp.plugin.template.PluginLoader;
 import io.jawisp.plugin.template.TemplateEngine;
 import io.jawisp.plugin.template.TemplateEnginePlugin;
-import io.jawisp.http.Route;
 
 /**
  * The Config class is used to configure the Jawisp application.
@@ -29,6 +29,7 @@ public class Config {
     private int port;
     private String contextPath;
     private Optional<TemplateEngine> templateEngine = Optional.empty();
+    private final List<String> staticResources;
 
     private final List<Route> routes = new ArrayList<>();
 
@@ -38,6 +39,7 @@ public class Config {
     public Config() {
         this.port = 8080;
         this.contextPath = "/";
+        this.staticResources = new ArrayList<>();
     }
 
     /**
@@ -86,6 +88,10 @@ public class Config {
         return this;
     }
 
+    public List<Route> routes() {
+        return this.routes;
+    }
+    
     /**
      * Gets the server port.
      *
@@ -127,7 +133,7 @@ public class Config {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Plugin '" + pluginName + "' not found"));
 
-        log.info("Plugins: use '{}' template rendering plugin", plugin.getName());
+        log.debug("Plugins: use '{}' template rendering plugin", plugin.getName());
         
         this.templateEngine = Optional.of(plugin.createEngine(this));
         return this;
@@ -141,4 +147,14 @@ public class Config {
     public TemplateEngine templateEngine() {
         return templateEngine.orElse(null);
     }
+
+    public Config staticResources(String path) {
+        staticResources.add(path);
+        return this;
+    }
+
+    public List<String> staticResources() {
+        return staticResources;
+    }
+
 }
