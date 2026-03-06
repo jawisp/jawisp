@@ -1,15 +1,14 @@
 package io.jawisp.http.netty;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jawisp.config.Config;
 import io.jawisp.http.Context;
 import io.jawisp.http.HttpMethod;
-import io.jawisp.http.Route;
-import io.jawisp.plugin.template.TemplateEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -34,8 +33,9 @@ import io.netty.util.CharsetUtil;
  */
 public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
-    private final List<Route> routes;
-    private final TemplateEngine templateEngine;
+
+    private final Config config;
+    private final Supplier<ResourceHandler> resourceHandler = () -> ResourceHandler.getInstance();
 
     /**
      * Constructs a new ServerHandler instance with the given list of routes and a
@@ -44,9 +44,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      * @param routes         the list of routes to handle incoming requests
      * @param templateEngine the template engine to use for rendering templates
      */
-    public ServerHandler(List<Route> routes, TemplateEngine templateEngine) {
-        this.routes = routes;
-        this.templateEngine = templateEngine;
+    public ServerHandler(Config config) {
+        this.config = config;
     }
 
     /**
@@ -59,8 +58,15 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        var route = ServerHandlerUtils.findRoute(request, routes);
-        Context context = new NettyContext(ctx, request, route.orElse(null), templateEngine);
+        // static resources
+        boolean matches = Utils.containsAny(config.staticResources(), request);
+        if (matches) {
+            resourceHandler.get().response(ctx, request);
+            return;
+        }
+
+        var route = ServerHandlerUtils.findRoute(request, config.routes());
+        Context context = new NettyContext(ctx, request, route.orElse(null), config.templateEngine());
 
         // Run BEFORE filter
         executeFilters(ctx, context, HttpMethod.BEFORE_FILTER);
@@ -82,6 +88,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     }
 
     /**
+     * Required by Netty - flush pending writes
+     */
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.flush();
+    }
+
+    /**
      * Executes the error handlers for the given request context.
      *
      * @param ctx     the ChannelHandlerContext for the request
@@ -89,11 +103,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      *                context
      */
     private void executeErrors(ChannelHandlerContext ctx, Context context) {
-        ServerHandlerUtils.findFilter(HttpMethod.ERROR, routes).ifPresent(route -> {
-            if (context.status() == route.status()) {
-                route.getHandler().handle(context);
-            }
-        });
+        ServerHandlerUtils.findFilters(HttpMethod.ERROR, config.routes())
+                .forEach(route -> {
+                    if (context.status() == route.status()) {
+                        route.getHandler().handle(context);
+                    }
+                });
     }
 
     /**
@@ -104,7 +119,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      * @param filterType the type of the filter to execute
      */
     private void executeFilters(ChannelHandlerContext ctx, Context context, HttpMethod filterType) {
-        ServerHandlerUtils.findFilter(filterType, routes).ifPresent(route -> {
+        ServerHandlerUtils.findFilter(filterType, config.routes()).ifPresent(route -> {
             route.getHandler().handle(context);
         });
     }
@@ -162,5 +177,4 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         logger.error(cause.getLocalizedMessage());
         ctx.close();
     }
-
 }

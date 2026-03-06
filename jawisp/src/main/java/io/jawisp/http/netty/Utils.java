@@ -1,5 +1,6 @@
 package io.jawisp.http.netty;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -57,6 +58,24 @@ public class Utils {
                 .collect(Collectors.toMap(
                         i -> patternParts[i].substring(1),
                         i -> parts[i]));
+    }
+
+    /**
+     * Checks if the request URI contains any of the specified static resource
+     * paths.
+     *
+     * @param staticResources the list of static resource paths to check against
+     * @param request         the incoming HTTP request
+     * @return true if the request URI contains any of the static resource paths,
+     *         false otherwise
+     */
+    public static boolean containsAny(List<String> staticResources, FullHttpRequest request) {
+        var resource = request.uri();
+        if (staticResources == null || resource == null) {
+            return false;
+        }
+        return staticResources.stream()
+                .anyMatch(resource::contains); 
     }
 
 }

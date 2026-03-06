@@ -4,17 +4,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import io.jawisp.http.HttpMethod;
 import io.jawisp.http.Route;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 /**
- * The ServerHandlerUtils class provides utility methods for handling HTTP routes and filters in the Netty server.
- * It includes methods for finding routes and filters, as well as matching request paths to route patterns.
+ * The ServerHandlerUtils class provides utility methods for handling HTTP
+ * routes and filters in the Netty server.
+ * It includes methods for finding routes and filters, as well as matching
+ * request paths to route patterns.
  *
  * @author Taras Chornyi
- * @since 1.0.0
+ * @since 1.0.2
  */
 public class ServerHandlerUtils {
 
@@ -30,8 +33,9 @@ public class ServerHandlerUtils {
      * Finds the appropriate route for the given HTTP request.
      *
      * @param request the FullHttpRequest object representing the HTTP request
-     * @param routes the list of routes to search through
-     * @return an Optional containing the matched Route, or an empty Optional if no match is found
+     * @param routes  the list of routes to search through
+     * @return an Optional containing the matched Route, or an empty Optional if no
+     *         match is found
      */
     public static Optional<Route> findRoute(FullHttpRequest request, List<Route> routes) {
         String uri = request.uri();
@@ -47,7 +51,8 @@ public class ServerHandlerUtils {
      *
      * @param filter the HttpMethod representing the type of filter to find
      * @param routes the list of routes to search through
-     * @return an Optional containing the matched Route, or an empty Optional if no match is found
+     * @return an Optional containing the matched Route, or an empty Optional if no
+     *         match is found
      */
     public static Optional<Route> findFilter(HttpMethod filter, List<Route> routes) {
         return routes.stream()
@@ -56,10 +61,22 @@ public class ServerHandlerUtils {
     }
 
     /**
+     * Finds and returns a stream of routes that match the specified HTTP method.
+     *
+     * @param filter the HTTP method to filter the routes by
+     * @param routes the list of routes to search through
+     * @return a stream of routes that match the specified HTTP method
+     */
+    public static Stream<Route> findFilters(HttpMethod filter, List<Route> routes) {
+        return routes.stream()
+                .filter(r -> r.getMethod() == filter);
+    }
+
+    /**
      * Matches the given request path to the route pattern.
      *
      * @param pattern the route pattern to match against
-     * @param path the request path to match
+     * @param path    the request path to match
      * @return true if the request path matches the route pattern, false otherwise
      */
     public static boolean matchPath(String pattern, String path) {

@@ -1,6 +1,6 @@
 package io.jawisp.plugin.template;
 
-import io.jawisp.core.Config;
+import io.jawisp.config.Config;
 
 /**
  * The TemplateEnginePlugin interface defines methods for template engine plugins.

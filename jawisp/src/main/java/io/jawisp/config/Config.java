@@ -1,6 +1,7 @@
-package io.jawisp.core;
+package io.jawisp.config;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -8,11 +9,11 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jawisp.http.Route;
 import io.jawisp.http.Routes;
 import io.jawisp.plugin.template.PluginLoader;
 import io.jawisp.plugin.template.TemplateEngine;
 import io.jawisp.plugin.template.TemplateEnginePlugin;
-import io.jawisp.http.Route;
 
 /**
  * The Config class is used to configure the Jawisp application.
@@ -29,6 +30,7 @@ public class Config {
     private int port;
     private String contextPath;
     private Optional<TemplateEngine> templateEngine = Optional.empty();
+    private final List<String> staticResources;
 
     private final List<Route> routes = new ArrayList<>();
 
@@ -38,6 +40,7 @@ public class Config {
     public Config() {
         this.port = 8080;
         this.contextPath = "/";
+        this.staticResources = new ArrayList<>();
     }
 
     /**
@@ -86,6 +89,10 @@ public class Config {
         return this;
     }
 
+    public List<Route> routes() {
+        return this.routes;
+    }
+
     /**
      * Gets the server port.
      *
@@ -120,15 +127,15 @@ public class Config {
      * @return the current Config instance
      * @throws IllegalArgumentException if the specified plugin is not found
      */
-    public Config usePlugin(String pluginName) {
+    public Config templateEngine(String pluginName) {
         List<TemplateEnginePlugin> plugins = PluginLoader.loadAll();
         TemplateEnginePlugin plugin = plugins.stream()
                 .filter(p -> p.getName().equals(pluginName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Plugin '" + pluginName + "' not found"));
 
-        log.info("Plugins: use '{}' template rendering plugin", plugin.getName());
-        
+        log.debug("Plugins: use '{}' template rendering plugin", plugin.getName());
+
         this.templateEngine = Optional.of(plugin.createEngine(this));
         return this;
     }
@@ -141,4 +148,38 @@ public class Config {
     public TemplateEngine templateEngine() {
         return templateEngine.orElse(null);
     }
+
+    /**
+     * Adds a collection of static resource paths.
+     *
+     * @param paths the collection of paths of static resources
+     * @return the current Config instance
+     */
+    public Config staticResources(Collection<String> paths) {
+        staticResources.addAll(paths);
+        return this;
+    }
+
+    /**
+     * Adds multiple static resource paths.
+     *
+     * @param paths the variable number of paths of static resources
+     * @return the current Config instance
+     */
+    public Config staticResources(String... paths) {
+        for (String path : paths) {
+            staticResources.add(path);
+        }
+        return this;
+    }
+
+    /**
+     * Retrieves the list of static resource paths.
+     *
+     * @return a list of static resource paths
+     */
+    public List<String> staticResources() {
+        return staticResources;
+    }
+
 }

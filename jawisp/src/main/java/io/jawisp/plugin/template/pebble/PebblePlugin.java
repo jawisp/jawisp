@@ -1,6 +1,6 @@
 package io.jawisp.plugin.template.pebble;
 
-import io.jawisp.core.Config;
+import io.jawisp.config.Config;
 import io.jawisp.plugin.template.TemplateEngine;
 import io.jawisp.plugin.template.TemplateEnginePlugin;
 
