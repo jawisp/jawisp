@@ -310,7 +310,8 @@ import io.jawisp.core.Context;
 public class MyWebApplication {
     public static void main(String[] args) {
         Jawisp.build(config -> config
-            .usePlugin("pebble") // or "thymeleaf"
+            .staticResources("/static")
+            .templateEngine("pebble") // or "thymeleaf"
             .routes(route -> route.get("/", App::homePage))
         ).start();
     }
@@ -353,4 +354,13 @@ Jawisp.build(config -> config
     .templateDirectory("myTemplates/")
     .routes(route -> route.get("/", App::homePage))
 ).start();
+```
+
+### Static resources
+
+```java
+Config config = new Config()
+    .staticResources("/static", "/public", "/assets")  
+    .staticResources(List.of("/css", "/js"))           
+    .build();
 ```
