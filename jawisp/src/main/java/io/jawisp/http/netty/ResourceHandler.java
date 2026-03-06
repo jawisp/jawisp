@@ -29,7 +29,7 @@ import io.netty.handler.stream.ChunkedFile;
  * It manages the loading, sanitization, and delivery of static resources.
  *
  * @author Taras Chornyi
- * @since 1.0.7
+ * @since 1.0.8
  */
 
 public class ResourceHandler {
