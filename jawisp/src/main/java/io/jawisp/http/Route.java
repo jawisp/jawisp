@@ -6,7 +6,7 @@ package io.jawisp.http;
  * requests to this route.
  *
  * @author reftch
- * @version 1.0.5
+ * @version ${version}
  */
 public class Route {
 
@@ -30,6 +30,16 @@ public class Route {
         this.status = 200;
     }
 
+    /**
+     * Constructs a new Route instance with the specified HTTP method, path,
+     * handler,
+     * and status code.
+     *
+     * @param method  the HTTP method (GET, POST, etc.)
+     * @param path    the path pattern for the route
+     * @param handler the handler to process requests to this route
+     * @param status  the HTTP status code to be used for this route
+     */
     public Route(HttpMethod method, String path, Handler handler, int status) {
         this(method, path, handler);
         this.status = status;

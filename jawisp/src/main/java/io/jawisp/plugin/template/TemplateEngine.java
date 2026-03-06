@@ -9,7 +9,7 @@ import java.util.Map;
  * different templating engines.
  *
  * @author reftch
- * @version 1.0.5
+ * ${version}
  */
 public interface TemplateEngine {
 

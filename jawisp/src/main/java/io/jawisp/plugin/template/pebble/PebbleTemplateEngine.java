@@ -14,7 +14,7 @@ import io.pebbletemplates.pebble.loader.ClasspathLoader;
  * and provides methods to render templates using the Pebble templating engine.
  *
  * @author reftch
- * @version 1.0.5
+ * ${version}
  */
 public class PebbleTemplateEngine implements TemplateEngine {
     private final PebbleEngine engine;

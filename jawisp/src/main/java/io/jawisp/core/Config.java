@@ -20,7 +20,7 @@ import io.jawisp.http.Route;
  * and routes.
  *
  * @author reftch
- * @version 1.0.5
+ * ${version}
  */
 public class Config {
 

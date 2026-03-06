@@ -6,7 +6,7 @@ package io.jawisp.http;
  * in handling HTTP requests within the application.
  * 
  * @author reftch
- * @version 1.0.5
+ * ${version}
  */
 public enum HttpMethod {
     /**
