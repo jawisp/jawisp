@@ -1,6 +1,7 @@
 package io.jawisp.config;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -91,7 +92,7 @@ public class Config {
     public List<Route> routes() {
         return this.routes;
     }
-    
+
     /**
      * Gets the server port.
      *
@@ -126,7 +127,7 @@ public class Config {
      * @return the current Config instance
      * @throws IllegalArgumentException if the specified plugin is not found
      */
-    public Config usePlugin(String pluginName) {
+    public Config templateEngine(String pluginName) {
         List<TemplateEnginePlugin> plugins = PluginLoader.loadAll();
         TemplateEnginePlugin plugin = plugins.stream()
                 .filter(p -> p.getName().equals(pluginName))
@@ -134,7 +135,7 @@ public class Config {
                 .orElseThrow(() -> new IllegalArgumentException("Plugin '" + pluginName + "' not found"));
 
         log.debug("Plugins: use '{}' template rendering plugin", plugin.getName());
-        
+
         this.templateEngine = Optional.of(plugin.createEngine(this));
         return this;
     }
@@ -148,11 +149,35 @@ public class Config {
         return templateEngine.orElse(null);
     }
 
-    public Config staticResources(String path) {
-        staticResources.add(path);
+    /**
+     * Adds a collection of static resource paths.
+     *
+     * @param paths the collection of paths of static resources
+     * @return the current Config instance
+     */
+    public Config staticResources(Collection<String> paths) {
+        staticResources.addAll(paths);
         return this;
     }
 
+    /**
+     * Adds multiple static resource paths.
+     *
+     * @param paths the variable number of paths of static resources
+     * @return the current Config instance
+     */
+    public Config staticResources(String... paths) {
+        for (String path : paths) {
+            staticResources.add(path);
+        }
+        return this;
+    }
+
+    /**
+     * Retrieves the list of static resource paths.
+     *
+     * @return a list of static resource paths
+     */
     public List<String> staticResources() {
         return staticResources;
     }

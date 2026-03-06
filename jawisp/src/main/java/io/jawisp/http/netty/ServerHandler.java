@@ -88,6 +88,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     }
 
     /**
+     * Required by Netty - flush pending writes
+     */
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.flush();
+    }
+
+    /**
      * Executes the error handlers for the given request context.
      *
      * @param ctx     the ChannelHandlerContext for the request
@@ -95,11 +103,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      *                context
      */
     private void executeErrors(ChannelHandlerContext ctx, Context context) {
-        ServerHandlerUtils.findFilter(HttpMethod.ERROR, config.routes()).ifPresent(route -> {
-            if (context.status() == route.status()) {
-                route.getHandler().handle(context);
-            }
-        });
+        ServerHandlerUtils.findFilters(HttpMethod.ERROR, config.routes())
+                .forEach(route -> {
+                    if (context.status() == route.status()) {
+                        route.getHandler().handle(context);
+                    }
+                });
     }
 
     /**
