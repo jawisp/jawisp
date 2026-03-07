@@ -75,7 +75,7 @@ public class Jawisp {
      * Starts the HTTP server.
      * Logs the start time and the time taken to start the server.
      */
-    public void start() {
+    public Jawisp start() {
         try {
             server.start();
         } catch (Exception e) {
@@ -85,6 +85,7 @@ public class Jawisp {
         long elapsedMs = (end - start) / 1_000_000;
         logger.info("Server started on {}:{}/ in {} ms", "http://localhost",
                 String.valueOf(config.getPort()), elapsedMs);
+        return this;
     }
 
     /**

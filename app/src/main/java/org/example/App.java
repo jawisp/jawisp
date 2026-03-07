@@ -14,14 +14,16 @@ public class App {
 
     public static void main(String[] args) {
         Jawisp.build(config -> config
+                .port(8080)
                 .templateEngine("pebble")
                 .staticResources("/static")
                 .routes(route -> route
-                    .get("/", App::homePage)
-                    .get("/api/v1/users/:id", UserController::getUser)
-                    .post("/api/v1/users", UserController::createUser)
-                    .error(404, ctx -> ctx.text("Generic 404 Error"))
-                )).start();
+                        .get("/", App::homePage)
+                        .get("/api/v1/users/:id", UserController::getUser)
+                        .post("/api/v1/users", UserController::createUser)
+                        .error(404, ctx -> ctx.text("Generic 404 Error"))))
+                .start();
+
     }
 
 }
