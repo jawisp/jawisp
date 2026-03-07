@@ -186,8 +186,13 @@ public class Routes {
     }
 
     /**
-     * Adds nested routes under a path prefix.
-     * All child routes get the prefix automatically prepended.
+     * Adds nested routes under a specified path prefix.
+     * All child routes will have the specified prefix automatically prepended to
+     * their paths.
+     *
+     * @param pathPrefix   the path prefix to be added to all nested routes
+     * @param nestedRoutes a consumer that configures the nested routes
+     * @return the current {@link Routes} instance with the nested routes added
      */
     public Routes path(String pathPrefix, Consumer<Routes> nestedRoutes) {
         // Clean the prefix
