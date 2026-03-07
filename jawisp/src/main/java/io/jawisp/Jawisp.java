@@ -74,6 +74,8 @@ public class Jawisp {
     /**
      * Starts the HTTP server.
      * Logs the start time and the time taken to start the server.
+     *
+     * @return the current instance of {@link Jawisp} to allow method chaining.
      */
     public Jawisp start() {
         try {
