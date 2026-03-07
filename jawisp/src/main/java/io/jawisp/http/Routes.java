@@ -2,6 +2,7 @@ package io.jawisp.http;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The Routes class manages a collection of HTTP routes within the application.
@@ -173,12 +174,34 @@ public class Routes {
     /**
      * Adds a new route to handle error responses.
      *
-     * @param code    the HTTP status code for which this error handler is registered
-     * @param handler the handler to process requests when the specified error code is encountered
+     * @param code    the HTTP status code for which this error handler is
+     *                registered
+     * @param handler the handler to process requests when the specified error code
+     *                is encountered
      * @return the current Routes instance
      */
     public Routes error(int code, Handler handler) {
         routes.add(new Route(HttpMethod.ERROR, "/", handler, code));
+        return this;
+    }
+
+    /**
+     * Adds nested routes under a path prefix.
+     * All child routes get the prefix automatically prepended.
+     */
+    public Routes path(String pathPrefix, Consumer<Routes> nestedRoutes) {
+        // Clean the prefix
+        String cleanPrefix = forceCleanPath(pathPrefix);
+
+        // Create nested routes instance with prefix
+        Routes nested = new Routes(cleanPrefix);
+
+        // Execute nested configuration
+        nestedRoutes.accept(nested);
+
+        // Merge all nested routes into current collection
+        this.routes.addAll(nested.getRoutes());
+
         return this;
     }
 
@@ -212,4 +235,5 @@ public class Routes {
 
         return prefix + "/" + route;
     }
+
 }

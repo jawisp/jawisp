@@ -151,6 +151,109 @@ methods for interacting with these components. Below is a detailed list of the a
 These methods provide a comprehensive toolkit for handling HTTP requests and responses within the **Jawisp** framework. They allow developers to easily manipulate and access request
 and response data, enabling the construction of robust and efficient web applications.
 
+## Route handlers
+
+The Jawisp framework uses a builder pattern to configure the server and define routes. The `.routes()` method is used to define the routing rules, and nested `.path()` methods are used
+to create hierarchical routes.
+
+### Basic Routing
+
+```java
+Jawisp.build(config -> config
+    .port(8080)
+    .templateEngine("pebble")
+    .staticResources("/static")
+    .routes(route -> route
+        .get("/", App::homePage)
+        // Other routes
+    )
+    .start();
+```
+
+- **`.port(8080)`**: Sets the server to listen on port 8080.
+- **`.templateEngine("pebble")`**: Configures the template engine to use Pebble.
+- **`.staticResources("/static")`**: Serves static resources from the `/static` directory.
+- **`.routes(route -> route)`**: Defines the routing rules.
+  - **`.get("/", App::homePage)`**: Maps GET requests to the root path (`/`) to the `homePage` method in the `App` class.
+
+### Nested Routing
+
+Nested routing allows you to group related routes under a common base path. This makes the code cleaner and more organized, especially for RESTful APIs.
+
+```java
+.path("/api/v1", api -> api
+    .path("users", users -> users // /api/v1/users
+        .get("/:id", UserController::getUser)
+        .post("/", UserController::createUser)
+        .delete("/:id", UserController::deleteUser)
+        .path("/orders", orders -> orders // /api/v1/users/orders
+            .get("/:orderId", UserController::getOrder)
+            .post("/", ctx -> ctx.text("create order"))))
+```
+
+- **`.path("/api/v1", api -> api)`**: Defines a base path `/api/v1` and groups related routes under this path.
+  - **`.path("users", users -> users)`**: Defines a nested path `/api/v1/users`.
+    - **`.get("/:id", UserController::getUser)`**: Maps GET requests to `/api/v1/users/:id` to the `getUser` method in the `UserController` class.
+    - **`.post("/", UserController::createUser)`**: Maps POST requests to `/api/v1/users` to the `createUser` method in the `UserController` class.
+    - **`.delete("/:id", UserController::deleteUser)`**: Maps DELETE requests to `/api/v1/users/:id` to the `deleteUser` method in the `UserController` class.
+    - **`.path("/orders", orders -> orders)`**: Defines a nested path `/api/v1/users/orders`.
+      - **`.get("/:orderId", UserController::getOrder)`**: Maps GET requests to `/api/v1/users/orders/:orderId` to the `getOrder` method in the `UserController` class.
+      - **`.post("/", ctx -> ctx.text("create order"))`**: Maps POST requests to `/api/v1/users/orders` to a lambda function that returns the text "create order".
+
+### Jawisp Configuration with Multiple Levels of Nested Routes
+
+```java
+Jawisp.build(config -> config
+    .port(8080)  // Set the server port to 8080
+    .templateEngine("pebble")  // Use Pebble as the template engine
+    .staticResources("/static")  // Serve static resources from the /static directory
+    .routes(route -> route
+        .get("/", App::homePage)  // Define a GET route for the root path
+        // Nested API v1
+        .path("/api/v1", api -> api
+            .path("users", users -> users  // Define /api/v1/users
+                .get("/:id", UserController::getUser)  // GET /api/v1/users/:id
+                .post("/", UserController::createUser)  // POST /api/v1/users
+                .delete("/:id", UserController::createUser)  // DELETE /api/v1/users/:id
+                .path("/orders", orders -> orders  // Define /api/v1/users/orders
+                    .get("/:orderId", UserController::getOrder)  // GET /api/v1/users/orders/:orderId
+                    .post("/", ctx -> ctx.text("create order"))  // POST /api/v1/users/orders
+                )
+            )
+        )
+        .error(404, ctx -> ctx.text("Generic 404 Error"))  // Handle 404 errors
+    )
+    .start();  // Start the Jawisp server
+```
+
+1. **Top-Level Path: `/api/v1`**
+   - **Description**: This is the top-level path for version 1 of the API.
+   - **Purpose**: It groups all API endpoints under a common base path, making it easier to manage and version the API.
+
+2. **First-Level Nested Path: `/api/v1/users`**
+   - **Description**: This path is nested under `/api/v1`.
+   - **Purpose**: It handles routes related to users.
+   - **Endpoints**:
+     - **GET `/api/v1/users/:id`**: Retrieves a user by their ID.
+     - **POST `/api/v1/users`**: Creates a new user.
+     - **DELETE `/api/v1/users/:id`**: Deletes a user by their ID.
+
+3. **Second-Level Nested Path: `/api/v1/users/orders`**
+   - **Description**: This path is nested under `/api/v1/users`.
+   - **Purpose**: It handles routes related to orders for a specific user.
+   - **Endpoints**:
+     - **GET `/api/v1/users/orders/:orderId`**: Retrieves an order by its ID for a specific user.
+     - **POST `/api/v1/users/orders`**: Creates a new order for a specific user.
+
+     
+### Error Handling
+
+```java
+.error(404, ctx -> ctx.text("Generic 404 Error"))
+```
+
+- **`.error(404, ctx -> ctx.text("Generic 404 Error"))`**: Configures a custom handler for 404 errors, which returns the text "Generic 404 Error" when a request is made to a
+non-existent route.  
 
 ## Logging with SLF4J and Logback
 

@@ -13,4 +13,10 @@ public class UserController {
         var user = ctx.bodyAsClass(User.class);
         ctx.status(201).json(ctx.jsonMapper().toJsonString(user, User.class));
     }
+
+    static void getOrder(Context ctx) {
+        var id = ctx.pathParam("orderId");
+        ctx.status(200).json("{\"orderId\":\"" + id + "\"}");
+    }
+
 }
