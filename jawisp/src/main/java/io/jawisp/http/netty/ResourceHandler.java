@@ -1,5 +1,6 @@
 package io.jawisp.http.netty;
 
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultFileRegion;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -82,15 +84,15 @@ public class ResourceHandler {
             return;
         }
 
-        String filePath = resource.getPath();
-        try (RandomAccessFile raf = new RandomAccessFile(filePath, "r")) {
-            long length = raf.length();
+        // Read from embedded resource (no filesystem, because it won't work under GRAALVM)
+        try (InputStream is = resource.openStream()) {
+            byte[] content = is.readAllBytes();
 
             DefaultHttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
             HttpHeaders headers = response.headers();
-            headers.set(HttpHeaderNames.CONTENT_TYPE, getMimeType(filePath));
-            headers.set(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length));
-            headers.set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600"); // 1 hour cache
+            headers.set(HttpHeaderNames.CONTENT_TYPE, getMimeType(sanitizedPath));
+            headers.set(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(content.length));
+            headers.set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600");
 
             final boolean isKeepAlive = HttpUtil.isKeepAlive(request);
             if (!isKeepAlive) {
@@ -100,12 +102,7 @@ public class ResourceHandler {
             }
 
             ctx.write(response);
-
-            if (ctx.pipeline().get(SslHandler.class) == null) {
-                ctx.write(new DefaultFileRegion(raf.getChannel(), 0, length));
-            } else {
-                ctx.write(new ChunkedFile(raf));
-            }
+            ctx.write(new DefaultHttpContent(ctx.alloc().buffer().writeBytes(content)));
 
             ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
             if (!isKeepAlive) {
