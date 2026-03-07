@@ -13,4 +13,7 @@ mise.toml
 
 # REST Client for Visual Studio Code
 *.http
+
+# VSCode
 .vscode
+
