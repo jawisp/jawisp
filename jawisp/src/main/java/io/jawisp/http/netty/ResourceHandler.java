@@ -5,11 +5,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.netty.buffer.Unpooled;
+import io.jawisp.http.Context;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -67,16 +66,16 @@ public class ResourceHandler {
      * @param request the FullHttpRequest received from the client
      * @throws Exception if an error occurs while handling the request
      */
-    public void response(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+    public void response(ChannelHandlerContext ctx, FullHttpRequest request, Context context) throws Exception {
         String sanitizedPath = sanitizeUri(request.uri());
         if (sanitizedPath == null) {
-            sendError(ctx, HttpResponseStatus.FORBIDDEN);
+            context.status(403);
             return;
         }
 
         URL resource = getClass().getClassLoader().getResource(sanitizedPath);
         if (resource == null) {
-            sendError(ctx, HttpResponseStatus.NOT_FOUND);
+            context.status(404);
             return;
         }
 
@@ -105,19 +104,6 @@ public class ResourceHandler {
                 lastContentFuture.addListener(ChannelFutureListener.CLOSE);
             }
         }
-    }
-
-    /**
-     * Sends an error response to the client.
-     *
-     * @param ctx    the ChannelHandlerContext for the current channel
-     * @param status the HttpResponseStatus indicating the error
-     */
-    private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
-        DefaultFullHttpResponse errorResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
-                Unpooled.copiedBuffer((status.code() + " " + status.reasonPhrase()).getBytes()));
-        errorResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
-        ctx.writeAndFlush(errorResponse).addListener(ChannelFutureListener.CLOSE);
     }
 
     /**

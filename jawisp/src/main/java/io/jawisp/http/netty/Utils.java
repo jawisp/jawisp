@@ -5,9 +5,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * Utility class containing methods for handling Netty {@link FullHttpRequest}.
@@ -77,5 +83,19 @@ public class Utils {
         return staticResources.stream()
                 .anyMatch(resource::contains); 
     }
+
+    /**
+     * Sends an error response to the client.
+     *
+     * @param ctx    the ChannelHandlerContext for the current channel
+     * @param status the HttpResponseStatus indicating the error
+     */
+    public static void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
+        DefaultFullHttpResponse errorResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
+                Unpooled.copiedBuffer((status.code() + " " + status.reasonPhrase()).getBytes()));
+        errorResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
+        ctx.writeAndFlush(errorResponse).addListener(ChannelFutureListener.CLOSE);
+    }
+
 
 }

@@ -1,0 +1,16 @@
+:root {
+  color-scheme: light dark; /* let browser style built-ins correctly */
+}
+
+body {
+  background-color: #ffffff;
+  color: #111111;
+}
+
+/* Auto-switch when user prefers dark */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #111111;
+    color: #f5f5f5;
+  }
+}

@@ -14,20 +14,13 @@ public class App {
 
     public static void main(String[] args) {
         Jawisp.build(config -> config
-                .port(8080)
                 .templateEngine("pebble")
                 .staticResources("/static")
                 .routes(route -> route
                         .get("/", App::homePage)
-                        // Nested API v1
-                        .path("/api/v1", api -> api
-                                .path("users", users -> users // /api/v1/users
-                                        .get("/:id", UserController::getUser)
-                                        .post("/", UserController::createUser)
-                                        .delete("/:id", UserController::createUser)
-                                        .path("/orders", orders -> orders // /api/v1/users/orders
-                                                .get("/:orderId", UserController::getOrder)
-                                                .post("/", ctx -> ctx.text("create order")))))
+                        .path("/api/v1/users", api -> api
+                                .get(":id", UserController::getUser)
+                                .post("/", UserController::createUser))
                         .error(404, ctx -> ctx.text("Generic 404 Error"))))
                 .start();
 

@@ -51,26 +51,26 @@ public class NettyContext implements Context {
     private final FullHttpRequest request;
     private final DefaultHttpResponse response;
     private final String path;
-    private final Route route;
     private String result;
     private int status;
     private String contentType;
     private boolean keepAlive;
+    private Route route;
     private JsonMapper jsonMapper;
     private TemplateEngine templateEngine;
 
     /**
      * Constructs a new NettyContext instance with the given ChannelHandlerContext,
-     * FullHttpRequest, and Route.
+     * FullHttpRequest and TemplateEngine.
      *
-     * @param ctx     the ChannelHandlerContext for the request
-     * @param request the FullHttpRequest object representing the HTTP request
-     * @param route   the Route object representing the matched route
+     * @param ctx            the ChannelHandlerContext for the request
+     * @param request        the FullHttpRequest object representing the HTTP
+     *                       request
+     * @param templateEngine the TemplateEngine for rendering templates
      */
-    public NettyContext(ChannelHandlerContext ctx, FullHttpRequest request, Route route) {
+    public NettyContext(ChannelHandlerContext ctx, FullHttpRequest request, TemplateEngine templateEngine) {
         this.ctx = ctx;
         this.request = request;
-        this.route = route;
         this.path = request.uri();
         this.contentType = "text/plain; charset=UTF-8";
         this.result = "";
@@ -79,22 +79,16 @@ public class NettyContext implements Context {
         this.response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
                 HttpResponseStatus.valueOf(status));
+        this.templateEngine = templateEngine;
     }
 
     /**
-     * Constructs a new NettyContext instance with the given ChannelHandlerContext,
-     * FullHttpRequest, Route, and TemplateEngine.
+     * Sets the route for this handler.
      *
-     * @param ctx            the ChannelHandlerContext for the request
-     * @param request        the FullHttpRequest object representing the HTTP
-     *                       request
-     * @param route          the Route object representing the matched route
-     * @param templateEngine the TemplateEngine for rendering templates
+     * @param route the route to be set
      */
-    public NettyContext(ChannelHandlerContext ctx, FullHttpRequest request, Route route,
-            TemplateEngine templateEngine) {
-        this(ctx, request, route);
-        this.templateEngine = templateEngine;
+    public void route(Route route) {
+        this.route = route;
     }
 
     /**

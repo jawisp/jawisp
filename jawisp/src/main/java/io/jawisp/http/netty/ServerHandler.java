@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.jawisp.config.Config;
 import io.jawisp.http.Context;
 import io.jawisp.http.HttpMethod;
+import io.jawisp.http.Route;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -56,30 +57,26 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+        NettyContext context = new NettyContext(ctx, request, config.templateEngine());
+        // Run BEFORE filter
+        executeFilters(ctx, context, HttpMethod.BEFORE_FILTER);
+
         // static resources
         boolean matches = Utils.containsAny(config.staticResources(), request);
         if (matches) {
-            resourceHandler.get().response(ctx, request);
-            return;
-        }
-
-        var route = ServerHandlerUtils.findRoute(request, config.routes());
-        Context context = new NettyContext(ctx, request, route.orElse(null), config.templateEngine());
-
-        // Run BEFORE filter
-        executeFilters(ctx, context, HttpMethod.BEFORE_FILTER);
-        if (route.isPresent()) {
-            // Run main handler
-            route.get().getHandler().handle(context);
+            resourceHandler.get().response(ctx, request, context);
         } else {
-            // 404 result
-            context.text("404 Not Found").status(404);
+            // generic handlers
+            ServerHandlerUtils.findRoute(request, config.routes())
+                    .ifPresentOrElse(
+                            r -> handleMatchingRoute(r, context),
+                            () -> handleNotFound(context));
         }
 
         // check on error handlers
         executeErrors(ctx, context);
 
-        // Always run AFTER filter
+        // Run AFTER filter
         executeFilters(ctx, context, HttpMethod.AFTER_FILTER);
 
         response(ctx, context);
@@ -91,6 +88,46 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
+    }
+
+    /**
+     * Handles exceptions that occur during request processing.
+     * Closes the connection if an exception is caught.
+     *
+     * @param ctx   the ChannelHandlerContext for the request
+     * @param cause the Throwable that caused the exception
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (cause instanceof IOException &&
+                cause.getMessage().contains("Connection reset")) {
+            // Normal client disconnect - ignore
+            ctx.close();
+            return;
+        }
+        // cause.printStackTrace();
+        logger.error(cause.getLocalizedMessage());
+        ctx.close();
+    }
+
+    /**
+     * Handles the routing for a matching route.
+     *
+     * @param route   the route that matches the incoming request
+     * @param context the context of the Netty request
+     */
+    private void handleMatchingRoute(Route route, NettyContext context) {
+        context.route(route);
+        route.getHandler().handle(context);
+    }
+
+    /**
+     * Handles the case where no route matches the incoming request.
+     *
+     * @param context the context of the request
+     */
+    private void handleNotFound(Context context) {
+        context.text("404 Not Found").status(404);
     }
 
     /**
@@ -156,23 +193,4 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         }
     }
 
-    /**
-     * Handles exceptions that occur during request processing.
-     * Closes the connection if an exception is caught.
-     *
-     * @param ctx   the ChannelHandlerContext for the request
-     * @param cause the Throwable that caused the exception
-     */
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        if (cause instanceof IOException &&
-                cause.getMessage().contains("Connection reset")) {
-            // Normal client disconnect - ignore
-            ctx.close();
-            return;
-        }
-        // cause.printStackTrace();
-        logger.error(cause.getLocalizedMessage());
-        ctx.close();
-    }
 }

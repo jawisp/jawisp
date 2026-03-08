@@ -48,10 +48,8 @@ class ContextTest {
         when(content.toString(StandardCharsets.UTF_8)).thenReturn("body-data");
         when(request.content()).thenReturn(content);
 
-        Route route = new Route(HttpMethod.GET, "/test", null);
-
         // Now constructor works with all 3 params
-        NettyContext ctx = new NettyContext(context, request, route);
+        NettyContext ctx = new NettyContext(context, request, null);
         assertEquals("body-data", ctx.body());
     }
 
@@ -61,7 +59,8 @@ class ContextTest {
         when(request.uri()).thenReturn("/");
         when(request.protocolVersion()).thenReturn(HttpVersion.HTTP_1_1); // FIX: HttpUtil safe
 
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        Context ctx = new NettyContext(context, request, null);
+        ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/", null));
 
         ctx.text("Hello World");
         assertEquals("Hello World", ctx.result().toString());
@@ -75,7 +74,9 @@ class ContextTest {
         when(request.uri()).thenReturn("/");
         when(request.protocolVersion()).thenReturn(HttpVersion.HTTP_1_1); // FIX: HttpUtil safe
 
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        Context ctx = new NettyContext(context, request, null);
+        ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/", null));
+
         ctx.json("{\"test\":true}"); // Line 61 - PASSES
         assertEquals("application/json; charset=UTF-8", ctx.contentType());
     }
@@ -86,7 +87,9 @@ class ContextTest {
         when(request.uri()).thenReturn("/users/42");
         when(request.protocolVersion()).thenReturn(HttpVersion.HTTP_1_1);
 
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/user/:id", null));
+        Context ctx = new NettyContext(context, request, null);
+        ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/user/:id", null));
+
         assertEquals("42", ctx.pathParam("id"));
     }
 
@@ -96,7 +99,9 @@ class ContextTest {
         when(request.uri()).thenReturn("/users/42");
         when(request.protocolVersion()).thenReturn(HttpVersion.HTTP_1_1);
 
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/user/:id", null));
+        Context ctx = new NettyContext(context, request, null);
+        ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/user/:id", null));
+
         assertEquals(null, ctx.pathParam("id2"));
     }
 
@@ -106,7 +111,8 @@ class ContextTest {
         when(request.uri()).thenReturn("/users/42");
         when(request.protocolVersion()).thenReturn(HttpVersion.HTTP_1_1);
 
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/user/:id", null));
+        Context ctx = new NettyContext(context, request, null);
+        ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/user/:id", null));
         assertEquals(null, ctx.pathParam(""));
     }
 
@@ -116,7 +122,8 @@ class ContextTest {
         when(request.uri()).thenReturn("/users/42");
         when(request.protocolVersion()).thenReturn(HttpVersion.HTTP_1_1);
 
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/user/:id", null));
+        Context ctx = new NettyContext(context, request, null);
+        ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/user/:id", null));
         assertEquals("/users/42", ctx.path());
         assertEquals(200, ctx.status());
         assertTrue(ctx.isKeepAlive());
@@ -129,7 +136,8 @@ class ContextTest {
         String body = "Hello, World!";
         ByteBuf content = Unpooled.wrappedBuffer(body.getBytes());
         when(request.content()).thenReturn(content);
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        Context ctx = new NettyContext(context, request, null);
+        ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/", null));
 
         // Act
         String result = ctx.body();
@@ -144,7 +152,8 @@ class ContextTest {
         // Arrange
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         when(request.content()).thenReturn(null);
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext ctx = new NettyContext(context, request, null);
+        ctx.route(new Route(HttpMethod.GET, "/", null));
 
         // Act
         String result = ctx.body();
@@ -160,7 +169,8 @@ class ContextTest {
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         ByteBuf content = Unpooled.buffer(0);
         when(request.content()).thenReturn(content);
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext ctx = new NettyContext(context, request, null);
+        ctx.route(new Route(HttpMethod.GET, "/", null));
 
         // Act
         String result = ctx.body();
@@ -177,7 +187,8 @@ class ContextTest {
         String body = "Hello, World!";
         ByteBuf content = Unpooled.wrappedBuffer(body.getBytes());
         when(request.content()).thenReturn(content);
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext ctx = new NettyContext(context, request, null);
+        ctx.route(new Route(HttpMethod.GET, "/", null));
 
         // Act
         byte[] result = ctx.bodyAsBytes();
@@ -192,7 +203,8 @@ class ContextTest {
         // Arrange
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         when(request.content()).thenReturn(null);
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext ctx = new NettyContext(context, request, null);
+        ctx.route(new Route(HttpMethod.GET, "/", null));
 
         // Act
         byte[] result = ctx.bodyAsBytes();
@@ -208,7 +220,8 @@ class ContextTest {
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         ByteBuf content = Unpooled.buffer(0);
         when(request.content()).thenReturn(content);
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext ctx = new NettyContext(context, request, null);
+        ctx.route(new Route(HttpMethod.GET, "/", null));
 
         // Act
         byte[] result = ctx.bodyAsBytes();
@@ -223,14 +236,16 @@ class ContextTest {
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         when(request.headers().get(HttpHeaderNames.CONTENT_TYPE)).thenReturn(null);
 
-        Context ctx = new NettyContext(context, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext ctx = new NettyContext(context, request, null);
+        ctx.route(new Route(HttpMethod.GET, "/", null));
 
         assertThrows(UnsupportedOperationException.class,
                 () -> ctx.bodyAsClass(String.class));
     }
 
     private Context mockContextWithJsonMapper(FullHttpRequest request, Route route, String expectedResult) {
-        Context ctx = new NettyContext(context, request, route);
+        NettyContext ctx = new NettyContext(context, request, null);
+        ctx.route(new Route(HttpMethod.GET, "/", null));
 
         try {
             // Use reflection to inject mock JsonMapper (bypasses ServiceLoader for tests)
@@ -309,7 +324,8 @@ class ContextTest {
 
         when(attr.get()).thenReturn("alice");
 
-        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext nettyCtx = new NettyContext(ctx, request, null);
+        nettyCtx.route(new Route(HttpMethod.GET, "/", null));
 
         // When
         nettyCtx.sessionAttribute("userId", "alice");
@@ -337,7 +353,8 @@ class ContextTest {
         when(channel.attr(key)).thenReturn(attr);
         when(attr.get()).thenReturn(null);
 
-        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext nettyCtx = new NettyContext(ctx, request, null);
+        nettyCtx.route(new Route(HttpMethod.GET, "/", null));
 
         // When
         String result = nettyCtx.sessionAttribute("missing");
@@ -358,7 +375,8 @@ class ContextTest {
         when(ctx.channel()).thenReturn(channel);
         when(channel.remoteAddress()).thenReturn(remoteAddr);
 
-        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext nettyCtx = new NettyContext(ctx, request, null);
+        nettyCtx.route(new Route(HttpMethod.GET, "/", null));
 
         String result = nettyCtx.ip();
         assertEquals("192.168.1.100", result);
@@ -379,7 +397,8 @@ class ContextTest {
         when(remoteAddr.getAddress().getHostName()).thenReturn("client.example.com");
         when(remoteAddr.getAddress().getHostAddress()).thenReturn("192.168.1.100");
 
-        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext nettyCtx = new NettyContext(ctx, request, null);
+        nettyCtx.route(new Route(HttpMethod.GET, "/", null));
 
         String result = nettyCtx.host();
         assertEquals("client.example.com", result);
@@ -390,7 +409,8 @@ class ContextTest {
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
 
-        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext nettyCtx = new NettyContext(ctx, request, null);
+        nettyCtx.route(new Route(HttpMethod.GET, "/", null));
 
         nettyCtx.redirect("/login", 302);
 
@@ -404,7 +424,8 @@ class ContextTest {
         FullHttpRequest request = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
         ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
 
-        Context nettyCtx = new NettyContext(ctx, request, new Route(HttpMethod.GET, "/", null));
+        NettyContext nettyCtx = new NettyContext(ctx, request, null);
+        nettyCtx.route(new Route(HttpMethod.GET, "/", null));
 
         nettyCtx.html("<h1>Hello</h1>");
 
