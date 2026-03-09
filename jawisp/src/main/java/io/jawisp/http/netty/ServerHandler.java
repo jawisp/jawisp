@@ -21,7 +21,6 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
 
 /**
  * The ServerHandler class extends SimpleChannelInboundHandler and is used to
@@ -166,8 +165,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      * @param context the Context object representing the HTTP request and response
      */
     private static void response(ChannelHandlerContext ctx, Context context) {
-        ByteBuf content = ctx.alloc().buffer();
-        content.writeCharSequence(context.result(), CharsetUtil.UTF_8);
+        ByteBuf content = ctx.alloc().buffer().writeBytes(context.result());
 
         // return already created response object
         var response = context.response();
@@ -175,8 +173,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         response.setStatus(HttpResponseStatus.valueOf(context.status()));
 
         HttpHeaders headers = response.headers();
-        headers.set(HttpHeaderNames.CONTENT_TYPE, context.contentType());
         headers.setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        if (!headers.contains(HttpHeaderNames.CONTENT_TYPE)) {
+            headers.set(HttpHeaderNames.CONTENT_TYPE, context.contentType());
+        }
 
         if (context.isKeepAlive()) {
             headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
@@ -184,10 +184,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
         // send headers
         ctx.write(response);
-
         // send body + end
         ChannelFuture future = ctx.writeAndFlush(new DefaultLastHttpContent(content));
-
         if (!context.isKeepAlive()) {
             future.addListener(ChannelFutureListener.CLOSE);
         }

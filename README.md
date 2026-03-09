@@ -126,10 +126,14 @@ methods for interacting with these components. Below is a detailed list of the a
 ### Response Methods
 
 #### Setting Response Body
+
 - **`text("string")`**: Sets the response body to the specified string.
 - **`json(obj)`**: Converts the object to a JSON string, sets the response body, and sets the content type to JSON.
 - **`html("html")`**: Sets the response body to the specified HTML string and sets the content type to HTML.
 - **`render("/template.tmpl", model)`**: Renders a template with the given model and sets the response body to the rendered HTML.
+
+#### Retrieving Response Body
+- **`result()`**: Retrieves the response body as an array of bytes.
 
 #### Response Status
 - **`status()`**: Retrieves the current response status.

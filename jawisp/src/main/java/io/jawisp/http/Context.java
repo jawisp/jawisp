@@ -6,6 +6,7 @@ import java.util.Map;
 import io.jawisp.json.JsonMapper;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.util.AsciiString;
 
 /**
  * The Context interface provides a contract for managing the context of an HTTP
@@ -34,11 +35,11 @@ public interface Context {
     HttpResponse response();
 
     /**
-     * Gets the text result of the HTTP response.
+     * Gets the binary result of the HTTP response.
      *
-     * @return the text of the HTTP response
+     * @return the binary data of the HTTP response as a byte array
      */
-    String result();
+    byte[] result();
 
     /**
      * Sets the result of the HTTP response.
@@ -47,6 +48,22 @@ public interface Context {
      * @return the current Context instance
      */
     Context text(String text);
+
+    /**
+     * Sets the JSON body of the HTTP response.
+     *
+     * @param json the JSON string to set
+     * @return the current Context instance
+     */
+    Context json(String json);
+
+    /**
+     * Sets the binary data for the context.
+     *
+     * @param bytes the binary data to be set
+     * @return the context object with the binary data set
+     */
+    Context bytes(byte[] bytes);
 
     /**
      * Sets the status code of the HTTP response.
@@ -62,14 +79,6 @@ public interface Context {
      * @return the status code of the HTTP response
      */
     int status();
-
-    /**
-     * Sets the JSON body of the HTTP response.
-     *
-     * @param json the JSON string to set
-     * @return the current Context instance
-     */
-    Context json(String json);
 
     /**
      * Gets the body of the HTTP request or response.
@@ -170,7 +179,7 @@ public interface Context {
      * @param name the name of the header to retrieve
      * @return the value of the header, or null if the header is not present
      */
-    String header(String name);
+    String header(AsciiString name);
 
     /**
      * Retrieves a map containing all the headers in this context.
@@ -178,7 +187,7 @@ public interface Context {
      * @return a map where the keys are header names and the values are header
      *         values
      */
-    Map<String, String> headerMap();
+    Map<AsciiString, String> headerMap();
 
     /**
      * Sets a response header by name.
@@ -186,7 +195,7 @@ public interface Context {
      * @param name  the name of the header
      * @param value the value of the header
      */
-    default void header(String name, String value) {
+    default void header(AsciiString name, String value) {
         response().headers().add(name, value);
     }
 
