@@ -173,8 +173,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         response.setStatus(HttpResponseStatus.valueOf(context.status()));
 
         HttpHeaders headers = response.headers();
-        headers.set(HttpHeaderNames.CONTENT_TYPE, context.contentType());
         headers.setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        if (!headers.contains(HttpHeaderNames.CONTENT_TYPE)) {
+            headers.set(HttpHeaderNames.CONTENT_TYPE, context.contentType());
+        }
 
         if (context.isKeepAlive()) {
             headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
@@ -182,10 +184,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
         // send headers
         ctx.write(response);
-
         // send body + end
         ChannelFuture future = ctx.writeAndFlush(new DefaultLastHttpContent(content));
-
         if (!context.isKeepAlive()) {
             future.addListener(ChannelFutureListener.CLOSE);
         }

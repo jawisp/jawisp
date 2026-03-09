@@ -7,12 +7,9 @@ import java.util.Map;
 
 import io.jawisp.http.Context;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * The ResourceHandler class is responsible for handling HTTP requests and
@@ -78,12 +75,9 @@ public class ResourceHandler {
             byte[] content = is.readAllBytes();
             context.bytes(content);
 
-            DefaultHttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-            HttpHeaders headers = response.headers();
+            HttpHeaders headers = context.response().headers();
             headers.set(HttpHeaderNames.CONTENT_TYPE, getMimeType(sanitizedPath));
-            headers.set(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(content.length));
             headers.set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600");
-
         }
     }
 

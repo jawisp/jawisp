@@ -30,6 +30,7 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
+import io.netty.util.AsciiString;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
@@ -155,6 +156,7 @@ public class NettyContext implements Context {
      */
     @Override
     public Context bytes(byte[] bytes) {
+        this.result = bytes;
         return this;
     }
 
@@ -310,7 +312,7 @@ public class NettyContext implements Context {
      * @return the value of the header, or null if the header is not present
      */
     @Override
-    public String header(String name) {
+    public String header(AsciiString name) {
         return headerMap().get(name);
     }
 
@@ -321,13 +323,13 @@ public class NettyContext implements Context {
      *         values
      */
     @Override
-    public Map<String, String> headerMap() {
+    public Map<AsciiString, String> headerMap() {
         if (request == null || request.headers() == null) {
             return Collections.emptyMap();
         }
         return request.headers().entries().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
+                        entry -> new AsciiString(entry.getKey()),
                         Map.Entry::getValue));
     }
 

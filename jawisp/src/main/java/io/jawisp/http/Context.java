@@ -6,6 +6,7 @@ import java.util.Map;
 import io.jawisp.json.JsonMapper;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.util.AsciiString;
 
 /**
  * The Context interface provides a contract for managing the context of an HTTP
@@ -178,7 +179,7 @@ public interface Context {
      * @param name the name of the header to retrieve
      * @return the value of the header, or null if the header is not present
      */
-    String header(String name);
+    String header(AsciiString name);
 
     /**
      * Retrieves a map containing all the headers in this context.
@@ -186,7 +187,7 @@ public interface Context {
      * @return a map where the keys are header names and the values are header
      *         values
      */
-    Map<String, String> headerMap();
+    Map<AsciiString, String> headerMap();
 
     /**
      * Sets a response header by name.
@@ -194,7 +195,7 @@ public interface Context {
      * @param name  the name of the header
      * @param value the value of the header
      */
-    default void header(String name, String value) {
+    default void header(AsciiString name, String value) {
         response().headers().add(name, value);
     }
 
