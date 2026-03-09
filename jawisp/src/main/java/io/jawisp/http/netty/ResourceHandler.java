@@ -6,19 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.jawisp.http.Context;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.LastHttpContent;
 
 /**
  * The ResourceHandler class is responsible for handling HTTP requests and
@@ -82,6 +76,7 @@ public class ResourceHandler {
         // Read from embedded resource (no filesystem, because it won't work under GRAALVM)
         try (InputStream is = resource.openStream()) {
             byte[] content = is.readAllBytes();
+            context.bytes(content);
 
             DefaultHttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
             HttpHeaders headers = response.headers();
@@ -89,20 +84,6 @@ public class ResourceHandler {
             headers.set(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(content.length));
             headers.set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600");
 
-            final boolean isKeepAlive = HttpUtil.isKeepAlive(request);
-            if (!isKeepAlive) {
-                response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
-            } else if (request.protocolVersion().equals(HttpVersion.HTTP_1_0)) {
-                response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-            }
-
-            ctx.write(response);
-            ctx.write(new DefaultHttpContent(ctx.alloc().buffer().writeBytes(content)));
-
-            ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-            if (!isKeepAlive) {
-                lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-            }
         }
     }
 

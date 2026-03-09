@@ -34,11 +34,11 @@ public interface Context {
     HttpResponse response();
 
     /**
-     * Gets the text result of the HTTP response.
+     * Gets the binary result of the HTTP response.
      *
-     * @return the text of the HTTP response
+     * @return the binary data of the HTTP response as a byte array
      */
-    String result();
+    byte[] result();
 
     /**
      * Sets the result of the HTTP response.
@@ -47,6 +47,22 @@ public interface Context {
      * @return the current Context instance
      */
     Context text(String text);
+
+    /**
+     * Sets the JSON body of the HTTP response.
+     *
+     * @param json the JSON string to set
+     * @return the current Context instance
+     */
+    Context json(String json);
+
+    /**
+     * Sets the binary data for the context.
+     *
+     * @param bytes the binary data to be set
+     * @return the context object with the binary data set
+     */
+    Context bytes(byte[] bytes);
 
     /**
      * Sets the status code of the HTTP response.
@@ -62,14 +78,6 @@ public interface Context {
      * @return the status code of the HTTP response
      */
     int status();
-
-    /**
-     * Sets the JSON body of the HTTP response.
-     *
-     * @param json the JSON string to set
-     * @return the current Context instance
-     */
-    Context json(String json);
 
     /**
      * Gets the body of the HTTP request or response.

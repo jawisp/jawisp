@@ -9,6 +9,7 @@ public class App {
 
     static void homePage(Context ctx) {
         // ctx.status(404);
+        // ctx.text("Hello, world!");
         ctx.render("home.html", Map.of("name", "John Smith"));
     }
 

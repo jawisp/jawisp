@@ -21,7 +21,6 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
 
 /**
  * The ServerHandler class extends SimpleChannelInboundHandler and is used to
@@ -166,8 +165,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
      * @param context the Context object representing the HTTP request and response
      */
     private static void response(ChannelHandlerContext ctx, Context context) {
-        ByteBuf content = ctx.alloc().buffer();
-        content.writeCharSequence(context.result(), CharsetUtil.UTF_8);
+        ByteBuf content = ctx.alloc().buffer().writeBytes(context.result());
 
         // return already created response object
         var response = context.response();

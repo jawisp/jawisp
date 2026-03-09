@@ -63,9 +63,9 @@ class ContextTest {
         ((NettyContext) ctx).route(new Route(HttpMethod.GET, "/", null));
 
         ctx.text("Hello World");
-        assertEquals("Hello World", ctx.result().toString());
+        assertEquals("Hello World", new String(ctx.result()));
         ctx.text("Hello");
-        assertEquals("Hello", ctx.result().toString());
+        assertEquals("Hello", new String(ctx.result()));
     }
 
     @Test
@@ -430,7 +430,7 @@ class ContextTest {
         nettyCtx.html("<h1>Hello</h1>");
 
         assertEquals("text/html; charset=UTF-8", nettyCtx.contentType());
-        assertEquals("<h1>Hello</h1>", nettyCtx.result());
+        assertEquals("<h1>Hello</h1>", new String(nettyCtx.result()));
     }
 
 }

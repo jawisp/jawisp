@@ -51,7 +51,7 @@ public class NettyContext implements Context {
     private final FullHttpRequest request;
     private final DefaultHttpResponse response;
     private final String path;
-    private String result;
+    private byte[] result;
     private int status;
     private String contentType;
     private boolean keepAlive;
@@ -73,7 +73,7 @@ public class NettyContext implements Context {
         this.request = request;
         this.path = request.uri();
         this.contentType = "text/plain; charset=UTF-8";
-        this.result = "";
+        this.result = new byte[0];
         this.status = 200;
         this.keepAlive = request != null ? HttpUtil.isKeepAlive(request) : false;
         this.response = new DefaultHttpResponse(
@@ -97,8 +97,8 @@ public class NettyContext implements Context {
      * @return the text of the HTTP response
      */
     @Override
-    public String result() {
-        return result;
+    public byte[] result() {
+        return this.result;
     }
 
     /**
@@ -109,7 +109,7 @@ public class NettyContext implements Context {
      */
     @Override
     public Context text(String text) {
-        this.result = text;
+        this.result = text.getBytes();
         return this;
     }
 
@@ -144,7 +144,17 @@ public class NettyContext implements Context {
     @Override
     public Context json(String json) {
         this.contentType = "application/json; charset=UTF-8";
-        this.result = json;
+        this.result = json.getBytes();
+        return this;
+    }
+
+    /**
+     * Gets the binary result of the HTTP response.
+     *
+     * @return the binary data of the HTTP response as a byte array
+     */
+    @Override
+    public Context bytes(byte[] bytes) {
         return this;
     }
 
@@ -478,7 +488,7 @@ public class NettyContext implements Context {
      */
     public void redirect(String path, int code) {
         this.status = code;
-        this.result = ""; // Clear body
+        this.result = new byte[0]; // Clear body
 
         HttpResponseStatus status = HttpResponseStatus.valueOf(code);
         this.response.setStatus(status);
@@ -500,7 +510,7 @@ public class NettyContext implements Context {
      */
     public void html(String html) {
         this.contentType = "text/html; charset=UTF-8";
-        this.result = html;
+        this.result = html.getBytes();
     }
 
     /**
