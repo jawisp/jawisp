@@ -53,8 +53,10 @@ public class ResourceHandler {
      * Handles the incoming HTTP request and sends the corresponding resource
      * response.
      *
-     * @param ctx     the ChannelHandlerContext for the current channel
-     * @param request the FullHttpRequest received from the client
+     * @param ctx     the {@link ChannelHandlerContext} for the current channel
+     * @param request the {@link FullHttpRequest} received from the client
+     * @param context the {@link Context} object representing the HTTP request and
+     *                response
      * @throws Exception if an error occurs while handling the request
      */
     public void response(ChannelHandlerContext ctx, FullHttpRequest request, Context context) throws Exception {
@@ -70,7 +72,8 @@ public class ResourceHandler {
             return;
         }
 
-        // Read from embedded resource (no filesystem, because it won't work under GRAALVM)
+        // Read from embedded resource (no filesystem, because it won't work under
+        // GRAALVM)
         try (InputStream is = resource.openStream()) {
             byte[] content = is.readAllBytes();
             context.bytes(content);
