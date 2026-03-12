@@ -33,7 +33,7 @@ For Gradle, add the following line to your `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'io.jawisp:jawisp:2.0.0'
+    implementation 'io.jawisp:jawisp:1.0.15'
 }
 ```
 
@@ -46,7 +46,7 @@ For Maven, add the following snippet to your `pom.xml` file:
     <dependency>
         <groupId>io.jawisp</groupId>
         <artifactId>jawisp</artifactId>
-        <version>2.0.0</version>
+        <version>1.0.15</version>
     </dependency>
 </dependencies>
 ```
