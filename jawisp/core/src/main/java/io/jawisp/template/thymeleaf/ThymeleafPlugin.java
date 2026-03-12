@@ -31,7 +31,6 @@ public class ThymeleafPlugin implements PluginFactory {
     /**
      * Creates a new ThymeleafTemplateEngine instance using the provided configuration.
      *
-     * @param config the configuration to use
      * @return a new {@link TemplateEngine} instance
      */
     @Override

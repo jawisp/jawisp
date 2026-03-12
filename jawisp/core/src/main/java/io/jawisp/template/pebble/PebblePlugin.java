@@ -31,7 +31,6 @@ public class PebblePlugin implements PluginFactory<TemplateEngine> {
     /**
      * Creates a new PebbleTemplateEngine instance using the provided configuration.
      *
-     * @param config the configuration to use
      * @return a new {@link TemplateEngine} instance
      */
     @Override
