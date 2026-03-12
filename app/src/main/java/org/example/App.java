@@ -19,12 +19,12 @@ public class App {
                 .staticResources("/static")
                 .routes(route -> route
                         .get("/", App::homePage)
-                        .path("/api/v1/users", api -> api
-                                .get(":id", UserController::getUser)
-                                .post("/", UserController::createUser))
-                        .error(404, ctx -> ctx.text("Generic 404 Error"))))
+                        // .path("/api/v1/users", api -> api
+                                // .get(":id", UserController::getUser)
+                                // .post("/", UserController::createUser))
+                        // .error(404, ctx -> ctx.text("Generic 404 Error"))
+                        ))
                 .start();
-
     }
 
 }

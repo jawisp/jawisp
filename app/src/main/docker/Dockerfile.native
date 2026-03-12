@@ -23,7 +23,6 @@ RUN --mount=type=cache,target=${WORKDIR}/.gradle \
 
 RUN --mount=type=cache,target=${WORKDIR}/.gradle \
     --mount=type=cache,target=/root/.gradle \
-    SPRING_PROFILES_ACTIVE=prod \
     ./gradlew -x test nativeCompile -Dorg.gradle.configuration-cache=false
 
 # -------- Stage 2: Running application ----------

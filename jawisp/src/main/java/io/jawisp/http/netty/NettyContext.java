@@ -14,7 +14,7 @@ import io.jawisp.http.Context;
 import io.jawisp.http.Route;
 import io.jawisp.json.JsonMapper;
 import io.jawisp.json.JsonMapperProvider;
-import io.jawisp.plugin.template.TemplateEngine;
+import io.jawisp.template.TemplateEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultHttpResponse;

@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import io.jawisp.http.Route;
 import io.jawisp.http.Routes;
-import io.jawisp.plugin.template.PluginLoader;
-import io.jawisp.plugin.template.TemplateEngine;
-import io.jawisp.plugin.template.TemplateEnginePlugin;
+import io.jawisp.template.PluginLoader;
+import io.jawisp.template.TemplateEngine;
+import io.jawisp.template.TemplateEnginePlugin;
 
 /**
  * The Config class is used to configure the Jawisp application.

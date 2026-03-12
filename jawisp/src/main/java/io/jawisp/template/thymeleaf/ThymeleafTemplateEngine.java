@@ -1,9 +1,9 @@
-package io.jawisp.plugin.template.thymeleaf;
+package io.jawisp.template.thymeleaf;
 
 import java.io.Writer;
 import java.util.Map;
 
-import io.jawisp.plugin.template.TemplateEngine;
+import io.jawisp.template.TemplateEngine;
 
 /**
  * The ThymeleafTemplateEngine class implements the TemplateEngine interface

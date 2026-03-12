@@ -1,8 +1,8 @@
-package io.jawisp.plugin.template.thymeleaf;
+package io.jawisp.template.thymeleaf;
 
 import io.jawisp.config.Config;
-import io.jawisp.plugin.template.TemplateEngine;
-import io.jawisp.plugin.template.TemplateEnginePlugin;
+import io.jawisp.template.TemplateEngine;
+import io.jawisp.template.TemplateEnginePlugin;
 
 /**
  * The ThymeleafPlugin class implements the TemplateEnginePlugin interface

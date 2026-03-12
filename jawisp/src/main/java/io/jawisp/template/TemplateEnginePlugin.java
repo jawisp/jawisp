@@ -1,4 +1,4 @@
-package io.jawisp.plugin.template;
+package io.jawisp.template;
 
 import io.jawisp.config.Config;
 

@@ -1,4 +1,4 @@
-package io.jawisp.plugin.template;
+package io.jawisp.template;
 
 import java.io.Writer;
 import java.util.Map;

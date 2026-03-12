@@ -1,11 +1,11 @@
-package io.jawisp.plugin.template.pebble;
+package io.jawisp.template.pebble;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 
-import io.jawisp.plugin.template.TemplateEngine;
+import io.jawisp.template.TemplateEngine;
 import io.pebbletemplates.pebble.PebbleEngine;
 import io.pebbletemplates.pebble.loader.ClasspathLoader;
 

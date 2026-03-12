@@ -1,8 +1,8 @@
-package io.jawisp.plugin.template.pebble;
+package io.jawisp.template.pebble;
 
 import io.jawisp.config.Config;
-import io.jawisp.plugin.template.TemplateEngine;
-import io.jawisp.plugin.template.TemplateEnginePlugin;
+import io.jawisp.template.TemplateEngine;
+import io.jawisp.template.TemplateEnginePlugin;
 
 /**
  * The PebblePlugin class implements the TemplateEnginePlugin interface
