@@ -3,6 +3,8 @@ package io.jawisp.template;
 import java.io.Writer;
 import java.util.Map;
 
+import io.jawisp.plugin.Plugin;
+
 /**
  * The TemplateEngine interface defines methods for rendering templates.
  * Implementing classes should provide the logic to render templates using
@@ -11,7 +13,7 @@ import java.util.Map;
  * @author Taras Chornyi
  * @since 1.0.0
  */
-public interface TemplateEngine {
+public interface TemplateEngine extends Plugin<TemplateEngine> {
 
     /**
      * Renders a template with the given name and model.

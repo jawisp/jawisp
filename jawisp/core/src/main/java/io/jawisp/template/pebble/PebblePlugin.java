@@ -1,8 +1,7 @@
 package io.jawisp.template.pebble;
 
-import io.jawisp.config.Config;
+import io.jawisp.plugin.PluginFactory;
 import io.jawisp.template.TemplateEngine;
-import io.jawisp.template.TemplateEnginePlugin;
 
 /**
  * The PebblePlugin class implements the TemplateEnginePlugin interface
@@ -11,7 +10,7 @@ import io.jawisp.template.TemplateEnginePlugin;
  * @author Taras Chornyi
  * @since 1.0.0
  */
-public class PebblePlugin implements TemplateEnginePlugin {
+public class PebblePlugin implements PluginFactory<TemplateEngine> {
 
     /**
      * Constructs a new PebblePlugin instance.
@@ -36,7 +35,7 @@ public class PebblePlugin implements TemplateEnginePlugin {
      * @return a new {@link TemplateEngine} instance
      */
     @Override
-    public TemplateEngine createEngine(Config config) {
+    public TemplateEngine create() {
         return new PebbleTemplateEngine();
     }
 }

@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 
+import io.jawisp.plugin.Plugin;
+
 /**
  * The JsonMapper interface provides a contract for converting objects to and from JSON.
  * It includes methods for converting objects to JSON strings or streams, and vice versa.
@@ -12,7 +14,7 @@ import java.lang.reflect.Type;
  * @author Taras Chornyi
  * @since 1.0.0
  */
-public interface JsonMapper {
+public interface JsonMapper extends Plugin<JacksonJsonMapper> {
 
     /**
      * Gets the JsonMapper instance.

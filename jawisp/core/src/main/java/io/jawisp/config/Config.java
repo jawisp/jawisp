@@ -11,9 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import io.jawisp.http.Route;
 import io.jawisp.http.Routes;
-import io.jawisp.template.PluginLoader;
+import io.jawisp.plugin.Plugin;
 import io.jawisp.template.TemplateEngine;
-import io.jawisp.template.TemplateEnginePlugin;
 
 /**
  * The Config class is used to configure the Jawisp application.
@@ -133,15 +132,9 @@ public class Config {
      * @throws IllegalArgumentException if the specified plugin is not found
      */
     public Config templateEngine(String pluginName) {
-        List<TemplateEnginePlugin> plugins = PluginLoader.loadAll();
-        TemplateEnginePlugin plugin = plugins.stream()
-                .filter(p -> p.getName().equals(pluginName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Plugin '" + pluginName + "' not found"));
-
-        log.debug("Plugins: use '{}' template rendering plugin", plugin.getName());
-
-        this.templateEngine = Optional.of(plugin.createEngine(this));
+        TemplateEngine plugin = Plugin.create(pluginName);
+        log.info("Plugins: use '{}' template rendering engine", pluginName);
+        this.templateEngine = Optional.of(plugin);
         return this;
     }
 

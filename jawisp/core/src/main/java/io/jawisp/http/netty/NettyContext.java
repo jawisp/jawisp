@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import io.jawisp.http.Context;
 import io.jawisp.http.Route;
 import io.jawisp.json.JsonMapper;
-import io.jawisp.json.JsonMapperProvider;
+import io.jawisp.plugin.Plugin;
 import io.jawisp.template.TemplateEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -253,7 +253,7 @@ public class NettyContext implements Context {
     @Override
     public JsonMapper jsonMapper() {
         if (jsonMapper == null) {
-            jsonMapper = JsonMapperProvider.load();
+            jsonMapper = Plugin.create("jackson");
         }
         return jsonMapper;
     }

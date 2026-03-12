@@ -1,0 +1,6 @@
+# Render template plugins
+io.jawisp.template.pebble.PebblePlugin
+io.jawisp.template.thymeleaf.ThymeleafPlugin
+
+# Default Jackson provider
+io.jawisp.json.JacksonJsonMapperProvider

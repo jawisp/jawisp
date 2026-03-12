@@ -1,8 +1,7 @@
 package io.jawisp.template.thymeleaf;
 
-import io.jawisp.config.Config;
+import io.jawisp.plugin.PluginFactory;
 import io.jawisp.template.TemplateEngine;
-import io.jawisp.template.TemplateEnginePlugin;
 
 /**
  * The ThymeleafPlugin class implements the TemplateEnginePlugin interface
@@ -11,7 +10,7 @@ import io.jawisp.template.TemplateEnginePlugin;
  * @author Taras Chornyi
  * @since 1.0.0
  */
-public class ThymeleafPlugin implements TemplateEnginePlugin {
+public class ThymeleafPlugin implements PluginFactory {
 
     /**
      * Constructs a new ThymeleafPlugin instance.
@@ -36,7 +35,7 @@ public class ThymeleafPlugin implements TemplateEnginePlugin {
      * @return a new {@link TemplateEngine} instance
      */
     @Override
-    public TemplateEngine createEngine(Config config) {
+    public TemplateEngine create() {
         return new ThymeleafTemplateEngine();
     }
 }
