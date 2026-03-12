@@ -10,7 +10,7 @@ import io.jawisp.template.TemplateEngine;
  * @author Taras Chornyi
  * @since 1.0.0
  */
-public class ThymeleafPlugin implements PluginFactory {
+public class ThymeleafPlugin implements PluginFactory<TemplateEngine> {
 
     /**
      * Constructs a new ThymeleafPlugin instance.

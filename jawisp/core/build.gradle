@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'io.jawisp'
-version = '1.0.14'
+version = '1.0.15'
 
 java {
     toolchain {
@@ -58,7 +58,7 @@ tasks.named('test') {
 }
 
 mavenPublishing {
-  coordinates(group.toString(), name.toString(), version.toString())
+  coordinates(group.toString(), "jawisp", version.toString())
 
   pom {
     name = "Jawisp"
