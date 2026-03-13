@@ -101,4 +101,22 @@ public class Jawisp {
             logger.error("Error during stopping server {}", e.getMessage());
         }
     }
+
+    /**
+     * Retrieves the configuration object.
+     *
+     * @return the configuration object
+     */
+    public Config config() {
+        return config;
+    }
+
+    /**
+     * Retrieves the HTTP server instance.
+     *
+     * @return the HTTP server instance
+     */
+    public HttpServer server() {
+        return server;
+    }
 }

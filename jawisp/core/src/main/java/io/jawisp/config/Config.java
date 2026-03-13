@@ -65,6 +65,15 @@ public class Config {
     }
 
     /**
+     * Gets the server port.
+     *
+     * @return the server port
+     */
+    public int port() {
+        return port;
+    }
+
+    /**
      * Sets the context path.
      *
      * @param contextPath the context path to set
@@ -95,15 +104,6 @@ public class Config {
      */
     public List<Route> routes() {
         return this.routes;
-    }
-
-    /**
-     * Gets the server port.
-     *
-     * @return the server port
-     */
-    public int port() {
-        return port;
     }
 
     /**
