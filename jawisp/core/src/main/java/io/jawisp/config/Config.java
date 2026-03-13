@@ -102,7 +102,7 @@ public class Config {
      *
      * @return the server port
      */
-    public int getPort() {
+    public int port() {
         return port;
     }
 

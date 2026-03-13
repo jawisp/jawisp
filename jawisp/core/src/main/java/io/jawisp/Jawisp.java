@@ -86,7 +86,7 @@ public class Jawisp {
         long end = System.nanoTime();
         long elapsedMs = (end - start) / 1_000_000;
         logger.info("Server started on {}:{}/ in {} ms", "http://localhost",
-                String.valueOf(config.getPort()), elapsedMs);
+                String.valueOf(config.port()), elapsedMs);
         return this;
     }
 

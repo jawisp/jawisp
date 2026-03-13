@@ -15,6 +15,7 @@ public class App {
 
     public static void main(String[] args) {
         Jawisp.build(config -> config
+                // .port(0)
                 .templateEngine("pebble")
                 .staticResources("/static")
                 .routes(route -> route

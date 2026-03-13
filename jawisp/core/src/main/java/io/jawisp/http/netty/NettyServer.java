@@ -71,8 +71,11 @@ public class NettyServer implements HttpServer {
                 });
 
         try {
-            ChannelFuture f = b.bind(config.getPort()).sync();
-            channel = f.channel();
+            ChannelFuture f = b.bind(config.port());
+            Channel serverChannel = f.sync().channel();
+            // getting real port
+            int port = ((java.net.InetSocketAddress) serverChannel.localAddress()).getPort();
+            config.port(port);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } 
