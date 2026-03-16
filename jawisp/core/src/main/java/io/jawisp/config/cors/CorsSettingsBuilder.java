@@ -2,34 +2,52 @@ package io.jawisp.config.cors;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import io.jawisp.http.HttpMethod;
 import io.jawisp.http.netty.Utils;
 
 /**
- * A builder class for creating instances of {@link CorsSettings}.
- * Provides a fluent API to configure CORS settings.
+ * Fluent builder for {@link CorsSettings}. Supports method chaining for configuring
+ * CORS settings before creating an immutable {@link CorsSettings} instance.
+ * <p>
+ * Example usage:
+ * <pre>{@code
+ * Jawisp.build(config -> config 
+ *             .cors(cors -> cors.origins("http://localhost:8080"))
+ *             .start());
+ * }</pre>
  *
  * @author Taras Chornyi
  * @since 1.0.18
+ * @see CorsSettings
  */
 public final class CorsSettingsBuilder {
+    
+    // All fields private for encapsulation
     private boolean enabled = true;
     private boolean allowAnyOrigin = false;
-    private List<String> allowedOrigins = new ArrayList<>();
-    private List<HttpMethod> allowedMethods = new ArrayList<>(List.of(HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS));
-    private List<String> allowedHeaders = new ArrayList<>(List.of("Content-Type", "Authorization"));
-    private List<String> exposedHeaders = new ArrayList<>();
+    private final List<String> allowedOrigins = new ArrayList<>();
+    private final List<HttpMethod> allowedMethods = new ArrayList<>(List.of(
+            HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS));
+    private final List<String> allowedHeaders = new ArrayList<>(List.of(
+            "Content-Type", "Authorization"));
+    private final List<String> exposedHeaders = new ArrayList<>();
     private boolean allowCredentials = true;
     private boolean allowNullOrigin = false;
     private boolean shortCircuit = true;
     private long maxAgeSeconds = 3600;
 
     /**
-     * Sets whether CORS is enabled.
+     * Creates a new builder with default CORS settings (enabled, common methods/headers).
+     */
+    public CorsSettingsBuilder() {
+        // Default constructor - all fields initialized above
+    }
+
+    /**
+     * Enables or disables CORS handling entirely.
      *
-     * @param enabled the enabled status to set
-     * @return the current CorsSettingsBuilder instance
+     * @param enabled true to enable CORS processing
+     * @return this builder
      */
     public CorsSettingsBuilder enabled(boolean enabled) {
         this.enabled = enabled;
@@ -37,9 +55,10 @@ public final class CorsSettingsBuilder {
     }
 
     /**
-     * Allows any origin for CORS requests.
+     * Allows requests from any origin ({@code Access-Control-Allow-Origin: *}).
+     * Overrides {@link #origins(String...)}.
      *
-     * @return the current CorsSettingsBuilder instance
+     * @return this builder
      */
     public CorsSettingsBuilder allowAnyOrigin() {
         this.allowAnyOrigin = true;
@@ -47,10 +66,11 @@ public final class CorsSettingsBuilder {
     }
 
     /**
-     * Adds allowed origins for CORS requests.
+     * Adds specific origins to the allow list. Ignored if {@link #allowAnyOrigin()}
+     * is called.
      *
-     * @param origins the origins to add
-     * @return the current CorsSettingsBuilder instance
+     * @param origins allowed origin URLs (e.g. "https://app.example.com")
+     * @return this builder
      */
     public CorsSettingsBuilder origins(String... origins) {
         this.allowedOrigins.addAll(List.of(origins));
@@ -58,43 +78,48 @@ public final class CorsSettingsBuilder {
     }
 
     /**
-     * Sets the allowed HTTP methods for CORS requests.
+     * Sets allowed HTTP methods. Non-standard methods (BEFORE_FILTER, etc.) are filtered
+     * out by {@link Utils#methods(List)}.
      *
-     * @param methods the HTTP methods to set
-     * @return the current CorsSettingsBuilder instance
+     * @param methods allowed {@link HttpMethod}s
+     * @return this builder
      */
     public CorsSettingsBuilder methods(HttpMethod... methods) {
-        this.allowedMethods = new ArrayList<>(List.of(methods));
+        this.allowedMethods.clear();
+        this.allowedMethods.addAll(List.of(methods));
         return this;
     }
 
     /**
-     * Sets the allowed headers for CORS requests.
+     * Sets headers clients may send (validated in preflight OPTIONS requests).
      *
-     * @param headers the headers to set
-     * @return the current CorsSettingsBuilder instance
+     * @param headers header names (e.g. "X-API-Key", "Authorization")
+     * @return this builder
      */
     public CorsSettingsBuilder allowedHeaders(String... headers) {
-        this.allowedHeaders = new ArrayList<>(List.of(headers));
+        this.allowedHeaders.clear();
+        this.allowedHeaders.addAll(List.of(headers));
         return this;
     }
 
     /**
-     * Sets the exposed headers for CORS requests.
+     * Sets response headers clients can read via JavaScript.
      *
-     * @param headers the headers to set
-     * @return the current CorsSettingsBuilder instance
+     * @param headers header names (e.g. "X-Rate-Limit")
+     * @return this builder
      */
     public CorsSettingsBuilder exposedHeaders(String... headers) {
-        this.exposedHeaders = new ArrayList<>(List.of(headers));
+        this.exposedHeaders.clear();
+        this.exposedHeaders.addAll(List.of(headers));
         return this;
     }
 
     /**
-     * Sets whether credentials are allowed for CORS requests.
+     * Allows credentials (cookies, auth headers) in cross-origin requests.
+     * Cannot be used with {@link #allowAnyOrigin()}.
      *
-     * @param allow the allow status to set
-     * @return the current CorsSettingsBuilder instance
+     * @param allow true to permit credentials
+     * @return this builder
      */
     public CorsSettingsBuilder allowCredentials(boolean allow) {
         this.allowCredentials = allow;
@@ -102,10 +127,10 @@ public final class CorsSettingsBuilder {
     }
 
     /**
-     * Sets whether null origin is allowed for CORS requests.
+     * Allows requests from null origins (file://, data:// URLs).
      *
-     * @param allow the allow status to set
-     * @return the current CorsSettingsBuilder instance
+     * @param allow true to permit null Origin header
+     * @return this builder
      */
     public CorsSettingsBuilder allowNullOrigin(boolean allow) {
         this.allowNullOrigin = allow;
@@ -113,10 +138,10 @@ public final class CorsSettingsBuilder {
     }
 
     /**
-     * Sets whether CORS should short-circuit.
+     * Enables fast-failure for invalid CORS requests (returns 403 immediately).
      *
-     * @param val the short-circuit status to set
-     * @return the current CorsSettingsBuilder instance
+     * @param val true for short-circuit behavior
+     * @return this builder
      */
     public CorsSettingsBuilder shortCircuit(boolean val) {
         this.shortCircuit = val;
@@ -124,10 +149,10 @@ public final class CorsSettingsBuilder {
     }
 
     /**
-     * Sets the maximum age in seconds for preflight requests.
+     * Sets preflight response caching duration ({@code Access-Control-Max-Age}).
      *
-     * @param seconds the maximum age in seconds
-     * @return the current CorsSettingsBuilder instance
+     * @param seconds cache duration in seconds (0 = no cache)
+     * @return this builder
      */
     public CorsSettingsBuilder maxAgeSeconds(long seconds) {
         this.maxAgeSeconds = seconds;
@@ -135,14 +160,23 @@ public final class CorsSettingsBuilder {
     }
 
     /**
-     * Builds and returns a {@link CorsSettings} instance based on the current configuration.
+     * Creates an immutable {@link CorsSettings} instance from current configuration.
+     * Converts Jawisp {@link HttpMethod}s to Netty equivalents via {@link Utils#methods(List)}.
      *
-     * @return the CorsSettings instance
+     * @return configured {@link CorsSettings}
      */
     public CorsSettings build() {
-        return new CorsSettings(enabled, allowAnyOrigin, List.copyOf(allowedOrigins),
-                List.copyOf(Utils.methods(allowedMethods)), List.copyOf(allowedHeaders),
-                List.copyOf(exposedHeaders), allowCredentials, allowNullOrigin,
-                shortCircuit, maxAgeSeconds);
+        return new CorsSettings(
+            enabled,
+            allowAnyOrigin,
+            List.copyOf(allowedOrigins),
+            List.copyOf(Utils.methods(allowedMethods)),
+            List.copyOf(allowedHeaders),
+            List.copyOf(exposedHeaders),
+            allowCredentials,
+            allowNullOrigin,
+            shortCircuit,
+            maxAgeSeconds
+        );
     }
 }
