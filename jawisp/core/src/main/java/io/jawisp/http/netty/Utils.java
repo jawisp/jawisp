@@ -1,10 +1,13 @@
 package io.jawisp.http.netty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import io.jawisp.config.cors.CorsSettingsBuilder;
+import io.jawisp.http.HttpMethod;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -81,7 +84,7 @@ public class Utils {
             return false;
         }
         return staticResources.stream()
-                .anyMatch(resource::contains); 
+                .anyMatch(resource::contains);
     }
 
     /**
@@ -97,5 +100,27 @@ public class Utils {
         ctx.writeAndFlush(errorResponse).addListener(ChannelFutureListener.CLOSE);
     }
 
+    public static List<io.netty.handler.codec.http.HttpMethod> methods(List<HttpMethod> methods) {
+        List<io.netty.handler.codec.http.HttpMethod> nettyMethods = new ArrayList<>();
+
+        for (io.jawisp.http.HttpMethod jawisp : methods) {
+            switch (jawisp) {
+                case GET -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.GET);
+                case POST -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.POST);
+                case PUT -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.PUT);
+                case DELETE -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.DELETE);
+                case PATCH -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.PATCH);
+                case HEAD -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.HEAD);
+                case OPTIONS -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.OPTIONS);
+                case TRACE -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.TRACE);
+                case CONNECT -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.CONNECT);
+                // skip BEFORE_FILTER, AFTER_FILTER, ERROR - they're Jawisp internals
+                default -> {
+                }
+            }
+        }
+
+        return nettyMethods;
+    }
 
 }

@@ -1,5 +1,7 @@
 package io.jawisp.http.netty;
 
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.nio.NioIoHandler;
@@ -17,10 +20,15 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.cors.CorsConfig;
+import io.netty.handler.codec.http.cors.CorsConfigBuilder;
+import io.netty.handler.codec.http.cors.CorsHandler;
 
 /**
- * The NettyServer class implements the HttpServer interface and uses the Netty framework to handle HTTP requests.
- * It sets up the Netty server with appropriate configurations and event loop groups.
+ * The NettyServer class implements the HttpServer interface and uses the Netty
+ * framework to handle HTTP requests.
+ * It sets up the Netty server with appropriate configurations and event loop
+ * groups.
  *
  * @author Taras Chornyi
  * @since 1.0.0
@@ -63,22 +71,27 @@ public class NettyServer implements HttpServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(
-                                new HttpServerCodec(),
-                                new HttpObjectAggregator(65536),
-                                new ServerHandler(config));
+                        ChannelPipeline p = ch.pipeline();
+                        p.addLast(new HttpServerCodec());
+                        p.addLast(new HttpObjectAggregator(65536));
+                        CorsHandler cors = NettyCorsSupport.from(config.cors());
+                        if (cors != null) {
+                            p.addLast(cors);
+                        }
+
+                        p.addLast(new ServerHandler(config));
                     }
                 });
 
         try {
             ChannelFuture f = b.bind(config.port());
-            Channel serverChannel = f.sync().channel();
+            channel = f.sync().channel();
             // getting real port
-            int port = ((java.net.InetSocketAddress) serverChannel.localAddress()).getPort();
+            int port = ((java.net.InetSocketAddress) channel.localAddress()).getPort();
             config.port(port);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        } 
+        }
     }
 
     /**
@@ -101,5 +114,4 @@ public class NettyServer implements HttpServer {
         logger.info("Jawisp server stopped");
     }
 
-    
 }

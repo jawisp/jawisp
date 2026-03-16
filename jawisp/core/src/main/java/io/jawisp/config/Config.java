@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jawisp.config.cors.CorsSettings;
+import io.jawisp.config.cors.CorsSettingsBuilder;
 import io.jawisp.http.Route;
 import io.jawisp.http.Routes;
 import io.jawisp.plugin.Plugin;
@@ -30,7 +32,8 @@ public class Config {
     private String contextPath;
     private Optional<TemplateEngine> templateEngine = Optional.empty();
     private final List<String> staticResources;
-
+    
+    private CorsSettings cors = CorsSettings.disabled();
     private final List<Route> routes = new ArrayList<>();
 
     /**
@@ -180,4 +183,14 @@ public class Config {
         return staticResources;
     }
 
+    public Config cors(Consumer<CorsSettingsBuilder> corsConsumer) {
+        CorsSettingsBuilder b = new CorsSettingsBuilder();
+        corsConsumer.accept(b);
+        this.cors = b.build();
+        return this;
+    }
+
+    public CorsSettings cors() {
+        return cors;
+    }
 }
