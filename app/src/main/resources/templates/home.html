@@ -3,6 +3,23 @@
 {% block title %} Home {% endblock %}
 
 {% block content %}
-	<h1> Home page </h1>
-	<p> Welcome to my home page. My name is {{ name }}</p>
+<h1> Home page </h1>
+<p> Welcome to my home page. My name is {{ name }}</p>
+<script>
+	fetch('http://localhost:8080/api/v1/users/1', {
+		method: 'GET',
+		headers: {
+			'X-Custom-Header': 'test'  // ← Triggers preflight!
+		}
+	})
+		.then(r => r.json())
+		.then(console.log)
+		.catch(e => console.error('CORS BLOCKED:', e));
+		
+	fetch('http://localhost:8080/api/v1/users', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },  // ← Triggers preflight
+		body: JSON.stringify({ id: '1', name: 'test', age: '33' })
+	})
+</script>
 {% endblock %}
