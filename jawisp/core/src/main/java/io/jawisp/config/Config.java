@@ -32,7 +32,7 @@ public class Config {
     private String contextPath;
     private Optional<TemplateEngine> templateEngine = Optional.empty();
     private final List<String> staticResources;
-    
+
     private CorsSettings cors = CorsSettings.disabled();
     private final List<Route> routes = new ArrayList<>();
 
@@ -183,6 +183,14 @@ public class Config {
         return staticResources;
     }
 
+    /**
+     * Configures CORS settings using the provided consumer.
+     *
+     * @param corsConsumer a consumer to configure the CORS settings
+     * @return the current Config instance
+     * 
+     * @since 1.0.18
+     */
     public Config cors(Consumer<CorsSettingsBuilder> corsConsumer) {
         CorsSettingsBuilder b = new CorsSettingsBuilder();
         corsConsumer.accept(b);
@@ -190,6 +198,13 @@ public class Config {
         return this;
     }
 
+    /**
+     * Gets the CORS settings.
+     *
+     * @return the CORS settings
+     * 
+     * @since 1.0.18
+    */
     public CorsSettings cors() {
         return cors;
     }

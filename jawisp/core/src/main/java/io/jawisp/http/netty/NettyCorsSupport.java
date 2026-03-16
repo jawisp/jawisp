@@ -6,8 +6,21 @@ import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
 
+/**
+ * A utility class to provide support for configuring CORS (Cross-Origin Resource Sharing)
+ * in Netty using {@link CorsSettings}.
+ *
+ * @author Taras Chornyi
+ * @since 1.0.18
+ */
 public final class NettyCorsSupport {
 
+    /**
+     * Creates a {@link CorsHandler} from the provided {@link CorsSettings}.
+     *
+     * @param s the CORS settings to use for configuration
+     * @return a {@link CorsHandler} based on the provided settings, or null if CORS is disabled
+     */
     public static CorsHandler from(CorsSettings s) {
         if (s == null || !s.enabled()) {
             return null;
@@ -16,46 +29,48 @@ public final class NettyCorsSupport {
         CorsConfigBuilder builder;
 
         if (s.allowAnyOrigin() || s.allowedOrigins().isEmpty()) {
-            builder = CorsConfigBuilder.forAnyOrigin(); 
+            builder = CorsConfigBuilder.forAnyOrigin();
         } else {
-            builder = CorsConfigBuilder.forOrigins(s.allowedOrigins().toArray(new String[0]));                                         
+            builder = CorsConfigBuilder.forOrigins(s.allowedOrigins().toArray(new String[0]));
         }
 
         if (!s.allowedMethods().isEmpty()) {
             builder.allowedRequestMethods(
                     s.allowedMethods().toArray(new HttpMethod[0])
-            );                                          
+            );
         }
 
         if (!s.allowedHeaders().isEmpty()) {
-            builder.allowedRequestHeaders(s.allowedHeaders().toArray(new String[0]));                                          
+            builder.allowedRequestHeaders(s.allowedHeaders().toArray(new String[0]));
         }
 
         if (!s.exposedHeaders().isEmpty()) {
-            builder.exposeHeaders(s.exposedHeaders().toArray(new String[0]));                                          
+            builder.exposeHeaders(s.exposedHeaders().toArray(new String[0]));
         }
 
         if (s.allowCredentials()) {
-            builder.allowCredentials();                 
+            builder.allowCredentials();
         }
 
         if (s.allowNullOrigin()) {
-            builder.allowNullOrigin();                  
+            builder.allowNullOrigin();
         }
 
         if (s.maxAgeSeconds() > 0) {
-            builder.maxAge(s.maxAgeSeconds());          
+            builder.maxAge(s.maxAgeSeconds());
         }
 
         if (s.shortCircuit()) {
-            builder.shortCircuit();                     
+            builder.shortCircuit();
         }
 
-        CorsConfig config = builder.build();         
-        // CorsConfig config = CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build();   
-        return new CorsHandler(config);                
+        CorsConfig config = builder.build();
+        return new CorsHandler(config);
     }
 
+    /**
+     * Private constructor to prevent instantiation of the utility class.
+     */
     private NettyCorsSupport() {
     }
 }

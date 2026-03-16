@@ -100,6 +100,14 @@ public class Utils {
         ctx.writeAndFlush(errorResponse).addListener(ChannelFutureListener.CLOSE);
     }
 
+    /**
+     * Converts a list of {@link io.jawisp.http.HttpMethod} to a list of
+     * {@link io.netty.handler.codec.http.HttpMethod}.
+     *
+     * @param methods the list of Jawisp HTTP methods to convert
+     * @return a list of Netty HTTP methods corresponding to the provided Jawisp
+     *         HTTP methods
+     */
     public static List<io.netty.handler.codec.http.HttpMethod> methods(List<HttpMethod> methods) {
         List<io.netty.handler.codec.http.HttpMethod> nettyMethods = new ArrayList<>();
 

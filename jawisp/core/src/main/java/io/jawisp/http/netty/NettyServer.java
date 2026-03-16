@@ -1,7 +1,5 @@
 package io.jawisp.http.netty;
 
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +18,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.cors.CorsConfig;
-import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
 
 /**
@@ -78,7 +74,6 @@ public class NettyServer implements HttpServer {
                         if (cors != null) {
                             p.addLast(cors);
                         }
-
                         p.addLast(new ServerHandler(config));
                     }
                 });
