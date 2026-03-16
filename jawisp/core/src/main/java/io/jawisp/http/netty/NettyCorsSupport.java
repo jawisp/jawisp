@@ -1,7 +1,5 @@
 package io.jawisp.http.netty;
 
-import java.util.Arrays;
-
 import io.jawisp.config.cors.CorsSettings;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.cors.CorsConfig;
