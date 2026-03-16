@@ -4,6 +4,7 @@ import java.util.Map;
 
 import io.jawisp.Jawisp;
 import io.jawisp.http.Context;
+import io.jawisp.http.HttpMethod;
 
 public class App {
 
@@ -17,7 +18,10 @@ public class App {
         Jawisp.build(config -> config
                 .templateEngine("pebble")
                 .staticResources("/static")
-                // .cors(cors -> cors.origins("http://localhost:8081"))
+                .cors(cors -> cors
+                    .origins("http://localhost:8080")
+                    .methods(HttpMethod.GET, HttpMethod.PUT)
+                )
                 .routes(route -> route
                         .get("/", App::homePage)
                         .path("/api/v1/users", api -> api

@@ -1,5 +1,7 @@
 package io.jawisp.http.netty;
 
+import java.util.Arrays;
+
 import io.jawisp.config.cors.CorsSettings;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.cors.CorsConfig;
@@ -7,7 +9,8 @@ import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
 
 /**
- * A utility class to provide support for configuring CORS (Cross-Origin Resource Sharing)
+ * A utility class to provide support for configuring CORS (Cross-Origin
+ * Resource Sharing)
  * in Netty using {@link CorsSettings}.
  *
  * @author Taras Chornyi
@@ -19,33 +22,33 @@ public final class NettyCorsSupport {
      * Creates a {@link CorsHandler} from the provided {@link CorsSettings}.
      *
      * @param s the CORS settings to use for configuration
-     * @return a {@link CorsHandler} based on the provided settings, or null if CORS is disabled
+     * @return a {@link CorsHandler} based on the provided settings, or null if CORS
+     *         is disabled
      */
     public static CorsHandler from(CorsSettings s) {
         if (s == null || !s.enabled()) {
             return null;
         }
-
         CorsConfigBuilder builder;
 
         if (s.allowAnyOrigin() || s.allowedOrigins().isEmpty()) {
             builder = CorsConfigBuilder.forAnyOrigin();
         } else {
-            builder = CorsConfigBuilder.forOrigins(s.allowedOrigins().toArray(new String[0]));
+            builder = CorsConfigBuilder.forOrigins(s.allowedOrigins().toArray(String[]::new));
         }
 
         if (!s.allowedMethods().isEmpty()) {
             builder.allowedRequestMethods(
-                    s.allowedMethods().toArray(new HttpMethod[0])
+                    s.allowedMethods().toArray(HttpMethod[]::new) 
             );
         }
 
         if (!s.allowedHeaders().isEmpty()) {
-            builder.allowedRequestHeaders(s.allowedHeaders().toArray(new String[0]));
+            builder.allowedRequestHeaders(s.allowedHeaders().toArray(String[]::new));
         }
 
         if (!s.exposedHeaders().isEmpty()) {
-            builder.exposeHeaders(s.exposedHeaders().toArray(new String[0]));
+            builder.exposeHeaders(s.exposedHeaders().toArray(String[]::new));
         }
 
         if (s.allowCredentials()) {
