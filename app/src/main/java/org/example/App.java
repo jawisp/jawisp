@@ -17,7 +17,7 @@ public class App {
         Jawisp.build(config -> config
                 .templateEngine("pebble")
                 .staticResources("/static")
-                .cors(cors -> cors.origins("http://localhost:8080"))
+                // .cors(cors -> cors.origins("http://localhost:8081"))
                 .routes(route -> route
                         .get("/", App::homePage)
                         .path("/api/v1/users", api -> api

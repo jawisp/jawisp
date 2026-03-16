@@ -3,7 +3,6 @@ package io.jawisp.config.cors;
 import java.util.ArrayList;
 import java.util.List;
 import io.jawisp.http.HttpMethod;
-import io.jawisp.http.netty.Utils;
 
 /**
  * Fluent builder for {@link CorsSettings}. Supports method chaining for configuring
@@ -160,6 +159,37 @@ public final class CorsSettingsBuilder {
     }
 
     /**
+     * Converts a list of {@link io.jawisp.http.HttpMethod} to a list of
+     * {@link io.netty.handler.codec.http.HttpMethod}.
+     *
+     * @param methods the list of Jawisp HTTP methods to convert
+     * @return a list of Netty HTTP methods corresponding to the provided Jawisp
+     *         HTTP methods
+     */
+    public List<io.netty.handler.codec.http.HttpMethod> convertMethods(List<HttpMethod> methods) {
+        List<io.netty.handler.codec.http.HttpMethod> nettyMethods = new ArrayList<>();
+
+        for (io.jawisp.http.HttpMethod jawisp : methods) {
+            switch (jawisp) {
+                case GET -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.GET);
+                case POST -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.POST);
+                case PUT -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.PUT);
+                case DELETE -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.DELETE);
+                case PATCH -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.PATCH);
+                case HEAD -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.HEAD);
+                case OPTIONS -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.OPTIONS);
+                case TRACE -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.TRACE);
+                case CONNECT -> nettyMethods.add(io.netty.handler.codec.http.HttpMethod.CONNECT);
+                // skip BEFORE_FILTER, AFTER_FILTER, ERROR - they're Jawisp internals
+                default -> {
+                }
+            }
+        }
+
+        return nettyMethods;
+    }
+
+    /**
      * Creates an immutable {@link CorsSettings} instance from current configuration.
      * Converts Jawisp {@link HttpMethod}s to Netty equivalents via {@link Utils#methods(List)}.
      *
@@ -170,7 +200,7 @@ public final class CorsSettingsBuilder {
             enabled,
             allowAnyOrigin,
             List.copyOf(allowedOrigins),
-            List.copyOf(Utils.methods(allowedMethods)),
+            List.copyOf(convertMethods(allowedMethods)),
             List.copyOf(allowedHeaders),
             List.copyOf(exposedHeaders),
             allowCredentials,
