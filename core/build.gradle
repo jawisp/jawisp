@@ -28,7 +28,7 @@ dependencies {
     // Optional Linux perf boost
     implementation 'io.netty:netty-transport-native-epoll:4.2.10.Final:linux-x86_64'
     // Jackson mapper 
-    compileOnly("com.fasterxml.jackson.core:jackson-databind:2.21.1")
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.21.1'
 
     // Template engines
     compileOnly 'io.pebbletemplates:pebble:4.1.1'
@@ -50,11 +50,30 @@ dependencies {
     // Mockito for mocking
     testImplementation 'org.mockito:mockito-core:5.20.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
+
+    // test only
+    // testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.16'
+    testRuntimeOnly 'ch.qos.logback:logback-classic:1.5.23'
+    testRuntimeOnly 'io.pebbletemplates:pebble:4.1.1'
+    testRuntimeOnly 'com.fasterxml.jackson.core:jackson-databind:2.21.1'
 }
 
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+task runTestMain(type: JavaExec) {
+    group = 'application'
+    description = 'Run main class from test directory'
+    
+    // Point to your test classes
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.jawisp.examples.HelloWorld'
+    
+    // Optional: JVM args, system props
+    jvmArgs = ['-Xmx512m']
+    systemProperty 'spring.profiles.active', 'test'
 }
 
 mavenPublishing {

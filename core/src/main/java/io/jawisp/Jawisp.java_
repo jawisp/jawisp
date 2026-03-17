@@ -37,8 +37,6 @@ public class Jawisp {
     private Jawisp(Config config) {
         this.config = config;
 
-        // logger.info("JAWISP v1.0.0 starting ...");
-
         AtomicInteger index = new AtomicInteger(1);
         config.getRoutes().stream()
                 .forEach(route -> logger.info("Route[{}]: {} {}",
