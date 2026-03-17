@@ -8,7 +8,7 @@ import io.jawisp.http.Context;
 
 public class HelloWorld {
 
-    static PropertyReader property = PropertyReader.getInstance();
+    static PropertyReader property = PropertyReader.getInstance("test.properties");
 
     static void homePage(Context ctx) {
         ctx.render("home.html", Map.of("name", "John Smith"));
@@ -27,7 +27,9 @@ public class HelloWorld {
     record User(long id, String name, int age) {}
 
     public static void main(String[] args) {
+        
         Jawisp.build(config -> config
+                .dev(true)
                 .templateEngine("pebble")
                 .staticResources("/static")
                 .routes(route -> route

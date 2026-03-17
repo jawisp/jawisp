@@ -58,4 +58,14 @@ public class ThymeleafTemplateEngine implements TemplateEngine {
         context.setVariables(model);
         engine.process(templateName, context, writer);
     }
+
+    /**
+     * Returns the name of the engine.
+     *
+     * @return the name of the engine
+     */
+    @Override
+    public String toString() {
+        return "thymeleaf";
+    }
 }

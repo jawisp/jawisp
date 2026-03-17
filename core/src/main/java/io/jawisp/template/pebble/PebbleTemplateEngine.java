@@ -26,7 +26,7 @@ public class PebbleTemplateEngine implements TemplateEngine {
         PebbleEngine.Builder builder = new PebbleEngine.Builder();
 
         ClasspathLoader loader = new ClasspathLoader();
-        loader.setPrefix("templates");  // void method
+        loader.setPrefix("templates"); // void method
         builder.loader(loader);
 
         this.engine = builder.build();
@@ -36,7 +36,7 @@ public class PebbleTemplateEngine implements TemplateEngine {
      * Renders a template with the given name and model.
      *
      * @param templateName the name of the template to render
-     * @param model the model to use for rendering
+     * @param model        the model to use for rendering
      * @return the rendered template as a string
      * @throws RuntimeException if an error occurs during rendering
      */
@@ -54,8 +54,8 @@ public class PebbleTemplateEngine implements TemplateEngine {
      * Renders a template with the given name and model to the specified writer.
      *
      * @param templateName the name of the template to render
-     * @param model the model to use for rendering
-     * @param writer the writer to output the rendered template
+     * @param model        the model to use for rendering
+     * @param writer       the writer to output the rendered template
      * @throws RuntimeException if an error occurs during rendering
      */
     @Override
@@ -65,5 +65,15 @@ public class PebbleTemplateEngine implements TemplateEngine {
         } catch (IOException e) {
             throw new RuntimeException("Failed to render template: " + templateName, e);
         }
+    }
+
+    /**
+     * Returns the name of the engine.
+     *
+     * @return the name of the engine
+     */
+    @Override
+    public String toString() {
+        return "pebble";
     }
 }

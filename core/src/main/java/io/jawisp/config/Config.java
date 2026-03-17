@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.jawisp.config.cors.CorsSettings;
 import io.jawisp.config.cors.CorsSettingsBuilder;
 import io.jawisp.http.Route;
@@ -26,8 +23,6 @@ import io.jawisp.template.TemplateEngine;
  */
 public class Config {
 
-    private static final Logger log = LoggerFactory.getLogger(Config.class);
-
     private int port;
     private String contextPath;
     private Optional<TemplateEngine> templateEngine = Optional.empty();
@@ -35,6 +30,8 @@ public class Config {
 
     private CorsSettings cors = CorsSettings.disabled();
     private final List<Route> routes = new ArrayList<>();
+
+    private boolean dev = false;
 
     /**
      * Default constructor for the Config class.
@@ -136,7 +133,6 @@ public class Config {
      */
     public Config templateEngine(String pluginName) {
         TemplateEngine plugin = Plugin.create(pluginName);
-        log.info("Plugins: use '{}' template rendering engine", pluginName);
         this.templateEngine = Optional.of(plugin);
         return this;
     }
@@ -204,9 +200,28 @@ public class Config {
      * @return the CORS settings
      * 
      * @since 1.0.18
-    */
+     */
     public CorsSettings cors() {
         return cors;
     }
 
+    /**
+     * Enables or disables development mode.
+     *
+     * @param enabled true to enable development mode, false to disable it
+     * @return the current Config instance with the updated development mode setting
+     */
+    public Config dev(boolean enabled) {
+        this.dev = enabled;
+        return this;
+    }
+
+    /**
+     * Checks if development mode is enabled.
+     *
+     * @return true if development mode is enabled, false otherwise
+     */
+    public boolean isDev() {
+        return dev;
+    }
 }

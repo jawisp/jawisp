@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.jawisp.config.Config;
-import io.jawisp.config.PropertyReader;
 import io.jawisp.http.HttpServer;
 import io.jawisp.http.netty.NettyServer;
 
@@ -36,8 +35,7 @@ import io.jawisp.http.netty.NettyServer;
  */
 public class Jawisp {
 
-    private static final Logger logger = LoggerFactory.getLogger(Jawisp.class);
-    private static PropertyReader property = PropertyReader.getInstance();
+    private static final Logger log = LoggerFactory.getLogger(Jawisp.class);
 
     // Dev mode static state
     private static final AtomicBoolean shouldRestart = new AtomicBoolean(false);
@@ -51,20 +49,30 @@ public class Jawisp {
     private final Thread devWatcherThread;
 
     static {
-        logger.info("JAWISP v1.0.0 starting ...");
+        log.info("JAWISP v1.0.0 starting ...");
     }
 
+    /**
+     * Constructs a new instance of Jawisp with the provided configuration.
+     *
+     * @param config the configuration for the application
+     */
     private Jawisp(Config config) {
         this.config = config;
 
-        var isDev = property.get("jawisp.devtools.livereload.enabled").asBoolean().orElse(false);
+        var isDev = config.isDev();
         if (isDev) {
-            logger.info("DEV MODE enabled - Hot reload active");
+            log.info("DEV MODE enabled - Hot reload active");
+        }
+
+        var templateEngine = config.templateEngine();
+        if (templateEngine != null) {
+            log.info("Plugins: '{}' template rendering engine", templateEngine.toString());
         }
 
         AtomicInteger index = new AtomicInteger(1);
         config.getRoutes().stream()
-                .forEach(route -> logger.info("Route[{}]: {} {}",
+                .forEach(route -> log.info("Route[{}]: {} {}",
                         index.getAndIncrement(),
                         route.getMethod().name(),
                         route.getPath()));
@@ -82,17 +90,33 @@ public class Jawisp {
         }
     }
 
+    /**
+     * Builds a Jawisp instance with default configuration.
+     *
+     * @return a new Jawisp instance
+     */
     public static Jawisp build() {
         return build(config -> {
         });
     }
 
+    /**
+     * Builds a Jawisp instance with custom configuration.
+     *
+     * @param config a consumer to configure the application
+     * @return a new Jawisp instance
+     */
     public static Jawisp build(Consumer<Config> config) {
         Config cfg = new Config();
         config.accept(cfg);
         return new Jawisp(cfg);
     }
 
+    /**
+     * Starts the server and enters the development loop if in dev mode.
+     *
+     * @return this Jawisp instance
+     */
     public Jawisp start() {
         startServer();
 
@@ -104,6 +128,9 @@ public class Jawisp {
         return this;
     }
 
+    /**
+     * The development loop that monitors changes and restarts the server if necessary.
+     */
     private void devLoop() {
         while (true) {
             if (shouldRestart.getAndSet(false)) {
@@ -119,10 +146,13 @@ public class Jawisp {
         }
     }
 
+    /**
+     * Watches for changes in the source files and triggers a restart if necessary.
+     * @since 1.0.19
+     */
     private void watchDevFiles() {
         try {
             WatchService watcher = FileSystems.getDefault().newWatchService();
-            // Path projectRoot = Paths.get("src/main").toRealPath(); // Project root
             Path projectRoot = Paths.get(System.getProperty("user.dir")).toRealPath();
 
             // Find ALL src/main directories across all modules
@@ -162,7 +192,7 @@ public class Jawisp {
                             if (fileName.endsWith(".java")) {
                                 long now = System.currentTimeMillis();
                                 if (now - lastChangeTime > DEBOUNCE_MS) {
-                                    logger.info("📝 Hot reload detected: {}", fileName);
+                                    log.info("📝 Hot reload detected: {}", fileName);
                                     lastChangeTime = now;
                                     hasChange = true;
                                 }
@@ -181,11 +211,17 @@ public class Jawisp {
                 }
             }
         } catch (Exception e) {
-            logger.error("Hot reload watcher failed: {}", e.getMessage(), e);
+            log.error("Hot reload watcher failed: {}", e.getMessage(), e);
         }
     }
 
-    // Helper method to detect src/main directories
+    /**
+     * Helper method to detect src/main directories.
+     *
+     * @param dir the directory to check
+     * @return true if the directory is a src/main directory, false otherwise
+     * @since 1.0.19
+     */
     private boolean isSrcMainDir(Path dir) {
         Path parent = dir.getParent();
         Path grandparent = (parent != null) ? parent.getParent() : null;
@@ -196,32 +232,47 @@ public class Jawisp {
                 && grandparent != null; // At module level, not root
     }
 
+    /**
+     * Starts the HTTP server.
+     */
     private void startServer() {
         try {
             server.start();
             long end = System.nanoTime();
             long elapsedMs = (end - start) / 1_000_000;
-            logger.info("Server started on http://localhost:{}/ in {} ms", config.port(), elapsedMs);
+            log.info("Server started on http://localhost:{}/ in {} ms", config.port(), elapsedMs);
 
         } catch (Exception e) {
-            logger.error("Server start failed: {}", e.getMessage());
+            log.error("Server start failed: {}", e.getMessage());
         }
     }
 
+    /**
+     * Stops the HTTP server.
+     */
     public void stop() {
         try {
             server.stop();
         } catch (Exception e) {
-            logger.error("Error during stopping server {}", e.getMessage());
+            log.error("Error during stopping server {}", e.getMessage());
         }
     }
 
+    /**
+     * Returns the configuration of the application.
+     *
+     * @return the configuration
+     */
     public Config config() {
         return config;
     }
 
+    /**
+     * Returns the HTTP server instance.
+     *
+     * @return the HTTP server
+     */
     public HttpServer server() {
         return server;
     }
-
 }
