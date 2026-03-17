@@ -69,6 +69,7 @@ class PropertyReaderTest {
                 web.debug=true
                 db.url=jdbc:postgresql://localhost/test
                 server.port=8080
+                http.cors.allowed-origins=http://localhost:8080
                 """);
 
         PropertyReader config = PropertyReader.getInstance(testResourceName);
@@ -86,6 +87,12 @@ class PropertyReaderTest {
 
         boolean debug = config.get("web.debug").asBoolean().orElse(false);
         assertTrue(debug);
+
+        String cors = config.get("http.cors.allowed-origins").asString().orElse("*");
+        assertEquals("http://localhost:8080", cors);
+        
+        String cors2 = config.get("http").get("cors").get("allowed-origins").asString().orElse("*");
+        assertEquals("http://localhost:8080", cors2);
     }
 
     @Test
