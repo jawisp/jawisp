@@ -3,10 +3,12 @@ package org.example;
 import java.util.Map;
 
 import io.jawisp.Jawisp;
+import io.jawisp.config.PropertyReader;
 import io.jawisp.http.Context;
-import io.jawisp.http.HttpMethod;
 
 public class App {
+
+    static PropertyReader property = PropertyReader.getInstance();
 
     static void homePage(Context ctx) {
         // ctx.status(404);
@@ -18,10 +20,7 @@ public class App {
         Jawisp.build(config -> config
                 .templateEngine("pebble")
                 .staticResources("/static")
-                .cors(cors -> cors
-                    .origins("http://localhost:8080")
-                    .methods(HttpMethod.GET, HttpMethod.PUT)
-                )
+                .cors(cors -> cors.origins(property.get("http.cors.allowed-origins").asString().orElse("*")))
                 .routes(route -> route
                         .get("/", App::homePage)
                         .path("/api/v1/users", api -> api
