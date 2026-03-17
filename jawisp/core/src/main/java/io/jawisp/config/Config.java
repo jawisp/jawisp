@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,6 @@ public class Config {
 
     private CorsSettings cors = CorsSettings.disabled();
     private final List<Route> routes = new ArrayList<>();
-    private final Supplier<PropertyReader> propertyReader = () -> PropertyReader.getInstance();
 
     /**
      * Default constructor for the Config class.
@@ -211,7 +209,4 @@ public class Config {
         return cors;
     }
 
-    public PropertyReader properties() {
-        return propertyReader.get();
-    }
 }

@@ -78,7 +78,7 @@ public final class CorsSettingsBuilder {
 
     /**
      * Sets allowed HTTP methods. Non-standard methods (BEFORE_FILTER, etc.) are filtered
-     * out by {@link Utils#methods(List)}.
+     * out by {@link #convertMethods(List)}.
      *
      * @param methods allowed {@link HttpMethod}s
      * @return this builder
@@ -191,7 +191,7 @@ public final class CorsSettingsBuilder {
 
     /**
      * Creates an immutable {@link CorsSettings} instance from current configuration.
-     * Converts Jawisp {@link HttpMethod}s to Netty equivalents via {@link Utils#methods(List)}.
+     * Converts Jawisp {@link HttpMethod}s to Netty equivalents via {@link #convertMethods(List)}.
      *
      * @return configured {@link CorsSettings}
      */
