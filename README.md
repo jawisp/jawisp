@@ -46,7 +46,7 @@ For Maven, add the following snippet to your `pom.xml` file:
     <dependency>
         <groupId>io.jawisp</groupId>
         <artifactId>jawisp</artifactId>
-        <version>1.0.15</version>
+        <version>1.0.18</version>
     </dependency>
 </dependencies>
 ```
