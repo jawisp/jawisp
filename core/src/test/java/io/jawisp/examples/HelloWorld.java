@@ -27,9 +27,7 @@ public class HelloWorld {
     record User(long id, String name, int age) {}
 
     public static void main(String[] args) {
-        
         Jawisp.build(config -> config
-                .dev(true)
                 .templateEngine("pebble")
                 .staticResources("/static")
                 .routes(route -> route

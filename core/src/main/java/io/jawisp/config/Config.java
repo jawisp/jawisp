@@ -31,8 +31,6 @@ public class Config {
     private CorsSettings cors = CorsSettings.disabled();
     private final List<Route> routes = new ArrayList<>();
 
-    private boolean dev = false;
-
     /**
      * Default constructor for the Config class.
      */
@@ -205,23 +203,4 @@ public class Config {
         return cors;
     }
 
-    /**
-     * Enables or disables development mode.
-     *
-     * @param enabled true to enable development mode, false to disable it
-     * @return the current Config instance with the updated development mode setting
-     */
-    public Config dev(boolean enabled) {
-        this.dev = enabled;
-        return this;
-    }
-
-    /**
-     * Checks if development mode is enabled.
-     *
-     * @return true if development mode is enabled, false otherwise
-     */
-    public boolean isDev() {
-        return dev;
-    }
 }

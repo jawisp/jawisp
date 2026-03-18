@@ -1,13 +1,16 @@
 package io.jawisp;
 
-import io.jawisp.config.Config;
-import io.jawisp.http.HttpServer;
-import io.jawisp.http.netty.NettyServer;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import io.jawisp.config.Config;
+import io.jawisp.config.PropertyReader;
+import io.jawisp.http.HttpServer;
+import io.jawisp.http.netty.NettyServer;
 
 /**
  * The Jawisp class is the main entry point for the JAWISP application.
@@ -18,10 +21,13 @@ import java.util.function.Consumer;
  */
 public class Jawisp {
     private static final Logger log = LoggerFactory.getLogger(Jawisp.class);
-
+    
+    private final Supplier<PropertyReader> property = () -> PropertyReader.getInstance();
     private final Config config;
     private final HttpServer server;
     private final AtomicReference<HotReloader> hotReloader = new AtomicReference<>();
+    private final boolean isDevelopmentMode;
+    private long startTime = System.nanoTime();
 
     /**
      * Constructs a new instance of Jawisp with the provided configuration.
@@ -32,7 +38,8 @@ public class Jawisp {
         this.config = config;
 
         log.info("JAWISP v1.0.0 starting ...");
-        if (config.isDev()) {
+        isDevelopmentMode = property.get().get("jawisp.devtools.livereload.enabled").asBoolean().orElse(false);
+        if (isDevelopmentMode) {
             log.info("DEV MODE enabled - Hot reload will be activated");
         }
 
@@ -80,7 +87,7 @@ public class Jawisp {
     public Jawisp start() {
         startServer();
 
-        if (config.isDev()) {
+        if (isDevelopmentMode) {
             startHotReload();
         }
 
@@ -91,7 +98,6 @@ public class Jawisp {
      * Starts the HTTP server.
      */
     private void startServer() {
-        long startTime = System.nanoTime();
         try {
             server.start();
             long elapsedMs = (System.nanoTime() - startTime) / 1_000_000;
