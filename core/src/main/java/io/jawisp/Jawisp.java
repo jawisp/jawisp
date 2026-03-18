@@ -21,12 +21,13 @@ import io.jawisp.http.netty.NettyServer;
  */
 public class Jawisp {
     private static final Logger log = LoggerFactory.getLogger(Jawisp.class);
-    
+
     private final Supplier<PropertyReader> property = () -> PropertyReader.getInstance();
     private final Config config;
     private final HttpServer server;
+
     private final AtomicReference<HotReloader> hotReloader = new AtomicReference<>();
-    private final boolean isDevelopmentMode;
+
     private long startTime = System.nanoTime();
 
     /**
@@ -37,11 +38,7 @@ public class Jawisp {
     private Jawisp(Config config) {
         this.config = config;
 
-        log.info("JAWISP v1.0.0 starting ...");
-        isDevelopmentMode = property.get().get("jawisp.devtools.livereload.enabled").asBoolean().orElse(false);
-        if (isDevelopmentMode) {
-            log.info("DEV MODE enabled - Hot reload will be activated");
-        }
+        log.info("JAWISP v1.0.22 starting ...");
 
         // Template engine logging
         var templateEngine = config.templateEngine();
@@ -87,6 +84,10 @@ public class Jawisp {
     public Jawisp start() {
         startServer();
 
+        var isDevelopmentMode = property.get()
+            .get("jawisp.devtools.livereload.enabled")
+            .asBoolean()
+            .orElse(false);
         if (isDevelopmentMode) {
             startHotReload();
         }

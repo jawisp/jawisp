@@ -31,10 +31,10 @@ import io.netty.handler.codec.http.cors.CorsHandler;
  */
 public class NettyServer implements HttpServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+    private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
 
-    private final EventLoopGroup bossGroup;
-    private final EventLoopGroup workerGroup;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
     private final Config config;
 
     private Channel channel;
@@ -46,8 +46,6 @@ public class NettyServer implements HttpServer {
      */
     public NettyServer(Config config) {
         this.config = config;
-        bossGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
-        workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
     }
 
     /**
@@ -58,6 +56,9 @@ public class NettyServer implements HttpServer {
      */
     @Override
     public void start() throws Exception {
+        bossGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+        workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+
         ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -97,6 +98,7 @@ public class NettyServer implements HttpServer {
      */
     @Override
     public void stop() throws Exception {
+        long startTime = System.nanoTime();
         if (channel != null) {
             channel.close();
         }
@@ -106,7 +108,8 @@ public class NettyServer implements HttpServer {
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
         }
-        logger.info("Jawisp server stopped");
+        long elapsedMs = (System.nanoTime() - startTime) / 1_000_000;
+        log.info("Server stopped in {} ms", elapsedMs);
     }
 
 }

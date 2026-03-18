@@ -24,125 +24,69 @@ import io.jawisp.config.Config;
 import io.jawisp.http.HttpServer;
 
 /**
- * The HotReloader class provides a mechanism for monitoring changes in Java source files and restarting the server accordingly.
- * This is particularly useful during development to enable hot-reloading of code without manually stopping and starting the server.
- * 
+ * The HotReloader class provides a mechanism for monitoring changes in Java
+ * source files and restarting the server accordingly.
+ * This is particularly useful during development to enable hot‑reloading of
+ * code without manually stopping and starting the server.
+ *
  * @author Taras Chornyi
  * @since 1.0.21
  */
 public class HotReloader {
+
     private static final Logger log = LoggerFactory.getLogger(HotReloader.class);
 
-    /**
-     * Configuration settings for the application.
-     */
     private final Config config;
-
-    /**
-     * The HTTP server instance being managed for restarts.
-     */
     private final HttpServer server;
 
-    /**
-     * Flag to indicate if a restart is required due to code changes.
-     */
-    private final AtomicBoolean shouldRestart = new AtomicBoolean(false);
-
-    /**
-     * Flag to track whether the HotReloader is currently running.
-     */
     private final AtomicBoolean running = new AtomicBoolean(false);
-
-    /**
-     * Thread responsible for watching file system changes.
-     */
     private final Thread watcherThread;
 
-    /**
-     * Thread that checks if a restart is needed and performs it when necessary.
-     */
-    private final Thread restartCheckerThread;
-
-    /**
-     * Timestamp of the last detected change, used for debouncing.
-     */
     private volatile long lastChangeTime = 0;
+    private static final long DEBOUNCE_MS = 100;
 
-    /**
-     * Debounce period in milliseconds to prevent rapid successive restarts from multiple small changes.
-     */
-    private static final long DEBOUNCE_MS = 1500;
-
-    /**
-     * WatchService used to monitor file system events.
-     */
     private WatchService watcher;
 
     /**
-     * Constructs a HotReloader with the given configuration and HTTP server.
+     * Constructor to initialize HotReloader with configuration and server instances.
      *
-     * @param config The application configuration settings.
-     * @param server The HTTP server instance to manage restarts for.
+     * @param config The configuration object
+     * @param server The HTTP server instance
      */
     public HotReloader(Config config, HttpServer server) {
         this.config = config;
         this.server = server;
-        this.watcherThread = new Thread(this::watchDevFiles, "Jawisp-HotReload");
+        this.watcherThread = new Thread(this::watchDevFiles, "HotReload");
         this.watcherThread.setDaemon(true);
-        this.restartCheckerThread = new Thread(this::restartLoop, "Jawisp-RestartChecker");
-        this.restartCheckerThread.setDaemon(true);
     }
 
     /**
-     * Starts the HotReloader by beginning the monitoring of source files and setting up threads for change detection and restarts.
+     * Starts the hot reloading mechanism.
      */
     public void start() {
         if (running.compareAndSet(false, true)) {
             watcherThread.start();
-            restartCheckerThread.start();
             log.debug("HotReloader fully activated");
         }
     }
 
     /**
-     * Stops the HotReloader gracefully, interrupting the monitoring threads and closing any file system watchers.
+     * Stops the hot reloading mechanism and cleans up resources.
      */
     public void stop() {
         running.set(false);
-        if (watcherThread.isAlive()) watcherThread.interrupt();
-        if (restartCheckerThread.isAlive()) restartCheckerThread.interrupt();
-        try {
-            if (watcher != null) watcher.close();
-        } catch (IOException e) {
-            log.warn("Watcher close ignored: {}", e.getMessage());
-        }
-    }
-
-    /**
-     * Continuously checks if a restart is needed and performs the restart by stopping the server and exiting the JVM.
-     */
-    private void restartLoop() {
-        while (running.get()) {
-            if (shouldRestart.getAndSet(false)) {
-                log.debug("Restarting JVM due to code changes...");
-                try {
-                    server.stop();
-                } catch (Exception e) {
-                    log.warn("Server stop during restart: {}", e.getMessage());
-                }
-                System.exit(1);
-            }
+        watcherThread.interrupt();
+        if (watcher != null) {
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+                watcher.close();
+            } catch (IOException e) {
+                log.warn("Watcher close ignored: {}", e.getMessage());
             }
         }
     }
 
     /**
-     * Sets up the WatchService to monitor all src/main directories in the project root for changes.
+     * Watches for changes in the project's src/main directories.
      */
     private void watchDevFiles() {
         try {
@@ -163,11 +107,11 @@ public class HotReloader {
     }
 
     /**
-     * Recursively searches the project root for all 'src/main' directories.
+     * Recursively finds all directories named 'src/main' under the project root.
      *
-     * @param projectRoot The base directory to search from.
-     * @return A list of Paths to all found src/main directories.
-     * @throws IOException If an I/O error occurs during file traversal.
+     * @param projectRoot The root directory of the project
+     * @return A list of paths to 'src/main' directories
+     * @throws IOException If an I/O error occurs while accessing files in the file system
      */
     private List<Path> findAllSrcMainDirs(Path projectRoot) throws IOException {
         List<Path> srcMainDirs = new ArrayList<>();
@@ -186,11 +130,11 @@ public class HotReloader {
     }
 
     /**
-     * Registers a WatchService watcher for all directories under the specified path, watching for modification events.
+     * Recursively registers the WatchService for all subdirectories of a given directory.
      *
-     * @param srcMainDir The directory to start recursive registration from.
-     * @param watcher The WatchService to register with.
-     * @throws IOException If an I/O error occurs during registration.
+     * @param srcMainDir The directory to register
+     * @param watcher    The WatchService instance
+     * @throws IOException If an I/O error occurs while accessing files in the file system
      */
     private void registerRecursiveWatcher(Path srcMainDir, WatchService watcher) throws IOException {
         Files.walkFileTree(srcMainDir, new SimpleFileVisitor<Path>() {
@@ -204,18 +148,18 @@ public class HotReloader {
     }
 
     /**
-     * Polls the WatchService for events and processes them to determine if a restart is required.
+     * Processes events received by the WatchService.
      */
     private void watchEvents() {
         while (running.get()) {
             try {
-                WatchKey key = watcher.poll(1, TimeUnit.SECONDS);
+                WatchKey key = watcher.poll(500, TimeUnit.MILLISECONDS);
                 if (key != null) {
                     boolean hasChange = processEvents(key);
                     key.reset();
 
                     if (hasChange && running.get()) {
-                        shouldRestart.set(true);
+                        // Restart logic is inside processEvents now
                     }
                 }
             } catch (InterruptedException e) {
@@ -228,10 +172,10 @@ public class HotReloader {
     }
 
     /**
-     * Processes a WatchKey to check if any Java source files have been modified.
+     * Processes individual watch events.
      *
-     * @param key The WatchKey that generated the events.
-     * @return True if a change was detected and debounced, false otherwise.
+     * @param key The WatchKey instance containing the events
+     * @return True if a relevant change was detected, false otherwise
      */
     private boolean processEvents(WatchKey key) {
         boolean hasChange = false;
@@ -243,9 +187,17 @@ public class HotReloader {
                 if (fileName.endsWith(".java")) {
                     long now = System.currentTimeMillis();
                     if (now - lastChangeTime > DEBOUNCE_MS) {
-                        log.debug("Hot reload detected: {}", fileName);
+                        log.info("Hot reload detected: {}", fileName);
                         lastChangeTime = now;
                         hasChange = true;
+
+                        try {
+                            server.stop();
+                            // Presumably you start again elsewhere (e.g. main loop) or
+                            // via a restart strategy outside this class.
+                        } catch (Exception e) {
+                            log.warn("Server stop during reload: {}", e.getMessage());
+                        }
                     }
                 }
             }
@@ -254,17 +206,17 @@ public class HotReloader {
     }
 
     /**
-     * Checks if the given directory is a src/main directory.
+     * Checks if the given directory is a 'src/main' directory.
      *
-     * @param dir The directory to check.
-     * @return True if the directory matches the 'src/main' structure, false otherwise.
+     * @param dir The directory to check
+     * @return True if the directory is named 'src/main', false otherwise
      */
     private boolean isSrcMainDir(Path dir) {
         Path parent = dir.getParent();
         Path grandparent = parent != null ? parent.getParent() : null;
-        return "main".equals(dir.getFileName().toString())
-            && parent != null
+        return parent != null
+            && grandparent != null
             && "src".equals(parent.getFileName().toString())
-            && grandparent != null;
+            && "main".equals(dir.getFileName().toString());
     }
 }
