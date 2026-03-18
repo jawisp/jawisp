@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'io.jawisp'
-version = '1.0.19'
+version = '1.0.21'
 
 java {
     toolchain {
