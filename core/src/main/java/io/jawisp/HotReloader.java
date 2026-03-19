@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jawisp.config.Config;
 import io.jawisp.http.HttpServer;
 
 /**
@@ -36,7 +35,6 @@ public class HotReloader {
 
     private static final Logger log = LoggerFactory.getLogger(HotReloader.class);
 
-    private final Config config;
     private final HttpServer server;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -53,8 +51,7 @@ public class HotReloader {
      * @param config The configuration object
      * @param server The HTTP server instance
      */
-    public HotReloader(Config config, HttpServer server) {
-        this.config = config;
+    public HotReloader(HttpServer server) {
         this.server = server;
         this.watcherThread = new Thread(this::watchDevFiles, "HotReload");
         this.watcherThread.setDaemon(true);

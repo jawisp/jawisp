@@ -110,7 +110,7 @@ public class Jawisp {
     }
 
     private void startHotReload() {
-        HotReloader reloader = new HotReloader(config, server);
+        HotReloader reloader = new HotReloader(server);
         if (hotReloader.compareAndSet(null, reloader)) {
             reloader.start();
             log.info("HotReloader started in background");
