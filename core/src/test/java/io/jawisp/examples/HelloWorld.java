@@ -26,7 +26,6 @@ public class HelloWorld {
     public static void main(String[] args) {
         Jawisp.build(config -> config
                 .propertyFile("test.properties")
-                .templateEngine("pebble")
                 .staticResources("/static")
                 .routes(route -> route
                         .get("/", HelloWorld::homePage)

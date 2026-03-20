@@ -20,6 +20,10 @@ import java.util.Properties;
  */
 public final class PropertyReader {
 
+    public static final String CONFIG_SERVER_PORT = "jawisp.config.server.port";
+    public static final String CONFIG_TEMPLATE_ENGINE = "jawisp.config.template.engine";
+    public static final String CONFIG_STATIC_RESOURCES = "jawisp.config.static.resources";
+
     // Singleton instance - loads application.properties by default
     private static volatile PropertyReader INSTANCE;
 

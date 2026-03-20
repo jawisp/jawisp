@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import io.jawisp.config.cors.CorsSettings;
 import io.jawisp.config.cors.CorsSettingsBuilder;
@@ -26,11 +27,14 @@ public class Config {
     private int port;
     private String contextPath;
     private String propertyFile;
+    private String templateEngineName;
     private Optional<TemplateEngine> templateEngine = Optional.empty();
     private final List<String> staticResources;
 
     private CorsSettings cors = CorsSettings.disabled();
     private final List<Route> routes = new ArrayList<>();
+
+    private Supplier<PropertyReader> reader = () -> PropertyReader.getInstance(propertyFile());
 
     /**
      * Default constructor for the Config class.
@@ -70,11 +74,10 @@ public class Config {
      * @return the server port
      */
     public int port() {
-        port = PropertyReader
-            .getInstance(this.propertyFile())
-            .get("jawisp.config.server.port")
-            .asInt()
-            .orElse(this.port);
+        port = reader.get()
+                .get(PropertyReader.CONFIG_SERVER_PORT)
+                .asInt()
+                .orElse(port);
         return port;
     }
 
@@ -137,8 +140,7 @@ public class Config {
      * @throws IllegalArgumentException if the specified plugin is not found
      */
     public Config templateEngine(String pluginName) {
-        TemplateEngine plugin = Plugin.create(pluginName);
-        this.templateEngine = Optional.of(plugin);
+        this.templateEngineName = pluginName;
         return this;
     }
 
@@ -148,6 +150,14 @@ public class Config {
      * @return the configured template engine or null
      */
     public TemplateEngine templateEngine() {
+        var engineName = reader.get()
+                .get(PropertyReader.CONFIG_TEMPLATE_ENGINE)
+                .asString()
+                .orElse(templateEngineName);
+
+        templateEngine = Optional.ofNullable(engineName)
+                .map(Plugin::create);
+
         return templateEngine.orElse(null);
     }
 
@@ -210,14 +220,24 @@ public class Config {
         return cors;
     }
 
+    /**
+     * Sets the name of the configuration property file.
+     *
+     * @param filename the name of the property file to be used for configuration
+     * @return the current instance of {@link Config} to allow method chaining
+     */
     public Config propertyFile(String filename) {
         this.propertyFile = filename;
         return this;
     }
 
+    /**
+     * Retrieves the name of the configuration property file.
+     *
+     * @return the name of the property file currently set
+     */
     public String propertyFile() {
         return this.propertyFile;
     }
-
-
+    
 }
