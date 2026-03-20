@@ -25,6 +25,7 @@ public class Config {
 
     private int port;
     private String contextPath;
+    private String propertyFile;
     private Optional<TemplateEngine> templateEngine = Optional.empty();
     private final List<String> staticResources;
 
@@ -37,6 +38,7 @@ public class Config {
     public Config() {
         this.port = 8080;
         this.contextPath = "/";
+        this.propertyFile = "application.properties";
         this.staticResources = new ArrayList<>();
     }
 
@@ -68,6 +70,11 @@ public class Config {
      * @return the server port
      */
     public int port() {
+        port = PropertyReader
+            .getInstance(this.propertyFile())
+            .get("jawisp.config.server.port")
+            .asInt()
+            .orElse(this.port);
         return port;
     }
 
@@ -202,5 +209,15 @@ public class Config {
     public CorsSettings cors() {
         return cors;
     }
+
+    public Config propertyFile(String filename) {
+        this.propertyFile = filename;
+        return this;
+    }
+
+    public String propertyFile() {
+        return this.propertyFile;
+    }
+
 
 }

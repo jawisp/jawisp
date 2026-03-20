@@ -2,7 +2,6 @@ package io.jawisp;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,6 @@ import io.jawisp.http.netty.NettyServer;
 public class Jawisp {
     private static final Logger log = LoggerFactory.getLogger(Jawisp.class);
 
-    private final Supplier<PropertyReader> property = () -> PropertyReader.getInstance();
     private final Config config;
     private final HttpServer server;
 
@@ -36,9 +34,10 @@ public class Jawisp {
      * @param config the configuration for the application
      */
     private Jawisp(Config config) {
-        this.config = config;
-
         log.info("JAWISP v1.0.22 starting ...");
+        
+        this.config = config;
+        // this.propertyReader = PropertyReader.getInstance(config.propertyFile());
 
         // Template engine logging
         var templateEngine = config.templateEngine();
@@ -84,7 +83,7 @@ public class Jawisp {
     public Jawisp start() {
         startServer();
 
-        var isDevelopmentMode = property.get()
+        var isDevelopmentMode = PropertyReader.getInstance(config.propertyFile())
             .get("jawisp.devtools.livereload.enabled")
             .asBoolean()
             .orElse(false);

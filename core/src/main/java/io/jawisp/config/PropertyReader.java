@@ -32,16 +32,6 @@ public final class PropertyReader {
     }
 
     /**
-     * Get singleton instance (loads {@code application.properties} from classpath).
-     * Thread-safe lazy initialization.
-     *
-     * @return Singleton instance of PropertyReader
-     */
-    public static PropertyReader getInstance() {
-        return getInstance("application.properties");
-    }
-
-    /**
      * Get singleton instance for custom properties file.
      * Thread-safe lazy initialization.
      *

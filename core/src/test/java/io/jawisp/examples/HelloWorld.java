@@ -3,12 +3,9 @@ package io.jawisp.examples;
 import java.util.Map;
 
 import io.jawisp.Jawisp;
-import io.jawisp.config.PropertyReader;
 import io.jawisp.http.Context;
 
 public class HelloWorld {
-
-    static PropertyReader property = PropertyReader.getInstance("test.properties");
 
     static void homePage(Context ctx) {
         ctx.render("home.html", Map.of("name", "John Smith"));
@@ -28,6 +25,7 @@ public class HelloWorld {
 
     public static void main(String[] args) {
         Jawisp.build(config -> config
+                .propertyFile("test.properties")
                 .templateEngine("pebble")
                 .staticResources("/static")
                 .routes(route -> route
