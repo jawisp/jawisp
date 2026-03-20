@@ -28,12 +28,11 @@ public class Config {
     private String contextPath;
     private String propertyFile;
     private String templateEngineName;
-    private Optional<TemplateEngine> templateEngine = Optional.empty();
+
     private final List<String> staticResources;
 
     private CorsSettings cors = CorsSettings.disabled();
     private final List<Route> routes = new ArrayList<>();
-
     private Supplier<PropertyReader> reader = () -> PropertyReader.getInstance(propertyFile());
 
     /**
@@ -155,7 +154,7 @@ public class Config {
                 .asString()
                 .orElse(templateEngineName);
 
-        templateEngine = Optional.ofNullable(engineName)
+        Optional<TemplateEngine> templateEngine = Optional.ofNullable(engineName)
                 .map(Plugin::create);
 
         return templateEngine.orElse(null);
