@@ -25,16 +25,45 @@ import io.jawisp.template.TemplateEngine;
  */
 public class Config {
 
+    /**
+     * The server port.
+     */
     private int port;
+
+    /**
+     * The context path of the application.
+     */
     private String contextPath;
+
+    /**
+     * The name of the configuration property file.
+     */
     private String propertyFile;
+
+    /**
+     * The name of the template engine to be used.
+     */
     private String templateEngineName;
 
-    private final List<String> staticResources;
+    /**
+     * A list of static resource paths.
+     */
+    private final List<String> staticResources = new ArrayList<>();
 
+    /**
+     * CORS settings.
+     */
     private CorsSettings cors = CorsSettings.disabled();
+
+    /**
+     * A list of routes associated with this object.
+     */
     private final List<Route> routes = new ArrayList<>();
-    private Supplier<PropertyReader> reader = () -> PropertyReader.getInstance(propertyFile());
+
+    /**
+     * Supplier to create a PropertyReader instance based on the current configuration.
+     */
+    private final Supplier<PropertyReader> reader = () -> PropertyReader.getInstance(propertyFile());
 
     /**
      * Default constructor for the Config class.
@@ -43,7 +72,6 @@ public class Config {
         this.port = 8080;
         this.contextPath = "/";
         this.propertyFile = "application.properties";
-        this.staticResources = new ArrayList<>();
     }
 
     /**
@@ -69,16 +97,15 @@ public class Config {
     }
 
     /**
-     * Gets the server port.
+     * Gets the server port. If not explicitly set, it will be retrieved from the configuration file.
      *
      * @return the server port
      */
     public int port() {
-        port = reader.get()
+        return reader.get()
                 .get(PropertyReader.CONFIG_SERVER_PORT)
                 .asInt()
                 .orElse(port);
-        return port;
     }
 
     /**
@@ -186,7 +213,7 @@ public class Config {
     }
 
     /**
-     * Retrieves the list of static resource paths.
+     * Retrieves the list of static resource paths. If not explicitly set, it will be retrieved from the configuration file.
      *
      * @return a list of static resource paths
      */
@@ -209,7 +236,7 @@ public class Config {
      *
      * @param corsConsumer a consumer to configure the CORS settings
      * @return the current Config instance
-     * 
+     *
      * @since 1.0.18
      */
     public Config cors(Consumer<CorsSettingsBuilder> corsConsumer) {
@@ -223,7 +250,7 @@ public class Config {
      * Gets the CORS settings.
      *
      * @return the CORS settings
-     * 
+     *
      * @since 1.0.18
      */
     public CorsSettings cors() {
@@ -249,5 +276,4 @@ public class Config {
     public String propertyFile() {
         return this.propertyFile;
     }
-
 }
