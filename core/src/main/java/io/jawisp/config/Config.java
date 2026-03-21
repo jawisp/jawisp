@@ -1,6 +1,7 @@
 package io.jawisp.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -190,6 +191,16 @@ public class Config {
      * @return a list of static resource paths
      */
     public List<String> staticResources() {
+        var paths = reader.get()
+                .get(PropertyReader.CONFIG_STATIC_RESOURCES)
+                .asString()
+                .orElse(null);
+
+        if (paths != null) {
+            staticResources.clear();
+            staticResources.addAll(Arrays.asList(paths.split(",")));
+        }
+
         return staticResources;
     }
 
@@ -238,5 +249,5 @@ public class Config {
     public String propertyFile() {
         return this.propertyFile;
     }
-    
+
 }

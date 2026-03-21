@@ -26,7 +26,6 @@ public class HelloWorld {
     public static void main(String[] args) {
         Jawisp.build(config -> config
                 .propertyFile("test.properties")
-                .staticResources("/static")
                 .routes(route -> route
                         .get("/", HelloWorld::homePage)
                         .path("/api/v1/users", api -> api
